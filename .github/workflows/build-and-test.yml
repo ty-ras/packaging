@@ -35,7 +35,9 @@ jobs:
   build_and_test:
     strategy:
       matrix:
-        dir: [  ]
+        dir:
+          - backend-node-io-ts-openapi
+          - frontend-fetch-io-ts
     runs-on: ubuntu-latest
     name: Build and test ${{ matrix.dir }}
     steps:
