@@ -20,3 +20,5 @@ import * as tyrasDataBE from "@ty-ras/data-backend";
 ```
 
 This repository contains the following aggregator libraries:
+- [`@ty-ras/backend-node-io-ts-openapi`](./backend-node-io-ts-openapi) for backends using Node HTTP(S) 1/2 server, `io-ts` as data validation library, and OpenAPI as metadata format, and
+- [`@ty-ras/frontend-fetch-io-ts`](./frontend-fetch-io-ts) for frontend clients using Fetch API to send HTTP requests and `io-ts` as data validation library.
