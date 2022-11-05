@@ -1,0 +1,13 @@
+// TS config for the <project name>/src/**/*.ts files.
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*"
+  ],
+}
