@@ -407,10 +407,10 @@
   dependencies:
     "@ty-ras/endpoint" "0.12.7"
 
-"@ty-ras/typed-sql-io-ts@^0.12.1":
-  version "0.12.1"
-  resolved "https://registry.yarnpkg.com/@ty-ras/typed-sql-io-ts/-/typed-sql-io-ts-0.12.1.tgz#c04dbf8a318d4b4ce39c882b42b386b3b578e743"
-  integrity sha512-KkR6CnxeDtHMjAjoLm+UpN/G4P4PdCtRPi6VM6tRPrV2YBDML0MFbHSLEd65wgxAwWvhJ0IgCpVRVEGTypJo9w==
+"@ty-ras/typed-sql-io-ts@^0.12.2":
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/@ty-ras/typed-sql-io-ts/-/typed-sql-io-ts-0.12.2.tgz#1d04d7b74b69e8aa876eb4e58ba1287025419c6e"
+  integrity sha512-BM3j8dRSH+NV/CPD2g0XG3hqd6m4aIJIwfZxx+XRNxrUKcN3okDslO0Q8AOHCbgYKBj393Rfama/CMn0Ge8zzw==
 
 "@types/json-schema@^7.0.9":
   version "7.0.11"
