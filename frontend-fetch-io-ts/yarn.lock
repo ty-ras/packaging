@@ -305,25 +305,25 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@ty-ras/client-fetch@^0.12.4":
-  version "0.12.4"
-  resolved "https://registry.yarnpkg.com/@ty-ras/client-fetch/-/client-fetch-0.12.4.tgz#ef88cbf43c3340de461a51eeb85be17e0679d61c"
-  integrity sha512-UOFJpNfp2D5bEfVQ0zOcGLZOZyE7qJJKFH4T7dwWdzIVYf4nwumVg9xEI7pCc29N3/5fJXrCRkHVtDWqAdcgIw==
+"@ty-ras/client-fetch@^0.12.5":
+  version "0.12.5"
+  resolved "https://registry.yarnpkg.com/@ty-ras/client-fetch/-/client-fetch-0.12.5.tgz#d616d391ee4a6ef5a59de53009a51f05251e0576"
+  integrity sha512-FKsSjFHnSBmL7XIQx/YfwmeEn/CYcCXwLDuFw5P3e0tuCyEtYjBXQynk4H5Wfvn+d0b12M1IFrXSw27B/lHIFA==
   dependencies:
-    "@ty-ras/data-frontend" "0.12.3"
+    "@ty-ras/data-frontend" "0.12.4"
 
-"@ty-ras/data-frontend-io-ts@^0.12.6":
-  version "0.12.6"
-  resolved "https://registry.yarnpkg.com/@ty-ras/data-frontend-io-ts/-/data-frontend-io-ts-0.12.6.tgz#21d1d27580deb2f852542b42d8affdd8148f6bba"
-  integrity sha512-p1JWMkmiryHRINSR4EHnGmSqNAY4tWgy3WxRVk9tetBPmWSX7Q6czPXCVADOP0xsYMMP5tq9GCdKEUSlP1eFQQ==
+"@ty-ras/data-frontend-io-ts@^0.12.7":
+  version "0.12.7"
+  resolved "https://registry.yarnpkg.com/@ty-ras/data-frontend-io-ts/-/data-frontend-io-ts-0.12.7.tgz#a54bd5b56ca8f2f2a4350bf85931117c81824cff"
+  integrity sha512-6gQZ181zC4gJlPUmgc6i4AlgCP7ZUgRto6rqMMb4UJQNW0zwhlWw0ZtIcwgmHMi7OfWVgV6yj8wIuQB54BdP4A==
   dependencies:
-    "@ty-ras/data-frontend" "0.12.3"
+    "@ty-ras/data-frontend" "0.12.4"
     "@ty-ras/data-io-ts" "0.12.5"
 
-"@ty-ras/data-frontend@0.12.3":
-  version "0.12.3"
-  resolved "https://registry.yarnpkg.com/@ty-ras/data-frontend/-/data-frontend-0.12.3.tgz#8097e4c1f1a94545921e780ca108337bb09ea0e6"
-  integrity sha512-MSScgzEmQYdJbMi0ApIOllObahhpg0cFvkF393oD54tUzbV4rgy7eIS/YKKmtBKrHBTccG+WRf49hPsPK9xv7g==
+"@ty-ras/data-frontend@0.12.4":
+  version "0.12.4"
+  resolved "https://registry.yarnpkg.com/@ty-ras/data-frontend/-/data-frontend-0.12.4.tgz#c3599654b646a5642a80415893b8a6ab8c49bbe7"
+  integrity sha512-mSG53IgJxLm5dDfpD1FZE+NVIR3NPVb7zuDvpfZULEo0jPR9IxW7KDj++dcqRXlHqRh7ahtyQCB0Hj1jr6vQpA==
   dependencies:
     "@ty-ras/data" "0.12.3"
     "@ty-ras/protocol" "0.12.1"
