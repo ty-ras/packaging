@@ -354,26 +354,26 @@
   dependencies:
     "@ty-ras/data-backend" "0.12.4"
 
-"@ty-ras/metadata-jsonschema-io-ts@^0.12.6":
-  version "0.12.6"
-  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-jsonschema-io-ts/-/metadata-jsonschema-io-ts-0.12.6.tgz#b200a8bfd1532e09badfb6e9cd87a2feb1c97ad5"
-  integrity sha512-AWbXGRkGZ3pz/ApiUc5dO7ZRU0aVzLboZjYAcCrWwzcCkOMH0nHGy+JKw6N9f4sn9DmNLf7tyPIlObIJ9hA3sA==
+"@ty-ras/metadata-jsonschema-io-ts@^0.12.7":
+  version "0.12.7"
+  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-jsonschema-io-ts/-/metadata-jsonschema-io-ts-0.12.7.tgz#508213d5631380eba15c5957df384840f32f466b"
+  integrity sha512-jvFCSezeyYSZckg44fHPIqLq2FASoYKh7Wb3T9tjT1OR6jmLuh8DUiyPL0JM8o0jzkPST5uVVnIjEPgNVNWd3Q==
   dependencies:
     "@ty-ras/data-io-ts" "0.12.5"
-    "@ty-ras/metadata-jsonschema" "0.12.3"
+    "@ty-ras/metadata-jsonschema" "0.12.4"
 
-"@ty-ras/metadata-jsonschema@0.12.3":
-  version "0.12.3"
-  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-jsonschema/-/metadata-jsonschema-0.12.3.tgz#f950fe7c21e16d4e01924743f92805b01da73103"
-  integrity sha512-IsR4+5I17J8MdY/F/CCDiWAj9octazXn8vA7quMONIUk4rlzGQ4B5bsN+YrfC2XfpuXqEfYUrIh83MmP0A115w==
+"@ty-ras/metadata-jsonschema@0.12.4":
+  version "0.12.4"
+  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-jsonschema/-/metadata-jsonschema-0.12.4.tgz#ebde6a8ea2497d4c69a3b5244a9749352f7d46bb"
+  integrity sha512-WxMvyuC6wNnpCL1bdsXhYu7IQx0KzHIAiFMEfMQFe0WU1f5c0x+Rqsrao1DsW1y906iklE4Gw08XmSZrgi6fHQ==
 
-"@ty-ras/metadata-openapi@^0.12.5":
-  version "0.12.5"
-  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-openapi/-/metadata-openapi-0.12.5.tgz#237f097e847a6a3f7539efe102374cf3da152938"
-  integrity sha512-9FC2JRobCuciEkcWvd/O9anqdb03msz0woWsba7qYbNgjmLTDf+KyIyVMKJPcmWGxH3QR7bqyCtDRbakgJBPGw==
+"@ty-ras/metadata-openapi@^0.12.6":
+  version "0.12.6"
+  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-openapi/-/metadata-openapi-0.12.6.tgz#7b5b6925798c78d768ef99895c13d462ecf2a82e"
+  integrity sha512-gL/rQ2mrHi0VMcqH1T8Oy+niKajxN9k4Ao0zEjNcybbiZMkIhah0YDwlCy/QdIXgB2wjjkIIlR2559ilrJcOqQ==
   dependencies:
     "@ty-ras/metadata" "0.12.5"
-    "@ty-ras/metadata-jsonschema" "0.12.3"
+    "@ty-ras/metadata-jsonschema" "0.12.4"
 
 "@ty-ras/metadata@0.12.5":
   version "0.12.5"
@@ -392,25 +392,25 @@
   resolved "https://registry.yarnpkg.com/@ty-ras/resource-pool-fp-ts/-/resource-pool-fp-ts-0.12.0.tgz#1a68979dd927e8969836a06ffa6805a103d407fd"
   integrity sha512-29cITG9VTyBFuDSk7qbq8NSE+6FpXIhVEJE027NrUWHtE24hKrz7AnMM098PaMmN8/EHEGdskh3zcsCrBX22TQ==
 
-"@ty-ras/server-node@^0.12.6":
-  version "0.12.6"
-  resolved "https://registry.yarnpkg.com/@ty-ras/server-node/-/server-node-0.12.6.tgz#d0d9da0b78b2a70c48a2334c1f3280cf6504952d"
-  integrity sha512-y5RNY/qFkmoJDcTln0mj6LhbqW6IhTGDdimKxcMsD1eR9LxOrN7/FRPkMAEMF3/K2lzPFZkiWyJ5Zdq2jJlc+g==
+"@ty-ras/server-node@^0.12.7":
+  version "0.12.7"
+  resolved "https://registry.yarnpkg.com/@ty-ras/server-node/-/server-node-0.12.7.tgz#5ce20f1621423cfc35913d08215ae01f2914c8ba"
+  integrity sha512-0Yk16xxfwST2vck455AdhGBixFiBc/4RobCWXBgXWrO7B9k/uVZA2nuzXx4m3rR9TyIWNmv6kjSkatLz+rCrxg==
   dependencies:
     "@ty-ras/endpoint-prefix" "0.12.3"
-    "@ty-ras/server" "0.12.6"
+    "@ty-ras/server" "0.12.7"
 
-"@ty-ras/server@0.12.6":
-  version "0.12.6"
-  resolved "https://registry.yarnpkg.com/@ty-ras/server/-/server-0.12.6.tgz#134555ab7bb0228d34b8c4a5eeca3fcf4af4235c"
-  integrity sha512-LZOvOgULg+kV2/kqoWBfM6ISBAyVD4/7cfiPhcTJLlMDrKk4aWhQd9yc3O+YQNpWhrlSQKsrdWz4jvRzHQe7iw==
+"@ty-ras/server@0.12.7":
+  version "0.12.7"
+  resolved "https://registry.yarnpkg.com/@ty-ras/server/-/server-0.12.7.tgz#558414520842612a5de9bd12c0a5f446191a348a"
+  integrity sha512-4L4gbpXrOvCgFsE4iuNifoUOkdeekMejKj/7ru/LuVDXA5Y8+LRM23yLJ7JAsPgzs44mcc5jM0Nm2+tZlBWI7w==
   dependencies:
     "@ty-ras/endpoint" "0.12.7"
 
-"@ty-ras/typed-sql-io-ts@^0.12.2":
-  version "0.12.2"
-  resolved "https://registry.yarnpkg.com/@ty-ras/typed-sql-io-ts/-/typed-sql-io-ts-0.12.2.tgz#1d04d7b74b69e8aa876eb4e58ba1287025419c6e"
-  integrity sha512-BM3j8dRSH+NV/CPD2g0XG3hqd6m4aIJIwfZxx+XRNxrUKcN3okDslO0Q8AOHCbgYKBj393Rfama/CMn0Ge8zzw==
+"@ty-ras/typed-sql-io-ts@^0.12.3":
+  version "0.12.3"
+  resolved "https://registry.yarnpkg.com/@ty-ras/typed-sql-io-ts/-/typed-sql-io-ts-0.12.3.tgz#139e384a471d817fc1474ca556e72f0e6e28ef25"
+  integrity sha512-2vgL6MpCZ2CmevjgTEo1Jd3uriRC/ye5skwXPbzv+S3JT+rZ5BXu5r3F6Hf3zNkRHybE7stnDNlUJjFJ8qZWkg==
 
 "@types/json-schema@^7.0.9":
   version "7.0.11"
