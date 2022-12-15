@@ -333,10 +333,10 @@
   resolved "https://registry.yarnpkg.com/@ty-ras/data/-/data-0.13.0.tgz#45acb046958350de01916f2cb433ec9da165abef"
   integrity sha512-AZYCdMiBPTO4+V0Apg+i9XUo17c4C5Up+0O8Jk8cBYVCm/4W5kbzGdcE40GKNFqkn71IVrfjv5GAaMpg5EbFXg==
 
-"@ty-ras/endpoint-prefix@0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/endpoint-prefix/-/endpoint-prefix-0.13.0.tgz#0a40b5ceddad49ab93a99f6e3340298314be0e9b"
-  integrity sha512-H0PQ+DTOaIpglegZVpsSojMi27mQdgP3XK7QUn757L0tXq/8ARe4JgkkW7T4nlDIkPmhVa8WIbjYe3WrqZeBZA==
+"@ty-ras/endpoint-prefix@0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/endpoint-prefix/-/endpoint-prefix-0.13.1.tgz#6ceef1893681f171153d9786536c4bf7fbec0750"
+  integrity sha512-JT4GdYgEJjL1G/WAtGTVdzWlGjsimbLVbVVl2z8aKofzzA1iQyDSg2c+jr/JeKX2YuOe/hFD95bAJE1n/uXarQ==
   dependencies:
     "@ty-ras/endpoint" "0.13.1"
 
@@ -393,12 +393,12 @@
   resolved "https://registry.yarnpkg.com/@ty-ras/resource-pool-fp-ts/-/resource-pool-fp-ts-0.12.0.tgz#1a68979dd927e8969836a06ffa6805a103d407fd"
   integrity sha512-29cITG9VTyBFuDSk7qbq8NSE+6FpXIhVEJE027NrUWHtE24hKrz7AnMM098PaMmN8/EHEGdskh3zcsCrBX22TQ==
 
-"@ty-ras/server-node@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/server-node/-/server-node-0.13.0.tgz#f4904094eabc6c04a9139a7c6a9e0235ea169eac"
-  integrity sha512-QtrobAD3zLrLRj6e9ZbqdKPIPXKwuqDWkFbL1NzOyfUjursEzAbHpAG6KuWc98PU2NfDv9ncvogxUT3ANReOlg==
+"@ty-ras/server-node@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/server-node/-/server-node-0.13.1.tgz#0d30ed8ce76c7e7526c31226d1ca931168514e31"
+  integrity sha512-dBfzfJdoCyDb3fcB9k5+11xhqJsZzHhYvbdXlcKtwZHsjNXz+oKn9QBE8hz1iDeoETgIKpP7g1OaBJdZXuIKyw==
   dependencies:
-    "@ty-ras/endpoint-prefix" "0.13.0"
+    "@ty-ras/endpoint-prefix" "0.13.1"
     "@ty-ras/server" "0.13.0"
 
 "@ty-ras/server@0.13.0":
