@@ -355,26 +355,26 @@
   dependencies:
     "@ty-ras/data-backend" "0.13.0"
 
-"@ty-ras/metadata-jsonschema-io-ts@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-jsonschema-io-ts/-/metadata-jsonschema-io-ts-0.13.0.tgz#9efdff31e483cfc3320edb07096aeea54f1cac73"
-  integrity sha512-ldGaOlsgxX6jOYvRdSI1FiZqWnrCoNemVNbEMMD8Al1sswIbVCgpnVb5pP/QA4CchcL1hAjIqoEwKMzcK3OR2Q==
+"@ty-ras/metadata-jsonschema-io-ts@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-jsonschema-io-ts/-/metadata-jsonschema-io-ts-0.13.1.tgz#323ae78ae85d4714d27b0e5fd2baebcd48d219f9"
+  integrity sha512-41Q+mMLTUIbvQXBlA4vuFJOvD7KtcxOKRBDhYc9PogMRdNJWsFE0uDtCHEiTb5FSHHOQ8fH3/hiyAqP7rY3DWA==
   dependencies:
     "@ty-ras/data-io-ts" "0.13.0"
-    "@ty-ras/metadata-jsonschema" "0.13.0"
+    "@ty-ras/metadata-jsonschema" "0.13.1"
 
-"@ty-ras/metadata-jsonschema@0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-jsonschema/-/metadata-jsonschema-0.13.0.tgz#7e67fca359f6a9bfcc5e26927bd6d8f5a2d13c6b"
-  integrity sha512-W5cC/+bGT701irTakR4AkSshtnGBPPqAWfGmsoimwE67YjjAV55yI6oY/qkjvsNOV4pSmVqGLyJ2e0f5IcYsYg==
+"@ty-ras/metadata-jsonschema@0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-jsonschema/-/metadata-jsonschema-0.13.1.tgz#8d7384cd6c98dcf7a122b62d44e80cc8a5d1d27e"
+  integrity sha512-RIf3byzepCdHphXQFJViDsMNMgCANV+nJ+Ua9f5TizZ2fh3UqIbixmDqydp6HfSH8XGUlQTh8I9Nd6c/Qjlaeg==
 
-"@ty-ras/metadata-openapi@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-openapi/-/metadata-openapi-0.13.0.tgz#44ff92ed0867292652bf814ebd4ed4c0ff4e5bcf"
-  integrity sha512-V0FwH0aXBMjIBbJmQ5ae1WJRGpdh8zFiCiLjPyZekjaESY7eobAYkOJc13cw1lSHX+vqdCql3KiiIBJFooyznA==
+"@ty-ras/metadata-openapi@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-openapi/-/metadata-openapi-0.13.1.tgz#a3a07faad25566adda0f9c167a0f4dfe510459b9"
+  integrity sha512-YMcVKK6O3djQMMizkXySiC1BFxUnevOG87MvapVIxGZxrkVnIQBD+mH5z6TIVMfXfurUopKNA0u7H3LrAVmIgw==
   dependencies:
     "@ty-ras/metadata" "0.13.0"
-    "@ty-ras/metadata-jsonschema" "0.13.0"
+    "@ty-ras/metadata-jsonschema" "0.13.1"
 
 "@ty-ras/metadata@0.13.0":
   version "0.13.0"
