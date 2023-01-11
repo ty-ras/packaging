@@ -27,7 +27,3 @@ This library exports all members of the following libraries:
 - [`@ty-ras/metadata-openapi`](https://npmjs.com/package/@ty-ras/metadata-openapi),
 - [`@ty-ras/metadata-jsonschema`](https://npmjs.com/package/@ty-ras/metadata-jsonschema`), and
 - [`@ty-ras/metadata-jsonschema-io-ts`](https://npmjs.com/package/@ty-ras/metadata-jsonschema-io-ts).
-
-Furthermore, it exports all members of the following libraries as aliases:
-- [`@ty-ras/resource-pool-fp-ts`](https://npmjs.com/package/@ty-ras/resource-pool-fp-ts) as alias `resources`, and
-- [`@ty-ras/typed-sql-io-ts`](https://npmjs.com/package/@ty-ras/typed-sql-io-ts) as alias `sql`.

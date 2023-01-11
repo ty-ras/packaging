@@ -38,6 +38,8 @@ jobs:
         dir:
           - backend-node-io-ts-openapi
           - frontend-fetch-io-ts
+          - extras-backend-io-ts
+          - extras-frontend-io-ts
     runs-on: ubuntu-latest
     name: Build and test ${{ matrix.dir }}
     steps:

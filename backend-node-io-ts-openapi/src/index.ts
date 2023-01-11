@@ -39,6 +39,3 @@ export type {
 export * from "@ty-ras/metadata-openapi";
 export * from "@ty-ras/metadata-jsonschema";
 export * from "@ty-ras/metadata-jsonschema-io-ts";
-
-export * as resources from "@ty-ras/resource-pool-fp-ts";
-export * as sql from "@ty-ras/typed-sql-io-ts";
