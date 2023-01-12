@@ -1,7 +1,7 @@
 # TyRAS Library Bundle - Frontend using Fetch API to send HTTP requests and `io-ts` as Data Validation Library
 
 This library bundles various `@ty-ras/*` libraries into one.
-The purpose is to write this
+The purpose is to enable writing
 ```ts
 import * as tyras from "@ty-ras/frontend-fetch-io-ts";
 ```

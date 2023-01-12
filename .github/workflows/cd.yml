@@ -47,4 +47,4 @@ jobs:
           fi
         }
     secrets:
-      npm-publish-token: ${{ secrets.NPM_PUBLISH_TOKEN }}
+      npm-publish-token: ${{ secrets.NPM_PUBLISH_TOKEN_PACKAGING }}
