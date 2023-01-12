@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras-extras/frontend-io-ts",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@ty-ras-extras/cache": "^0.13.0",
-    "@ty-ras-extras/config-io-ts": "^0.13.2"
+    "@ty-ras-extras/config-io-ts": "^0.13.3"
   },
   "peerDependencies": {
     "fp-ts": "^2.13.1",
