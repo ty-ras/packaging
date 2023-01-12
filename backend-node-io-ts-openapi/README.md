@@ -1,7 +1,7 @@
 # TyRAS Library Bundle - Backend Running Node HTTP(S) 1/2 Server, `io-ts` as Data Validation Library, OpenAPI as Metadata Format
 
 This library bundles various `@ty-ras/*` libraries into one.
-The purpose is to write this
+The purpose is to enable writing
 ```ts
 import * as tyras from "@ty-ras/backend-node-io-ts-openapi";
 ```
