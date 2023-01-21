@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras/frontend-fetch-io-ts",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -42,8 +42,8 @@
     }
   },
   "dependencies": {
-    "@ty-ras/data-frontend-io-ts": "^0.13.0",
-    "@ty-ras/client-fetch": "^0.13.0",
+    "@ty-ras/data-frontend-io-ts": "^0.13.1",
+    "@ty-ras/client-fetch": "^0.13.1",
     "fp-ts": "^2.13.1",
     "io-ts": "^2.2.19",
     "io-ts-types": "^0.5.19",
