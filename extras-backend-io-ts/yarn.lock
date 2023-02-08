@@ -321,10 +321,10 @@
   resolved "https://registry.yarnpkg.com/@ty-ras-extras/main-io-ts/-/main-io-ts-0.13.2.tgz#d4309c3555f51bc11d808d88f806e38b5544069a"
   integrity sha512-BlTjZST8iKcEO/QEO6cI7gyqlf2zRt4L4cfNvhAbid7lPMQjxll+MyKbbYjVtjz/xaBsLjBCGlGkBoE3mN6oeQ==
 
-"@ty-ras-extras/resource-pool-fp-ts@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras-extras/resource-pool-fp-ts/-/resource-pool-fp-ts-0.13.0.tgz#68af42c8fd2e0ebaa636b8f7a7650420756aa739"
-  integrity sha512-0RrSBHvd2JV1x29j1w+fGhOpaeBoGfR89Ve5aZNTQGdTWt0kgaWXeMJu5KUtPttFm3RpDKpCJpgXYk4C15GVew==
+"@ty-ras-extras/resource-pool-fp-ts@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras-extras/resource-pool-fp-ts/-/resource-pool-fp-ts-0.13.1.tgz#2555404f201f96833f47afe6fb9483534d560636"
+  integrity sha512-zeTkN9d0+r4ZT9E0XAVChBEqoj2CFe1M1w9dRsoZnpsW0O7QpkjJAOkHgTEeyqK9M59zmFfE3AAIe3PKJ4F/Vw==
 
 "@ty-ras-extras/state-io-ts@^0.13.0":
   version "0.13.0"
