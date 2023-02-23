@@ -49,6 +49,7 @@
     "@ty-ras/metadata-jsonschema-zod": "^0.13.0",
     "@ty-ras/metadata-openapi": "^0.13.1",
     "zod": "^3.20.6",
+    "zod-to-json-schema": "3.20.4",
     "openapi-types": "^12.0.2",
     "raw-body": "^2.5.1"
   },
