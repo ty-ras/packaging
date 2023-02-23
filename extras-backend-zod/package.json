@@ -1,0 +1,88 @@
+{
+  "name": "@ty-ras-extras/backend-zod",
+  "version": "0.13.0",
+  "author": {
+    "name": "Stanislav Muhametsin",
+    "email": "346799+stazz@users.noreply.github.com",
+    "url": "https://github.com/stazz"
+  },
+  "license": "MIT",
+  "description": "Bundle of TyRAS Extras libraries suitable to use in backends which use `zod` as data validation library.",
+  "keywords": [
+    "backend",
+    "http",
+    "node",
+    "server",
+    "data",
+    "validation",
+    "zod",
+    "openapi",
+    "metadata",
+    "runtime"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ty-ras/packaging"
+  },
+  "files": [
+    "./src",
+    "./dist-ts",
+    "./dist-esm",
+    "./dist-cjs",
+    "README.md",
+    "LICENSE.txt"
+  ],
+  "type": "module",
+  "main": "./dist-cjs/index.js",
+  "module": "./dist-esm/index.js",
+  "types": "./dist-ts/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist-ts/index.d.ts",
+      "import": "./dist-esm/index.js",
+      "require": "./dist-cjs/index.js"
+    }
+  },
+  "dependencies": {
+    "@ty-ras-extras/cache": "^0.13.0",
+    "@ty-ras-extras/config-zod": "^0.13.0",
+    "@ty-ras-extras/main": "^0.13.0",
+    "@ty-ras-extras/resource-pool": "^0.13.0",
+    "@ty-ras-extras/state-zod": "^0.13.0",
+    "@ty-ras-extras/typed-sql-zod": "^0.13.0"
+  },
+  "peerDependencies": {
+    "@ty-ras/data-zod": "^0.13.0",
+    "@ty-ras/endpoint": "^0.13.1",
+    "zod": "^3.20.6"
+  },
+  "devDependencies": {
+    "@babel/core": "7.19.3",
+    "@babel/eslint-parser": "7.19.1",
+    "@types/node": "18.7.18",
+    "@types/pg": "8.6.5",
+    "@typescript-eslint/eslint-plugin": "5.38.0",
+    "@typescript-eslint/parser": "5.38.0",
+    "@ty-ras/data-zod": "^0.13.0",
+    "@ty-ras/endpoint": "^0.13.1",
+    "eslint": "8.23.1",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-sonarjs": "0.15.0",
+    "prettier": "2.7.1",
+    "tsconfig-paths": "4.1.0",
+    "typescript": "4.8.4",
+    "zod": "^3.20.6"
+  },
+  "scripts": {
+    "build:run": "yarn run lint && yarn run tsc",
+    "build:ci": "yarn run clear-build-artifacts && yarn run compile-d-ts-files && yarn run tsc --outDir ./dist-esm && yarn run tsc --module CommonJS --outDir ./dist-cjs && yarn run format-output-files",
+    "clear-build-artifacts": "rm -rf dist dist-ts dist-cjs dist-esm build",
+    "compile-d-ts-files": "yarn run tsc --removeComments false --emitDeclarationOnly --declaration --declarationDir ./dist-ts && yarn run copy-d-ts-files && yarn run tsc:plain --project tsconfig.out.json",
+    "copy-d-ts-files": "find ./src -mindepth 1 -maxdepth 1 -name '*.d.ts' -exec cp {} ./dist-ts +",
+    "format-output-files": "find dist-ts -name '*.ts' -type f -exec sh -c \"echo '/* eslint-disable */\n/* eslint-enable prettier/prettier */'\"' | cat - $1 > $1.tmp && mv $1.tmp $1' -- {} \\; && eslint --no-eslintrc --config '.eslintrc.output.ts.cjs' --fix './dist-ts/**/*.ts' && eslint --no-eslintrc --config '.eslintrc.output.cjs' --fix 'dist-cjs/*js' 'dist-esm/*js'",
+    "lint": "eslint ./src --ext .ts,.tsx",
+    "tsc": "tsc --project tsconfig.build.json",
+    "tsc:plain": "tsc"
+  }
+}
