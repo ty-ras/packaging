@@ -13,8 +13,8 @@ import * as tyrasCache from "@ty-ras-extras/cache";
 ```
 
 This library exports all members of the following libraries:
-- [`@ty-ras/cache`](https://npmjs.com/package/@ty-ras-extras/cache),
-- [`@ty-ras/config-io-ts`](https://npmjs.com/package/@ty-ras-extras/config-io-ts),
+- [`@ty-ras-extras/cache`](https://npmjs.com/package/@ty-ras-extras/cache),
+- [`@ty-ras-extras/config-io-ts`](https://npmjs.com/package/@ty-ras-extras/config-io-ts),
 - [`@ty-ras-extras/resource-pool-fp-ts`](https://npmjs.com/package/@ty-ras-extras/resource-pool-fp-ts),
 - [`@ty-ras-extras/typed-sql-io-ts`](https://npmjs.com/package/@ty-ras-extras/typed-sql-io-ts),
 - [`@ty-ras-extras/main-io-ts`](https://npmjs.com/package/@ty-ras-extras/main-io-ts), and

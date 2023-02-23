@@ -40,6 +40,10 @@ jobs:
           - frontend-fetch-io-ts
           - extras-backend-io-ts
           - extras-frontend-io-ts
+          - backend-node-zod-openapi
+          - frontend-fetch-zod
+          - extras-backend-zod
+          - extras-frontend-zod
     runs-on: ubuntu-latest
     name: Build and test ${{ matrix.dir }}
     steps:
