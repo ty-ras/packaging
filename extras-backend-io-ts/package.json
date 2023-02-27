@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras-extras/backend-io-ts",
-  "version": "0.13.4",
+  "version": "0.13.5",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -45,9 +45,9 @@
   },
   "dependencies": {
     "@ty-ras-extras/cache": "^0.13.0",
-    "@ty-ras-extras/resource-pool-fp-ts": "^0.13.1",
-    "@ty-ras-extras/typed-sql-io-ts": "^0.13.1",
-    "@ty-ras-extras/config-io-ts": "^0.13.4",
+    "@ty-ras-extras/resource-pool-fp-ts": "^0.13.3",
+    "@ty-ras-extras/typed-sql-io-ts": "^0.13.2",
+    "@ty-ras-extras/config-io-ts": "^0.13.5",
     "@ty-ras-extras/main-io-ts": "^0.13.2",
     "@ty-ras-extras/state-io-ts": "^0.13.0"
   },
