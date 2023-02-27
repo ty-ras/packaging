@@ -312,10 +312,10 @@
   resolved "https://registry.yarnpkg.com/@ty-ras-extras/cache/-/cache-0.13.0.tgz#d7f76a119532a5ce3996d8419bdb60da1147637e"
   integrity sha512-0HGLQcyOeBK31R8ERynSbLQ0V+Rb8P6uPjsIXYh6cYd68AU8O+fqWnfaGKD0nh8zH3UqYRQo7YW5gg3K2inBgA==
 
-"@ty-ras-extras/config-zod@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras-extras/config-zod/-/config-zod-0.13.0.tgz#afd0e62a4626c6da73b18b3bc2ddf6105a57cca0"
-  integrity sha512-QPK5qjtqUD8wCclBU+U/lx2/6RonE/cLCqX+Qyb9oIWclSk5A6t95sxP4E7jNWk1V0e8UbzZ9jVFGdNzrYtPeA==
+"@ty-ras-extras/config-zod@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras-extras/config-zod/-/config-zod-0.13.1.tgz#90bd941e03a7403ac3d7308ba4d6b17b35f4f75c"
+  integrity sha512-zXJdz3RIUN5pdrie5Kjz/APxwdff5mOD8HfRTCtVwgvv285QDNo7wgKiaBvmF/xgU1Wsnc27MjWODsoJl7/sjg==
 
 "@ty-ras-extras/main@^0.13.0":
   version "0.13.0"
