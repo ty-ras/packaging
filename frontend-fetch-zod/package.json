@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras/frontend-fetch-zod",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -44,7 +44,7 @@
   "dependencies": {
     "@ty-ras/data-frontend-zod": "^0.13.0",
     "@ty-ras/client-fetch": "^0.13.1",
-    "zod": "3.20.6"
+    "zod": "^3.20.6"
   },
   "devDependencies": {
     "@babel/core": "7.19.3",
