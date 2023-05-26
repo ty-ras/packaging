@@ -2,17 +2,16 @@
 module.exports = {
   root: true,
   extends: [
-    // See https://github.com/prettier/eslint-config-prettier/blob/main/CHANGELOG.md#version-800-2021-02-21
+    "plugin:path-import-extension/recommended",
     "plugin:prettier/recommended",
   ],
-  plugins: ["prettier"],
+  plugins: [
+    "path-import-extension",
+    "prettier"
+  ],
   parser: "@babel/eslint-parser",
   parserOptions: {
     requireConfigFile: false
-  },
-  env: {
-    node: true,
-    es2020: true
   },
   rules: {
     "prettier/prettier": "error",

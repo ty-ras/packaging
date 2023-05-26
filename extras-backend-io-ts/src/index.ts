@@ -1,3 +1,9 @@
+/**
+ * @file This file exports all of the types, functions, and constants of the TyRAS extras -libraries aimed for:
+ * - backend support
+ * - using `io-ts` as data validation framework
+ */
+
 export * as configuration from "@ty-ras-extras/config-io-ts";
 export * as cache from "@ty-ras-extras/cache";
 export * as resources from "@ty-ras-extras/resource-pool-fp-ts";

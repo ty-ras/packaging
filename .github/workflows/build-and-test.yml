@@ -68,6 +68,8 @@ jobs:
 
           ./scripts/install.sh '${{ matrix.dir }}' --frozen-lockfile
 
+      # Notice - no tests, since these libraries merely compose other libraries!
+
       - id: lint
         name: Lint ${{ matrix.dir }}
         shell: bash
@@ -76,11 +78,6 @@ jobs:
 
           ./scripts/lint.sh '${{ matrix.dir }}'
 
-      # Run build *after* tests - since tests no longer require transpiled JS to run
-      # We still want to run build to catch any TS error possibly lurking somewhere.
-      # Because we test first and build then, we can do compilation without __tests__ directory.
-      # We re-add it to src folder in order to include it in published NPM package (if CD pipeline).
-      # Notice we must produce stub package.json file to dist-cjs folder, otherwise `require` will fail on relative imports within the dist-cjs folder.
       - id: compile
         name: Compile ${{ matrix.dir }}
         shell: bash
@@ -88,10 +85,6 @@ jobs:
           set -e
 
           ./scripts/build.sh '${{ matrix.dir }}' ci
-          if [[ -d '${{ matrix.dir }}/dist-cjs' ]]; then
-            sudo chmod -R o=rwX '${{ matrix.dir }}/dist-cjs'
-            cat '${{ matrix.dir }}/package.json' | jq -M 'del(.files, .type, .main, .module, .types, .exports)' > '${{ matrix.dir }}/dist-cjs/package.json'
-          fi
 
       - id: finalize
         name: Finalize ${{ matrix.dir }}
