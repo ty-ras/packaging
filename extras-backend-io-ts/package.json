@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras-extras/backend-io-ts",
-  "version": "0.13.5",
+  "version": "1.0.0",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -44,18 +44,18 @@
     }
   },
   "dependencies": {
-    "@ty-ras-extras/cache": "^0.13.0",
-    "@ty-ras-extras/resource-pool-fp-ts": "^0.13.3",
-    "@ty-ras-extras/typed-sql-io-ts": "^0.13.2",
-    "@ty-ras-extras/config-io-ts": "^0.13.5",
-    "@ty-ras-extras/main-io-ts": "^0.13.2",
-    "@ty-ras-extras/state-io-ts": "^0.13.0"
+    "@ty-ras-extras/cache": "^1.0.0",
+    "@ty-ras-extras/resource-pool-fp-ts": "^1.0.0",
+    "@ty-ras-extras/typed-sql-io-ts": "^1.0.0",
+    "@ty-ras-extras/config-io-ts": "^1.0.1",
+    "@ty-ras-extras/main-io-ts": "^1.0.0",
+    "@ty-ras-extras/state-io-ts": "^1.0.0"
   },
   "peerDependencies": {
     "fp-ts": "^2.13.1",
     "io-ts": "^2.2.19",
-    "@ty-ras/data-io-ts": "^0.13.0",
-    "@ty-ras/endpoint": "^0.13.1"
+    "@ty-ras/data-io-ts": "^1.0.1",
+    "@ty-ras/endpoint": "^1.0.1"
   },
   "devDependencies": {
     "@babel/core": "7.21.5",
@@ -63,8 +63,8 @@
     "@types/node": "18.16.3",
     "@typescript-eslint/eslint-plugin": "5.59.2",
     "@typescript-eslint/parser": "5.59.2",
-    "@ty-ras/data-io-ts": "^0.13.0",
-    "@ty-ras/endpoint": "^0.13.1",
+    "@ty-ras/data-io-ts": "^1.0.1",
+    "@ty-ras/endpoint": "^1.0.1",
     "eslint": "8.39.0",
     "eslint-plugin-jsdoc": "43.1.1",
     "eslint-plugin-path-import-extension": "0.9.0",
