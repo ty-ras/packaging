@@ -11,3 +11,6 @@ export * from "@ty-ras/data";
 export * from "@ty-ras/data-zod";
 export * from "@ty-ras/data-frontend";
 export * from "@ty-ras/data-frontend-zod";
+
+// Export "glue" code, needed because e.g. Zod FE library is not aware of the client being used.
+export * from "./api-call";

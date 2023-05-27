@@ -325,46 +325,46 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@ty-ras/client-fetch@^0.13.1":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@ty-ras/client-fetch/-/client-fetch-0.13.1.tgz#ced2439d3ec3d20b4e7394cadb96bb233bc91540"
-  integrity sha512-sMehh124UEW3qQImy4K+JxAC9L9Yplilk/Ux90GuC/fgVRI983makSaS+yQNTLAQcQfGUwuAhhTk0tHEfYkTjw==
+"@ty-ras/client-fetch@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/client-fetch/-/client-fetch-1.0.1.tgz#388b2c923b885a373703105cc50ef70d353a8ae6"
+  integrity sha512-c4GjT8VCL0o54A8PGr8hHbac7rxsRFib65ttxw6edBy2soC/wcBRyVwFT6lQQIfZhnmNS82IJT4fp/W2VZ89HA==
   dependencies:
-    "@ty-ras/data-frontend" "0.13.1"
+    "@ty-ras/data-frontend" "^1.0.1"
 
-"@ty-ras/data-frontend-zod@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/data-frontend-zod/-/data-frontend-zod-0.13.0.tgz#d385e834042854f018bab1f38e7ee2b2c136d70f"
-  integrity sha512-E+XKQMqmQ6GrskmXrynIDrcKNcL6J/t30GF9PlLFACGu9rsANCrJvrtEItkp1YQovTsbwDXeRDP8yiPG+0SubA==
+"@ty-ras/data-frontend-zod@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras/data-frontend-zod/-/data-frontend-zod-1.0.0.tgz#1f8698c4dd797c35db9b13b1cf3550318a2f9593"
+  integrity sha512-GErMAQPuqfLyKqpXnFWQCL/d0wvJ1DnwJWefLK9CMKS7K7kaatsag5EmfSLMTuysWgi5gdOCyi5XWKAx31xuww==
   dependencies:
-    "@ty-ras/data-frontend" "0.13.1"
-    "@ty-ras/data-zod" "0.13.0"
+    "@ty-ras/data-frontend" "^1.0.1"
+    "@ty-ras/data-zod" "^1.0.0"
 
-"@ty-ras/data-frontend@0.13.1":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@ty-ras/data-frontend/-/data-frontend-0.13.1.tgz#603d9c391352a005a74554753c7b338e08195e67"
-  integrity sha512-MWSNXNCLnIyVXYJ68Y8aPzIrEVhfL5IEge5hJJWbYECPr+WSgoAXa9acN3VEs9VfeNMXYnQqkXvBMJK4L4BNgQ==
+"@ty-ras/data-frontend@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/data-frontend/-/data-frontend-1.0.1.tgz#1ed9b12d815424365f16abef64cd19b5491970e9"
+  integrity sha512-c2NPXkApHJHNiBSgUQxpZ70+dqzUjExZyJjT7XopTHINoy3TH8MqZPU+tCuCkfH00TZTwTN0iJHF11EZx+sDTg==
   dependencies:
-    "@ty-ras/data" "0.13.0"
-    "@ty-ras/protocol" "0.13.0"
+    "@ty-ras/data" "^1.0.0"
+    "@ty-ras/protocol" "^1.0.1"
 
-"@ty-ras/data-zod@0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/data-zod/-/data-zod-0.13.0.tgz#e38c92b9fa4f97e03b6218c7eb7261464bfd6463"
-  integrity sha512-C3bMckHqXRL/c7ktQ/nmfRE7xSAAEvvJ83RQ0Fr9rbmXaPtL0EER6imxdRflDkh5p3vX/TOyOIMcwmxKXtMQHA==
+"@ty-ras/data-zod@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras/data-zod/-/data-zod-1.0.0.tgz#a4d475adfac17aec6ed37894d8e50410b33eda68"
+  integrity sha512-10g8kyPBSvcTsBZGQNwuCfQbsxRZWdGqp9/9QYAhs3rN0SDdM510ck2XR2DXzTJdNjYaRlcAdvlcBSqdqWKQUA==
   dependencies:
-    "@ty-ras/data" "0.13.0"
-    "@ty-ras/protocol" "0.13.0"
+    "@ty-ras/data" "^1.0.0"
+    "@ty-ras/protocol" "^1.0.1"
 
-"@ty-ras/data@0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/data/-/data-0.13.0.tgz#45acb046958350de01916f2cb433ec9da165abef"
-  integrity sha512-AZYCdMiBPTO4+V0Apg+i9XUo17c4C5Up+0O8Jk8cBYVCm/4W5kbzGdcE40GKNFqkn71IVrfjv5GAaMpg5EbFXg==
+"@ty-ras/data@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras/data/-/data-1.0.0.tgz#d49c7ccba3e26463d05470ff10bb947f8f3293d7"
+  integrity sha512-WjiVqThVwVX6NpkU3sweiG1I2b6hiIt4VuvbSGWwniAXBJVZg6AFrndOtCgf6MQmmgS/LqOtmT1xbeF/Gk1Ayg==
 
-"@ty-ras/protocol@0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/protocol/-/protocol-0.13.0.tgz#1718b204f4d29e1eea4e39c25f909ce9f522f2de"
-  integrity sha512-rGs/gsdpQTIJLTd6wATTw5CXHAnAEXLKmZstRlKvOkKkslktbyIrl83+l+mlVRp/ZkIqpjOfL6eSEID7jnIS9g==
+"@ty-ras/protocol@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/protocol/-/protocol-1.0.1.tgz#67a42c62df00b51566e2bfd8615e84518717d7fd"
+  integrity sha512-ivkK4s1+hHn72LAd+JSsKGzVwdPHYwUSYbdUzFVyY1ZQ5rk+iPEeP4KkQg8XHWqD/f+rEsYsHxmdynb1rXg2nw==
 
 "@types/json-schema@^7.0.9":
   version "7.0.12"
