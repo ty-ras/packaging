@@ -340,20 +340,20 @@
   resolved "https://registry.yarnpkg.com/@ty-ras-extras/main-io-ts/-/main-io-ts-1.0.0.tgz#99244565712c9b709afeb452d343983ac3f73c5a"
   integrity sha512-nsom8zqGl2EXnoyoIT+YWY1CzcKiQ0UlInjbkxj2igrTZFr/WLcuaYFrliilzn6Vz/oDyVSA91hcLQczKC6RLA==
 
-"@ty-ras-extras/resource-pool-fp-ts@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras-extras/resource-pool-fp-ts/-/resource-pool-fp-ts-1.0.0.tgz#662f3b05c5090650488eb975627e3c8a2b18523b"
-  integrity sha512-V/7iSEF3M+VgZ81Y3Y8PHo8EF9pSoiYTk+XUDdULwypUooCtrjvvpkpbUlfJPYk1oaMP/hqObQWtgkX/1gMhaw==
+"@ty-ras-extras/resource-pool-fp-ts@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras-extras/resource-pool-fp-ts/-/resource-pool-fp-ts-1.0.1.tgz#1be5d7f1ef8d5b32e88cae4bf6e1f0f6d55c0b98"
+  integrity sha512-Lcm8kxFz0+NsaMEY1wY867Y7hE2Cz1FKeDgr90KQTraGRAdvcrAaeiJJq/9FSWoE/Xd6V5dvjGRG3mDJ0lSmkw==
 
 "@ty-ras-extras/state-io-ts@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@ty-ras-extras/state-io-ts/-/state-io-ts-1.0.0.tgz#051bbf317d584b1fe7928aa7a1440e2c801ed1bb"
   integrity sha512-IwrtvCeimBIkyafT6qS/5x3CBY8IdgATgVLqbgdb4wwQvNHfmHPSw4658k2JZBWRaa/m3CWIFUZiGhjRsvdI4A==
 
-"@ty-ras-extras/typed-sql-io-ts@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras-extras/typed-sql-io-ts/-/typed-sql-io-ts-1.0.0.tgz#26aa89462d3a33c4469a1d3c7adc87facab2ab0b"
-  integrity sha512-y+RqqHwfhqxoTNF/uFLUyrAxqrq14ohW9hoU7315sEQ6YHWtT/1qcP+QCNPf3212C87KlUQO7nawWLb/Uzl2tA==
+"@ty-ras-extras/typed-sql-io-ts@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras-extras/typed-sql-io-ts/-/typed-sql-io-ts-1.0.1.tgz#b0dd323ce09bd52f7d3f5ef0797b4a43f14577d5"
+  integrity sha512-mPTxIhUusRuWOhlOsVeyiUXFke1PA9k+CWlIzsRlJJohuwkcALzFec2dI1tMZBafqh2fWz+8+gJ5d1JGicippw==
 
 "@ty-ras/data-backend@^1.0.1":
   version "1.0.1"
