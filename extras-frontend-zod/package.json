@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras-extras/frontend-zod",
-  "version": "0.13.1",
+  "version": "1.0.0",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -44,8 +44,8 @@
     }
   },
   "dependencies": {
-    "@ty-ras-extras/cache": "^0.13.0",
-    "@ty-ras-extras/config-zod": "^0.13.1"
+    "@ty-ras-extras/cache": "^1.0.0",
+    "@ty-ras-extras/config-zod": "^1.0.0"
   },
   "peerDependencies": {
     "zod": "^3.20.6"
