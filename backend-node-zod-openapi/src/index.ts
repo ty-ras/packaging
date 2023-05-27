@@ -20,3 +20,6 @@ export type * from "@ty-ras/metadata";
 export * from "@ty-ras/metadata-openapi";
 export * from "@ty-ras/metadata-jsonschema";
 export * from "@ty-ras/metadata-jsonschema-zod";
+
+// Export "glue" code, needed because e.g. OpenAPI MD library is not aware of Zod data validation library, and Zod data validation library is not aware of OpenAPI MD library.
+export * from "./md";
