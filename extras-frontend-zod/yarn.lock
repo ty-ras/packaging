@@ -325,15 +325,15 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@ty-ras-extras/cache@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras-extras/cache/-/cache-0.13.0.tgz#d7f76a119532a5ce3996d8419bdb60da1147637e"
-  integrity sha512-0HGLQcyOeBK31R8ERynSbLQ0V+Rb8P6uPjsIXYh6cYd68AU8O+fqWnfaGKD0nh8zH3UqYRQo7YW5gg3K2inBgA==
+"@ty-ras-extras/cache@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras-extras/cache/-/cache-1.0.0.tgz#d1224b11a7ffc627f0f78a7b456e651aa4b68c73"
+  integrity sha512-csw/9Q7ySyRzRALsSN2xz3JGg7qBgaV0Bm031Uv5bivPK1iCLWGJfZ+st2Wf+zMLwjECsQRglB8TqCiK/Ahtqw==
 
-"@ty-ras-extras/config-zod@^0.13.1":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@ty-ras-extras/config-zod/-/config-zod-0.13.1.tgz#90bd941e03a7403ac3d7308ba4d6b17b35f4f75c"
-  integrity sha512-zXJdz3RIUN5pdrie5Kjz/APxwdff5mOD8HfRTCtVwgvv285QDNo7wgKiaBvmF/xgU1Wsnc27MjWODsoJl7/sjg==
+"@ty-ras-extras/config-zod@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras-extras/config-zod/-/config-zod-1.0.0.tgz#80b711d6fce47abbd715c51620262e9aaa73dabb"
+  integrity sha512-ziOIsNnxhnSoaUt4ZO3aJQQxUyXbZZWr5O98EThq519oD8MrlnsRgwKFaqYYFU7HUMFRaoEzzYT8DPhIWaA3cg==
 
 "@types/json-schema@^7.0.9":
   version "7.0.12"
