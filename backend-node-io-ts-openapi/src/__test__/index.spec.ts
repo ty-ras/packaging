@@ -1,5 +1,5 @@
 /**
- * @file This file contains example usage code as test case.
+ * @file This file contains tests to start TyRAS-powered HTTP server, and validate that endpoints work as expected.
  */
 
 import test from "ava";
@@ -9,7 +9,7 @@ import endpoints from "./api";
 import { request } from "undici";
 
 test("Verify that using server works", async (c) => {
-  c.plan(2);
+  c.plan(3);
   // Start the server
   const host = "localhost";
   const port = await getPort();
@@ -102,6 +102,9 @@ test("Verify that using server works", async (c) => {
       },
     },
   });
+
+  // Verify that server gives 404 for URL which is not recognized
+  c.deepEqual((await request(`${urlBase}/non-existing`)).statusCode, 404);
 });
 
 const tryGetUserId = (): Promise<string | undefined> => {
