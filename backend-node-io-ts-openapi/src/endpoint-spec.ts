@@ -198,6 +198,9 @@ export type MetadataProviders = {
 };
 
 export const DEFAULT_AUTHENTICATED_STATE = Object.freeze({
+  /**
+   * This property will be set to user ID whenever HTTP request is considered to be authenticated.
+   */
   userId: t.string,
 } as const);
 
