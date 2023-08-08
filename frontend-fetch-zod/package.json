@@ -74,6 +74,8 @@
     "lint": "eslint ./src --ext .ts,.tsx",
     "remove-empty-js-files": "../scripts/remove-empty-js-files.cjs",
     "tsc": "tsc --project tsconfig.build.json",
-    "tsc:plain": "tsc"
+    "tsc:plain": "tsc",
+    "test:coverage": "echo TODO tests",
+    "test:run": "echo TODO tests"
   }
 }

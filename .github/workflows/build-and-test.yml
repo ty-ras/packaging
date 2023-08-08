@@ -68,7 +68,23 @@ jobs:
 
           ./scripts/install.sh '${{ matrix.dir }}' --frozen-lockfile
 
-      # Notice - no tests, since these libraries merely compose other libraries!
+      - id: test
+        name: Test ${{ matrix.dir }}
+        shell: bash
+        run: |
+          set -e
+
+          ./scripts/test.sh '${{ matrix.dir }}' coverage
+
+      # Run build *after* tests - since tests no longer require transpiled JS to run
+      # We still want to run build to catch any TS error possibly lurking somewhere.
+      - id: compile
+        name: Compile ${{ matrix.dir }}
+        shell: bash
+        run: |
+          set -e
+
+          ./scripts/build.sh '${{ matrix.dir }}' ci
 
       - id: lint
         name: Lint ${{ matrix.dir }}
@@ -78,13 +94,12 @@ jobs:
 
           ./scripts/lint.sh '${{ matrix.dir }}'
 
-      - id: compile
-        name: Compile ${{ matrix.dir }}
-        shell: bash
-        run: |
-          set -e
-
-          ./scripts/build.sh '${{ matrix.dir }}' ci
+      - id: coverage
+        name: Upload coverage for '${{ matrix.dir }}'
+        uses: codecov/codecov-action@v3
+        with:
+          flags: ${{ matrix.dir }}
+          directory: ${{ matrix.dir }}
 
       - id: finalize
         name: Finalize ${{ matrix.dir }}
