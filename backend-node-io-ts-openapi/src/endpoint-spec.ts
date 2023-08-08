@@ -5,15 +5,14 @@
 import type * as dataBE from "@ty-ras/data-backend";
 import * as epSpec from "@ty-ras/endpoint-spec";
 import * as dataValidation from "@ty-ras/data-io-ts";
-import * as md from "@ty-ras/metadata-openapi";
+import type * as md from "@ty-ras/metadata-openapi";
 import * as stateGeneric from "@ty-ras/state";
 import * as state from "@ty-ras/state-io-ts";
 import * as dataIO from "@ty-ras/data-backend-io-ts";
 import * as jsonIO from "@ty-ras/metadata-jsonschema-io-ts";
+import * as mdProvider from "./md-provider";
 import type * as server from "@ty-ras/server-node";
 import * as t from "io-ts";
-
-/* eslint-disable @typescript-eslint/ban-types */
 
 /**
  * This overload of `newBuilder` will create new {@link epSpec.ApplicationBuilder} with as many parameters set to sensible defaults as possible.
@@ -22,18 +21,7 @@ import * as t from "io-ts";
  */
 export function newBuilder(
   defaultReadRequestBody: dataBE.ReadBody,
-): epSpec.ApplicationBuilder<
-  dataValidation.EncodedHKT,
-  dataValidation.ValidatorHKT,
-  DefaultStateHKT,
-  MetadataProviders,
-  server.ServerContext,
-  typeof dataIO.CONTENT_TYPE,
-  typeof dataIO.CONTENT_TYPE,
-  typeof dataIO.CONTENT_TYPE,
-  typeof dataIO.CONTENT_TYPE,
-  epSpec.NoAdditionalSpecDataHKT
->;
+): DefaultApplicationBuilder;
 
 /**
  * This overload of `newBuilder` will create new {@link epSpec.ApplicationBuilder}, allowing customization of various configuration values.
@@ -44,7 +32,7 @@ export function newBuilder(
  */
 export function newBuilder<
   TAuthenticatedState extends TStateSpecBase = typeof DEFAULT_AUTHENTICATED_STATE,
-  TOtherState extends TStateSpecBase = {},
+  TOtherState extends TStateSpecBase = typeof DEFAULT_NOT_AUTHENTICATED_STATE,
   TAllRequestBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
   TAllResponseBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
   TDefaultRequestBodyContentType extends TAllRequestBodyContentTypes = TAllRequestBodyContentTypes,
@@ -59,19 +47,13 @@ export function newBuilder<
     TDefaultRequestBodyContentType,
     TDefaultResponseBodyContentType
   >,
-): epSpec.ApplicationBuilder<
-  dataValidation.EncodedHKT,
-  dataValidation.ValidatorHKT,
-  state.StateHKT<
-    stateGeneric.StatePropertyValidations<TAuthenticatedState, TOtherState>
-  >,
-  MetadataProviders,
-  server.ServerContext,
+): DefaultApplicationBuilder<
+  TAuthenticatedState,
+  TOtherState,
   TAllRequestBodyContentTypes,
   TAllResponseBodyContentTypes,
   TDefaultRequestBodyContentType,
-  TDefaultResponseBodyContentType,
-  epSpec.NoAdditionalSpecDataHKT
+  TDefaultResponseBodyContentType
 >;
 
 /**
@@ -82,7 +64,7 @@ export function newBuilder<
  */
 export function newBuilder<
   TAuthenticatedState extends TStateSpecBase = typeof DEFAULT_AUTHENTICATED_STATE,
-  TOtherState extends TStateSpecBase = {},
+  TOtherState extends TStateSpecBase = typeof DEFAULT_NOT_AUTHENTICATED_STATE,
   TAllRequestBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
   TAllResponseBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
   TDefaultRequestBodyContentType extends TAllRequestBodyContentTypes = TAllRequestBodyContentTypes,
@@ -97,19 +79,13 @@ export function newBuilder<
     TDefaultRequestBodyContentType,
     TDefaultResponseBodyContentType
   >,
-): epSpec.ApplicationBuilder<
-  dataValidation.EncodedHKT,
-  dataValidation.ValidatorHKT,
-  state.StateHKT<
-    stateGeneric.StatePropertyValidations<TAuthenticatedState, TOtherState>
-  >,
-  MetadataProviders,
-  server.ServerContext,
+): DefaultApplicationBuilder<
+  TAuthenticatedState,
+  TOtherState,
   TAllRequestBodyContentTypes,
   TAllResponseBodyContentTypes,
   TDefaultRequestBodyContentType,
-  TDefaultResponseBodyContentType,
-  epSpec.NoAdditionalSpecDataHKT
+  TDefaultResponseBodyContentType
 > {
   const actualOpts: AppBuilderCreationParametersFull<
     TAuthenticatedState,
@@ -145,42 +121,69 @@ export function newBuilder<
       ),
     ),
     {
-      openapi: md.createOpenAPIProviderGeneric(
-        actualOpts.getOpenAPISecurityInfo,
-        jsonIO.createJsonSchemaFunctionality({
-          transformSchema: md.convertToOpenAPISchemaObject,
-          requestBodyContentTypes: actualOpts.requestBodyContentTypes,
-          responseBodyContentTypes: actualOpts.responseBodyContentTypes,
-          fallbackValue: actualOpts.getJsonSchemaFallback,
-          override: actualOpts.getJsonSchemaOverride,
-        }),
-      ),
+      openapi: mdProvider.createOpenAPIProvider({
+        getSecurityObjects: actualOpts.getOpenAPISecurityInfo,
+        requestBodyContentTypes: actualOpts.requestBodyContentTypes,
+        responseBodyContentTypes: actualOpts.responseBodyContentTypes,
+        fallbackValue: actualOpts.getJsonSchemaFallback,
+        override: actualOpts.getJsonSchemaOverride,
+      }),
     },
   );
 }
 
 /**
+ * This type specializes generic {@link epSpec.ApplicationBuilder} type to use `io-ts` and OpenAPI -specific type parameters where possible.
+ */
+export type DefaultApplicationBuilder<
+  TAuthenticatedState extends TStateSpecBase = typeof DEFAULT_AUTHENTICATED_STATE,
+  TOtherState extends TStateSpecBase = typeof DEFAULT_NOT_AUTHENTICATED_STATE,
+  TAllRequestBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
+  TAllResponseBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
+  TDefaultRequestBodyContentType extends TAllRequestBodyContentTypes = TAllRequestBodyContentTypes,
+  TDefaultResponseBodyContentType extends TAllResponseBodyContentTypes = TAllResponseBodyContentTypes,
+  // TMetadataProviders extends epSpec.TMetadataProvidersBase = MetadataProviders,
+  TAdditionalDataSpecHKT extends epSpec.EndpointSpecAdditionalDataHKTBase = epSpec.NoAdditionalSpecDataHKT,
+> = epSpec.ApplicationBuilder<
+  dataValidation.EncodedHKT,
+  dataValidation.ValidatorHKT,
+  DefaultStateHKT<TAuthenticatedState, TOtherState>,
+  MetadataProviders,
+  server.ServerContext,
+  TAllRequestBodyContentTypes,
+  TAllResponseBodyContentTypes,
+  TDefaultRequestBodyContentType,
+  TDefaultResponseBodyContentType,
+  TAdditionalDataSpecHKT
+>;
+
+/**
  * This is the {@link dataBE.MaterializeStateInfo} type for {@link DefaultStateHKT}.
  */
-export type DefaultStateInfo = dataBE.MaterializeStateInfo<
-  DefaultStateHKT,
-  dataBE.MaterializeStateSpecBase<DefaultStateHKT>
+export type DefaultStateInfo<
+  TAuthenticatedState extends TStateSpecBase = typeof DEFAULT_AUTHENTICATED_STATE,
+  TOtherState extends TStateSpecBase = typeof DEFAULT_NOT_AUTHENTICATED_STATE,
+> = dataBE.MaterializeStateInfo<
+  DefaultStateHKT<TAuthenticatedState, TOtherState>,
+  dataBE.MaterializeStateSpecBase<
+    DefaultStateHKT<TAuthenticatedState, TOtherState>
+  >
 >;
 
 /**
  * This is type for base constraints of generic parameters representing state specification objects with `io-ts` validators.
  */
-export type TStateSpecBase = Record<string, t.Mixed>;
+export type TStateSpecBase = Readonly<Record<string, t.Mixed>>;
 
 /**
  * This is the [higher-kinded type (HKT)](https://www.matechs.com/blog/encoding-hkts-in-typescript-once-again) for default usage of {@link state.StateHKT}.
  * The authenticated state consists of one property `userId`, and unauthenticated state has no properties.
  */
-export type DefaultStateHKT = state.StateHKT<
-  stateGeneric.StatePropertyValidations<
-    typeof DEFAULT_AUTHENTICATED_STATE,
-    typeof DEFAULT_NOT_AUTHENTICATED_STATE
-  >
+export type DefaultStateHKT<
+  TAuthenticatedState extends TStateSpecBase = typeof DEFAULT_AUTHENTICATED_STATE,
+  TOtherState extends TStateSpecBase = typeof DEFAULT_NOT_AUTHENTICATED_STATE,
+> = state.StateHKT<
+  stateGeneric.StatePropertyValidations<TAuthenticatedState, TOtherState>
 >;
 
 /**
@@ -194,11 +197,11 @@ export type MetadataProviders = {
   openapi: md.MetadataProviderHKT;
 };
 
-const DEFAULT_AUTHENTICATED_STATE = Object.freeze({
+export const DEFAULT_AUTHENTICATED_STATE = Object.freeze({
   userId: t.string,
 } as const);
 
-const DEFAULT_NOT_AUTHENTICATED_STATE = Object.freeze({} as const);
+export const DEFAULT_NOT_AUTHENTICATED_STATE = Object.freeze({} as const);
 
 /**
  * This type is `Partial` version of {@link AppBuilderCreationParametersFull}, to be used as input to overloads of {@link newBuilder}.
@@ -226,7 +229,7 @@ export type AppBuilderCreationParameters<
  */
 export interface AppBuilderCreationParametersFull<
   TAuthenticatedState extends TStateSpecBase = typeof DEFAULT_AUTHENTICATED_STATE,
-  TOtherState extends TStateSpecBase = {},
+  TOtherState extends TStateSpecBase = typeof DEFAULT_NOT_AUTHENTICATED_STATE,
   TAllRequestBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
   TAllResponseBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
   TDefaultRequestBodyContentType extends TAllRequestBodyContentTypes = TAllRequestBodyContentTypes,

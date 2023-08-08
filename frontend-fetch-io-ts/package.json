@@ -52,6 +52,8 @@
     "@babel/eslint-parser": "7.21.3",
     "@typescript-eslint/eslint-plugin": "5.59.2",
     "@typescript-eslint/parser": "5.59.2",
+    "ava": "5.2.0",
+    "c8": "7.13.0",
     "eslint": "8.39.0",
     "eslint-plugin-jsdoc": "43.1.1",
     "eslint-plugin-path-import-extension": "0.9.0",
@@ -63,7 +65,8 @@
     "io-ts": "^2.2.19",
     "madge": "6.1.0",
     "prettier": "2.8.8",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "ts-node": "10.9.1"
   },
   "scripts": {
     "build:run": "yarn run lint && yarn run tsc",
@@ -79,7 +82,9 @@
     "lint:eslint": "eslint ./src --ext .ts,.tsx",
     "remove-empty-js-files": "../scripts/remove-empty-js-files.cjs",
     "tsc": "tsc --project tsconfig.build.json",
-    "tsc:plain": "tsc"
+    "tsc:plain": "tsc",
+    "test:coverage": "c8 --temp-directory /tmp ava",
+    "test:run": "c8 --temp-directory /tmp --reporter text ava"
   },
   "resolutions": {
     "detective-typescript": "11.1.0",
