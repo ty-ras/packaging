@@ -13,6 +13,7 @@ export default tyras.endpointsWithOpenAPI(
   app,
   app.createEndpoints(
     {
+      // OpenAPI-specific information about the REST API.
       openapi: {
         title: "The example API",
         version: "1.0.0",
@@ -20,6 +21,7 @@ export default tyras.endpointsWithOpenAPI(
     },
     {
       "/api/": {
+        // The final URL of greeting endpoint will be "/api/greet/{target}".
         "greet/": new Greeting(),
       },
     },

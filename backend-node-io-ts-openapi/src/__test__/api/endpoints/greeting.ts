@@ -10,6 +10,7 @@ const urlPath = app.url`${tyras.urlParameter(
   "target",
   greeting.data.greetingTarget,
 )}`({
+  // OpenAPI-specific information about all endpoints behind this URL pattern.
   openapi: {
     pathItem: {
       description: "Endpoint(s) related to greeting.",
@@ -42,6 +43,7 @@ export default class GreetingEndpoint {
    * @see greeting.GetGreeting
    */
   @urlPath<greeting.GetGreeting>({
+    // OpenAPI -specific information about this endpoint
     openapi: {
       operation: { description: "Get the greeting for given target." },
       responseBody: {
