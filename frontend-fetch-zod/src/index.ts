@@ -5,7 +5,7 @@
  * - using `zod` as data validation framework
  */
 
-export type * from "@ty-ras/protocol";
+export * from "@ty-ras/protocol";
 export * from "@ty-ras/client-fetch";
 export * from "@ty-ras/data";
 export * from "@ty-ras/data-zod";
