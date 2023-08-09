@@ -82,8 +82,8 @@
     "remove-empty-js-files": "../scripts/remove-empty-js-files.cjs",
     "tsc": "tsc --project tsconfig.build.json",
     "tsc:plain": "tsc",
-    "test:coverage": "echo TODO tests",
-    "test:run": "echo TODO tests"
+    "test:coverage": "echo No own code to test.",
+    "test:run": "echo No own code to test."
   },
   "resolutions": {
     "detective-typescript": "11.1.0",
