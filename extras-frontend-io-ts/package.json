@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras-extras/frontend-io-ts",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -65,6 +65,7 @@
     "eslint-plugin-sonarjs": "0.19.0",
     "fp-ts": "^2.13.1",
     "io-ts": "^2.2.19",
+    "madge": "6.1.0",
     "prettier": "2.8.8",
     "typescript": "5.0.4"
   },
@@ -77,11 +78,18 @@
     "format-output-files-ts": "eslint --no-eslintrc --config '.eslintrc.out-ts.cjs' --fix --fix-type layout './dist-ts/**/*.ts'",
     "format-output-files-js": "eslint --no-eslintrc --config '.eslintrc.out.cjs' --fix 'dist-cjs/**/*js' 'dist-esm/**/*js'",
     "generate-stub-package-json-for-cjs": "../scripts/generate-stub-package-json.cjs",
-    "lint": "eslint ./src --ext .ts,.tsx",
+    "lint": "yarn run lint:eslint && yarn run lint:circular",
+    "lint:circular": "madge --circular --no-color --no-spinner --extensions ts --warning ./src",
+    "lint:eslint": "eslint ./src --ext .ts,.tsx",
     "remove-empty-js-files": "../scripts/remove-empty-js-files.cjs",
     "tsc": "tsc --project tsconfig.build.json",
     "tsc:plain": "tsc",
-    "test:coverage": "echo TODO tests",
-    "test:run": "echo TODO tests"
+    "test:coverage": "echo No own code to test.",
+    "test:run": "echo No own code to test."
+  },
+  "resolutions": {
+    "detective-typescript": "11.1.0",
+    "dependency-tree": "10.0.9",
+    "precinct": "11.0.5"
   }
 }
