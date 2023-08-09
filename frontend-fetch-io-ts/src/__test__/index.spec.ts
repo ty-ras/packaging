@@ -29,7 +29,7 @@ fetchMock.mock({
 });
 
 test("Verify that using client works", async (c) => {
-  c.plan(3);
+  c.plan(4);
   returnedResponses.push(JSON.stringify("Hello, world!"));
 
   c.deepEqual(
@@ -60,6 +60,8 @@ test("Verify that using client works", async (c) => {
         error: "error",
       },
     });
+    // Make sure no actual HTTP calls has been made since the error was in the input.
+    c.deepEqual(recordedCalls.length, 1);
   }
 });
 

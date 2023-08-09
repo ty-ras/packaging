@@ -25,6 +25,7 @@ const urlPath = app.url`${tyras.urlParameter(
 const stateSpec = {
   // We don't really use authentication-related properties in the endpoint.
   // This is just to demonstrate how to specify that "this endpoint works for both authenticated and unauthenticated requests".
+  // For truly unauthenticated endpoints, simply remove this property altogether so that stateSpec is simply an empty object.
   userId: false,
 } as const satisfies StateSpecBase;
 

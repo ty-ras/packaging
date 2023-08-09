@@ -6,6 +6,9 @@ import * as tyras from "../../";
 import app from "./app";
 import Greeting from "./endpoints/greeting";
 
+/**
+ * These endpoints compose the whole of REST API: the actual endpoints + endpoint to serve OpenAPI document about the actual endpoints.
+ */
 export default tyras.endpointsWithOpenAPI(
   app,
   app.createEndpoints(
