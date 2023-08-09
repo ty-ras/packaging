@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras/frontend-fetch-io-ts",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -42,8 +42,8 @@
     }
   },
   "dependencies": {
-    "@ty-ras/data-frontend-io-ts": "^1.0.1",
-    "@ty-ras/client-fetch": "^1.0.1",
+    "@ty-ras/data-frontend-io-ts": "^2.0.1",
+    "@ty-ras/client-fetch": "^2.0.0",
     "fp-ts": "^2.13.1",
     "io-ts": "^2.2.19"
   },
@@ -52,6 +52,9 @@
     "@babel/eslint-parser": "7.21.3",
     "@typescript-eslint/eslint-plugin": "5.59.2",
     "@typescript-eslint/parser": "5.59.2",
+    "@types/node": "18.16.3",
+    "ava": "5.2.0",
+    "c8": "7.13.0",
     "eslint": "8.39.0",
     "eslint-plugin-jsdoc": "43.1.1",
     "eslint-plugin-path-import-extension": "0.9.0",
@@ -59,10 +62,15 @@
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-sonarjs": "0.19.0",
+    "fetch-mock": "9.11.0",
     "fp-ts": "^2.13.1",
     "io-ts": "^2.2.19",
+    "madge": "6.1.0",
+    "node-fetch": "2.6.7",
     "prettier": "2.8.8",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "ts-node": "10.9.1",
+    "undici": "5.23.0"
   },
   "scripts": {
     "build:run": "yarn run lint && yarn run tsc",
@@ -73,9 +81,18 @@
     "format-output-files-ts": "eslint --no-eslintrc --config '.eslintrc.out-ts.cjs' --fix --fix-type layout './dist-ts/**/*.ts'",
     "format-output-files-js": "eslint --no-eslintrc --config '.eslintrc.out.cjs' --fix 'dist-cjs/**/*js' 'dist-esm/**/*js'",
     "generate-stub-package-json-for-cjs": "../scripts/generate-stub-package-json.cjs",
-    "lint": "eslint ./src --ext .ts,.tsx",
+    "lint": "yarn run lint:eslint && yarn run lint:circular",
+    "lint:circular": "madge --circular --no-color --no-spinner --extensions ts --warning ./src",
+    "lint:eslint": "eslint ./src --ext .ts,.tsx",
     "remove-empty-js-files": "../scripts/remove-empty-js-files.cjs",
     "tsc": "tsc --project tsconfig.build.json",
-    "tsc:plain": "tsc"
+    "tsc:plain": "tsc",
+    "test:coverage": "c8 --temp-directory /tmp ava",
+    "test:run": "c8 --temp-directory /tmp --reporter text ava"
+  },
+  "resolutions": {
+    "detective-typescript": "11.1.0",
+    "dependency-tree": "10.0.9",
+    "precinct": "11.0.5"
   }
 }
