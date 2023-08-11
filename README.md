@@ -32,3 +32,10 @@ This repository contains the following aggregator libraries for [`zod`](https://
 - [`@ty-ras/frontend-fetch-zod`](./frontend-fetch-zod) for frontend clients using Fetch API to send HTTP requests and `zod` as data validation library,
 - [`@ty-ras-extras/backend-zod](./extras-backend-zod) for most typically used extra functionality (caching, configuration, resource pool, main invocation, SQL) in backend, and
 - [`@ty-ras-extras/frontend-zod](./extras-frontend-zod) for most typically used extra functionality (caching, configuration) in frontend.
+
+# Data validation using `runtypes`
+This repository contains the following aggregator libraries for [`runtypes`](https://github.com/pelotom/runtypes) framework:
+- [`@ty-ras/backend-node-runtypes-openapi`](./backend-node-runtypes-openapi) for backends using Node HTTP(S) 1/2 server, `runtypes` as data validation library, and OpenAPI as metadata format,
+- [`@ty-ras/frontend-fetch-runtypes`](./frontend-fetch-runtypes) for frontend clients using Fetch API to send HTTP requests and `runtypes` as data validation library,
+- [`@ty-ras-extras/backend-runtypes](./extras-backend-runtypes) for most typically used extra functionality (caching, configuration, resource pool, main invocation, SQL) in backend, and
+- [`@ty-ras-extras/frontend-runtypes](./extras-frontend-zod) for most typically used extra functionality (caching, configuration) in frontend.
