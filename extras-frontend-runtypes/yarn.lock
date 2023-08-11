@@ -348,10 +348,10 @@
   resolved "https://registry.yarnpkg.com/@ty-ras-extras/cache/-/cache-2.0.0.tgz#cabe7b8d20eddcae91f40e675cdf82cf1da9e7aa"
   integrity sha512-yFj/g0AYruty44W6L4NFDrfy07TB94noR7FZBVU/LJHmYjBe3GiRYzkcklNlXv9md+BIEROubLumKd0u+lg7cA==
 
-"@ty-ras-extras/config-runtypes@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras-extras/config-runtypes/-/config-runtypes-2.0.0.tgz#5ae2fcbcfb0080e3aa1ac3ca89ef1638ae31b6cd"
-  integrity sha512-ONsn4nqpWmjuejRNQKlCOUv+Dy4A8EUlACeAnHRgcvE+lOkfX+ajxtrOaNHu9PhX8Oj0g7QB44ofCMs2L1OEag==
+"@ty-ras-extras/config-runtypes@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras-extras/config-runtypes/-/config-runtypes-2.0.1.tgz#25bafef5f7f178afbc6239f3eb5c93d6412ec3f6"
+  integrity sha512-fVcC/1CTh+MfTqLxxI6x19aXGCZXePr4jYsyKfTYtw9BfvdxKGvcy/Bow5iIfUiGxud9ePhLTzpsL8P4ranjeQ==
 
 "@types/json-schema@^7.0.12":
   version "7.0.12"

@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras-extras/frontend-runtypes",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@ty-ras-extras/cache": "^2.0.0",
-    "@ty-ras-extras/config-runtypes": "^2.0.0"
+    "@ty-ras-extras/config-runtypes": "^2.0.1"
   },
   "peerDependencies": {
     "runtypes": "^6.7.0"
