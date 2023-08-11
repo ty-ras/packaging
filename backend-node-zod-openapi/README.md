@@ -19,7 +19,7 @@ This library exports all members of the following libraries:
 - [`@ty-ras/server`](https://npmjs.com/package/@ty-ras/server),
 - [`@ty-ras/server-node`](https://npmjs.com/package/@ty-ras/server-node),
 - [`@ty-ras/state`](https://npmjs.com/package/@ty-ras/state),
-- [`@ty-ras/state-io-ts`](https://npmjs.com/package/@ty-ras/state-io-ts),
+- [`@ty-ras/state-zod`](https://npmjs.com/package/@ty-ras/state-zod),
 - [`@ty-ras/data`](https://npmjs.com/package/@ty-ras/data),
 - [`@ty-ras/data-zod`](https://npmjs.com/package/@ty-ras/data-zod),
 - [`@ty-ras/data-backend`](https://npmjs.com/package/@ty-ras/data-backend),
