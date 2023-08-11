@@ -94,9 +94,6 @@ test("Verify that using server works", async (c) => {
             400: {
               description: "If URL path parameters fail validation.",
             },
-            401: {
-              description: "If authentication failed.",
-            },
           },
         },
       },

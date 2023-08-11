@@ -16,6 +16,5 @@ This library exports all members of the following libraries:
 - [`@ty-ras-extras/cache`](https://npmjs.com/package/@ty-ras-extras/cache),
 - [`@ty-ras-extras/main`](https://npmjs.com/package/@ty-ras-extras/main),
 - [`@ty-ras-extras/resource-pool`](https://npmjs.com/package/@ty-ras-extras/resource-pool),
-- [`@ty-ras-extras/config-zod`](https://npmjs.com/package/@ty-ras-extras/config-zod),
-- [`@ty-ras-extras/typed-sql-zod`](https://npmjs.com/package/@ty-ras-extras/typed-sql-zod), and
-- [`@ty-ras-extras/state-zod`](https://npmjs.com/package/@ty-ras-extras/state-zod).
+- [`@ty-ras-extras/config-zod`](https://npmjs.com/package/@ty-ras-extras/config-zod), and 
+- [`@ty-ras-extras/typed-sql-zod`](https://npmjs.com/package/@ty-ras-extras/typed-sql-zod).

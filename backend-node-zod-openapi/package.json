@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras/backend-node-zod-openapi",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -48,7 +48,7 @@
     "@ty-ras/data-backend-zod": "^2.0.0",
     "@ty-ras/endpoint-spec": "^2.0.0",
     "@ty-ras/metadata-jsonschema-zod": "^2.0.1",
-    "@ty-ras/metadata-openapi": "^2.0.1",
+    "@ty-ras/metadata-openapi": "^2.0.2",
     "@ty-ras/state-zod": "^2.0.1",
     "zod": "^3.20.6",
     "zod-to-json-schema": "^3.20.4",

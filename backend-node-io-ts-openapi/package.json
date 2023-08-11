@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras/backend-node-io-ts-openapi",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -48,7 +48,7 @@
     "@ty-ras/data-backend-io-ts": "^2.0.2",
     "@ty-ras/endpoint-spec": "^2.0.0",
     "@ty-ras/metadata-jsonschema-io-ts": "^2.0.1",
-    "@ty-ras/metadata-openapi": "^2.0.1",
+    "@ty-ras/metadata-openapi": "^2.0.2",
     "@ty-ras/state-io-ts": "^2.0.1",
     "fp-ts": "^2.13.1",
     "io-ts": "^2.2.19",
