@@ -70,7 +70,6 @@ test("Verify that using server works", async (c) => {
             name: "target",
             required: true,
             schema: {
-              description: "string",
               pattern: "[^/]+",
               type: "string",
             },
@@ -84,7 +83,6 @@ test("Verify that using server works", async (c) => {
                 "application/json": {
                   example: "Hello, world!",
                   schema: {
-                    description: "string",
                     type: "string",
                   },
                 },

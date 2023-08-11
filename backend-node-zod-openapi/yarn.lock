@@ -450,10 +450,10 @@
   dependencies:
     "@ty-ras/data" "^2.1.0"
 
-"@ty-ras/metadata-openapi@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-openapi/-/metadata-openapi-2.0.1.tgz#99266c17ed57674aa6034c217230c40cb42369e9"
-  integrity sha512-31Zc5zas1irYB2hvGeM1umqzG02ExkxCgNnkqThd1iyKcsai4FDo+1EXIpwxsPjhxXN1yYWNxpb6Gf+RdZ34wg==
+"@ty-ras/metadata-openapi@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@ty-ras/metadata-openapi/-/metadata-openapi-2.0.2.tgz#0c0214b775cb8b727b82c04fe9b94aeafb6bc8d4"
+  integrity sha512-DMxOT1oMYwSdILZic7cTtGZYHd301kxzUbFdlJKuJ6/YyiUEXrG20cscYY7RcX+dbgRGWnyv3Ib9JfYrEHA/4A==
   dependencies:
     "@ty-ras/endpoint" "^2.0.0"
     "@ty-ras/metadata" "^2.0.0"

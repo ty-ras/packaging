@@ -15,10 +15,11 @@ import * as tyrasDataBE from "@ty-ras/data-backend";
 This library exports all members of the following libraries:
 - [`@ty-ras/protocol`](https://npmjs.com/package/@ty-ras/protocol),
 - [`@ty-ras/endpoint`](https://npmjs.com/package/@ty-ras/endpoint),
-- [`@ty-ras/endpoint-prefix`](https://npmjs.com/package/@ty-ras/endpoint-prefix),
 - [`@ty-ras/endpoint-spec`](https://npmjs.com/package/@ty-ras/endpoint-spec),
 - [`@ty-ras/server`](https://npmjs.com/package/@ty-ras/server),
 - [`@ty-ras/server-node`](https://npmjs.com/package/@ty-ras/server-node),
+- [`@ty-ras/state`](https://npmjs.com/package/@ty-ras/state),
+- [`@ty-ras/state-io-ts`](https://npmjs.com/package/@ty-ras/state-io-ts),
 - [`@ty-ras/data`](https://npmjs.com/package/@ty-ras/data),
 - [`@ty-ras/data-io-ts`](https://npmjs.com/package/@ty-ras/data-io-ts),
 - [`@ty-ras/data-backend`](https://npmjs.com/package/@ty-ras/data-backend),
