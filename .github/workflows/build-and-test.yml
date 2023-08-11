@@ -44,6 +44,10 @@ jobs:
           - frontend-fetch-zod
           - extras-backend-zod
           - extras-frontend-zod
+          - backend-node-runtypes-openapi
+          - frontend-fetch-runtypes
+          - extras-backend-runtypes
+          - extras-frontend-runtypes
     runs-on: ubuntu-latest
     name: Build and test ${{ matrix.dir }}
     steps:
