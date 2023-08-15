@@ -17,13 +17,13 @@ import * as epSpec from "./endpoint-spec";
  * Given the builder and the {@link epSpecBase.EndpointsCreationResult} from the builder, returns the endpoints of given {@link epSpecBase.EndpointsCreationResult}, along with endpoint(s) to serve OpenAPI document built from the endpoints.
  *
  * Notice that the OpenAPI endpoint strips authenticated endpoints for requests which are not considered to be authenticated.
- * @param builder The {@link epSpec.DefaultApplicationBuilder} that was used to create `creationResult`.
+ * @param builder The {@link epSpec.ApplicationBuilder} that was used to create `creationResult`.
  * @param creationResult The {@link epSpecBase.EndpointsCreationResult} that was created from `builder`.
  * @param openAPIPath The URL path to serve the OpenAPI document from.
  * @returns All of the endpoints of `creationResult` along with endpoints to serve the OpenAPI document.
  */
 export function endpointsWithOpenAPI(
-  builder: epSpec.DefaultApplicationBuilder,
+  builder: epSpec.ApplicationBuilder,
   creationResult: epSpecBase.EndpointsCreationResult<
     epSpec.MetadataProviders,
     server.ServerContext,
@@ -36,7 +36,7 @@ export function endpointsWithOpenAPI(
  * Given the builder and the {@link epSpecBase.EndpointsCreationResult} from the builder, returns the endpoints of given {@link epSpecBase.EndpointsCreationResult}, along with endpoint(s) to serve OpenAPI document built from the endpoints.
  *
  * Notice that the OpenAPI endpoint strips authenticated endpoints for requests which are not considered to be authenticated.
- * @param builder The {@link epSpec.DefaultApplicationBuilder} that was used to create `creationResult`.
+ * @param builder The {@link epSpec.ApplicationBuilder} that was used to create `creationResult`.
  * @param creationResult The {@link epSpecBase.EndpointsCreationResult} that was created from `builder`.
  * @param responseContentType The content type of the data returned by OpenAPI endpoint.
  * @param authState The validation of state properties related to authentication.
@@ -58,7 +58,7 @@ export function endpointsWithOpenAPI<
     ...Array<keyof TAuthenticatedState>,
   ],
 >(
-  builder: epSpec.DefaultApplicationBuilder<
+  builder: epSpec.ApplicationBuilder<
     TAuthenticatedState,
     TOtherState,
     TAllRequestBodyContentTypes,
@@ -92,7 +92,7 @@ export function endpointsWithOpenAPI<
  * Given the builder and the {@link epSpecBase.EndpointsCreationResult} from the builder, returns the endpoints of given {@link epSpecBase.EndpointsCreationResult}, along with endpoint(s) to serve OpenAPI document built from the endpoints.
  *
  * Notice that the OpenAPI endpoint strips authenticated endpoints for requests which are not considered to be authenticated.
- * @param builder The {@link epSpec.DefaultApplicationBuilder} that was used to create `creationResult`.
+ * @param builder The {@link epSpec.ApplicationBuilder} that was used to create `creationResult`.
  * @param creationResult The {@link epSpecBase.EndpointsCreationResult} that was created from `builder`.
  * @param creationResult.metadata Privately deconstructed variable.
  * @param creationResult.endpoints Privately deconstructed variable.
@@ -116,7 +116,7 @@ export function endpointsWithOpenAPI<
     ...Array<keyof TAuthenticatedState>,
   ],
 >(
-  builder: epSpec.DefaultApplicationBuilder<
+  builder: epSpec.ApplicationBuilder<
     TAuthenticatedState,
     TOtherState,
     TAllRequestBodyContentTypes,

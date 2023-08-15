@@ -21,7 +21,7 @@ import * as t from "runtypes";
  */
 export function newBuilder(
   defaultReadRequestBody: dataBE.ReadBody,
-): DefaultApplicationBuilder;
+): ApplicationBuilder;
 
 /**
  * This overload of `newBuilder` will create new {@link epSpec.ApplicationBuilder}, allowing customization of various configuration values.
@@ -50,7 +50,7 @@ export function newBuilder<
     TDefaultRequestBodyContentType,
     TDefaultResponseBodyContentType
   >,
-): DefaultApplicationBuilder<
+): ApplicationBuilder<
   TAuthenticatedState,
   TOtherState,
   TAllRequestBodyContentTypes,
@@ -85,7 +85,7 @@ export function newBuilder<
     TDefaultRequestBodyContentType,
     TDefaultResponseBodyContentType
   >,
-): DefaultApplicationBuilder<
+): ApplicationBuilder<
   TAuthenticatedState,
   TOtherState,
   TAllRequestBodyContentTypes,
@@ -141,7 +141,7 @@ export function newBuilder<
 /**
  * This type specializes generic {@link epSpec.ApplicationBuilder} type to use `runtypes` and OpenAPI -specific type parameters where possible.
  */
-export type DefaultApplicationBuilder<
+export type ApplicationBuilder<
   TAuthenticatedState extends
     TStateSpecBase = typeof DEFAULT_AUTHENTICATED_STATE,
   TOtherState extends TStateSpecBase = typeof DEFAULT_NOT_AUTHENTICATED_STATE,
@@ -154,7 +154,7 @@ export type DefaultApplicationBuilder<
   // TMetadataProviders extends epSpec.TMetadataProvidersBase = MetadataProviders,
   TAdditionalDataSpecHKT extends
     epSpec.EndpointSpecAdditionalDataHKTBase = epSpec.NoAdditionalSpecDataHKT,
-> = epSpec.ApplicationBuilder<
+> = epSpec.ApplicationBuilderGeneric<
   dataValidation.EncodedHKT,
   dataValidation.ValidatorHKT,
   DefaultStateHKT<TAuthenticatedState, TOtherState>,
