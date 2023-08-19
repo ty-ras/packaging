@@ -363,10 +363,10 @@
   resolved "https://registry.yarnpkg.com/@ty-ras-extras/resource-pool/-/resource-pool-2.0.0.tgz#7ec9414d713c047287db590718c8b750cd3bef99"
   integrity sha512-L4v7FVrVhScJjemV9ISBKG/tsIqw4IO2+LXh97jRZnk5M4p0nItuQlcIesTopFfX5g5Zh/RV8J4wndqHJn+f6A==
 
-"@ty-ras-extras/typed-sql-runtypes@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras-extras/typed-sql-runtypes/-/typed-sql-runtypes-2.0.0.tgz#5160412a52f60e40d7194d3e8713d0a2fe6f177e"
-  integrity sha512-oFlg2BMzbtCmpK/DbeToNeIhbIAv0XDq0I5D8ZYy/O7JlHQzZAjo/+6niWlzee31VrmK22mzXsL8kJidGfd5Cg==
+"@ty-ras-extras/typed-sql-runtypes@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras-extras/typed-sql-runtypes/-/typed-sql-runtypes-2.1.0.tgz#23727ed32d7aba8db0d22c6e9a01e54217b15d37"
+  integrity sha512-kXi+TR5alsppLlftYSCE6sh7vq5ftcgQA7Wjj4gBu8HArKhLO99V9iRxE9d+5xmNtmSuvK+zYmL6z0IY+nSOMg==
 
 "@types/json-schema@^7.0.12":
   version "7.0.12"
