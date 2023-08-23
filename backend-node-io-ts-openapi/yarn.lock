@@ -469,17 +469,17 @@
   resolved "https://registry.yarnpkg.com/@ty-ras/protocol/-/protocol-2.0.0.tgz#2cba0ceb6f891228bed881eadb3e17812152c632"
   integrity sha512-4ZGXghpSu8pdNz8oG8t36QAcYOugZ7FcfzsnGUIdK4VXIAwm5dW8d3y2JNv8w4hpa/QT6/oFUngK1H+ARrBc/Q==
 
-"@ty-ras/server-node@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/server-node/-/server-node-2.0.0.tgz#8eece6d12ea15dd0c5589854831b62138a50bcb5"
-  integrity sha512-e60XVnL+/K+idlcpLNYlymqJJjr/cpq4yPePdNvvzC3kKxeyzQJc8VJ3h4pmX3DU4S5rZ8TLzf95IUd2YTobiA==
+"@ty-ras/server-node@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/server-node/-/server-node-2.1.1.tgz#e39d8e8627816ad8dbeed89e885b093cc5a2afeb"
+  integrity sha512-1Uo9fTiL8ZHNS9FC+gfkj97lmfwXfgf+jeo09P1cqTm+9rOY9iYyXREIIAV1czEhbNWwXoo3GZGp8Nr3RKBaDQ==
   dependencies:
-    "@ty-ras/server" "^2.0.0"
+    "@ty-ras/server" "^2.1.1"
 
-"@ty-ras/server@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/server/-/server-2.0.0.tgz#f4e5a1f94ec051db0fcb1731e5d23163372cce13"
-  integrity sha512-APUPz5qClHmlsj18poOob7o8jkqw6tgG/XvbBbfQictoFf/cqL3ghUM151hTpS94zdJpnHZRIlff3S4iwODYGQ==
+"@ty-ras/server@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/server/-/server-2.1.1.tgz#ea13ddbe58f3603d6eab396277c1cf97c2171fe7"
+  integrity sha512-KAiuSEYwXKQIfMSIDCaGjuX/hy42oes/JnyG0blumMNwR0kSA6PYonDfg1ROtBPO9dGQZ/mWiWS3JKbZfMFKoQ==
   dependencies:
     "@ty-ras/endpoint" "^2.0.0"
 
