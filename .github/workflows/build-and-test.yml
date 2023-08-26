@@ -46,6 +46,7 @@ jobs:
         uses: tj-actions/changed-files@v38
         with:
           dir_names_max_depth: 2
+          json: true
           files_yaml: |
             global:
               - 'code/.c8rc.json'
@@ -62,12 +63,15 @@ jobs:
       - name: Mark all components to be run
         if: steps.changed-files-yaml.outputs.global_any_modified == 'true'
         run: |
-          echo "$(find code -type d -maxdepth 1 -mindepth 1 -print0 | while IFS= read -r -d '' line; do jq -nM --arg dirname "$(basename "$line")" '$dirname'; done | jq -sMc)" > __output.txt
+          echo "$(find code -type d -maxdepth 1 -mindepth 1 -print0 | while IFS= read -r -d '' line; do jq -nM --arg dirname "$line" '$dirname'; done | jq -sMc)" > __output.txt
           cat __output.txt
 
       - name: Mark only affected components to be run
-        if: steps.changed-files-yaml.outputs.global_any_modified == 'false' && steps.changed-files-yaml.outputs.code_any_modified == 'true'
+        # steps.changed-files-yaml.outputs.global_any_modified == 'false' &&
+        if: steps.changed-files-yaml.outputs.code_any_modified == 'true'
         run: |
+          echo "TEST"
+          echo '${{ steps.changed-files-yaml.outputs.code_all_modified_files }}'
           echo "" > __output.txt
       
       - name: Save job output
