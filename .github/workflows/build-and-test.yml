@@ -103,13 +103,46 @@ jobs:
           ${{ inputs.pre-run-function }}
           tyras_pre_run '${{ matrix.dir }}'
 
-      - id: install
-        name: Install dependencies of ${{ matrix.dir }}
+      - id: cache-dl
+        name: Cache downloaded Yarn packages
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-dl
+        with:
+          # Our install script uses this as yarn cache directory
+          path: .yarn
+          # We don't need OS in cache key, as we run yarn always via Docker (Alpine image)
+          key: ${{ env.cache-name }}-${{ matrix.dir }}-${{ hashFiles(format('code/{0}/yarn.lock', matrix.dir)) }}
+
+      - id: cache-modules
+        name: Cache installed Yarn packages
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-modules
+        with:
+          # Our install script uses this as yarn cache directory
+          path: code/${{ matrix.dir }}/node_modules
+          # We don't need OS in cache key, as we run yarn always via Docker (Alpine image)
+          key: ${{ env.cache-name }}-${{ matrix.dir }}-${{ hashFiles(format('code/{0}/yarn.lock', matrix.dir)) }}
+      
+      - id: install-fresh
+        if: steps.cache-dl.outputs.cache-hit != 'true' || steps.cache-modules.outputs.cache-hit != 'true'
+        name: Download and install Yarn packages
         shell: bash
         run: |
           set -e
 
           ./scripts/install.sh '${{ matrix.dir }}' --frozen-lockfile
+
+      - id: install-existing
+        if: steps.cache-dl.outputs.cache-hit == 'true' && steps.cache-modules.outputs.cache-hit == 'true'
+        name: Setup target project
+        shell: bash
+        run: |
+          set -e
+
+          ./scripts/setup-project.sh '${{ matrix.dir }}' --frozen-lockfile
+      
 
       - id: test
         name: Test ${{ matrix.dir }}
