@@ -25,7 +25,7 @@ on:
             cp "${TYRAS_GIT_ROOT}/LICENSE" ./LICENSE.txt
             # Note - yarn doesn't have functionality to install package without saving it to package.json (!)
             # So we use global install instead.
-            yarn global add "@jsdevtools/npm-publish@$(cat ../versions/npm-publish)"
+            yarn global add "@jsdevtools/npm-publish@$(cat "${TYRAS_GIT_ROOT}/versions/npm-publish")"
             npm-publish --dry-run --access public
           }
     secrets:
