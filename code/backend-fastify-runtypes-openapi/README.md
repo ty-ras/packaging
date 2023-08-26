@@ -1,0 +1,30 @@
+# TyRAS Library Bundle - Backend Running Fastify HTTP(S) 1/2 Server, `runtypes` as Data Validation Library, OpenAPI as Metadata Format
+
+This library bundles various `@ty-ras/*` libraries into one.
+The purpose is to enable writing
+```ts
+import * as tyras from "@ty-ras/backend-fastify-runtypes-openapi";
+```
+instead of
+```ts
+import * as tyrasData from "@ty-ras/data";
+import * as tyrasDataBE from "@ty-ras/data-backend";
+...etc
+```
+
+This library exports all members of the following libraries:
+- [`@ty-ras/protocol`](https://npmjs.com/package/@ty-ras/protocol),
+- [`@ty-ras/endpoint`](https://npmjs.com/package/@ty-ras/endpoint),
+- [`@ty-ras/endpoint-spec`](https://npmjs.com/package/@ty-ras/endpoint-spec),
+- [`@ty-ras/server`](https://npmjs.com/package/@ty-ras/server),
+- [`@ty-ras/server-fastify`](https://npmjs.com/package/@ty-ras/server-fastify),
+- [`@ty-ras/state`](https://npmjs.com/package/@ty-ras/state),
+- [`@ty-ras/state-runtypes`](https://npmjs.com/package/@ty-ras/state-runtypes),
+- [`@ty-ras/data`](https://npmjs.com/package/@ty-ras/data),
+- [`@ty-ras/data-runtypes`](https://npmjs.com/package/@ty-ras/data-runtypes),
+- [`@ty-ras/data-backend`](https://npmjs.com/package/@ty-ras/data-backend),
+- [`@ty-ras/data-backend-runtypes`](https://npmjs.com/package/@ty-ras/data-backend-runtypes),
+- [`@ty-ras/metadata`](https://npmjs.com/package/@ty-ras/metadata),
+- [`@ty-ras/metadata-openapi`](https://npmjs.com/package/@ty-ras/metadata-openapi),
+- [`@ty-ras/metadata-jsonschema`](https://npmjs.com/package/@ty-ras/metadata-jsonschema`), and
+- [`@ty-ras/metadata-jsonschema-runtypes`](https://npmjs.com/package/@ty-ras/metadata-jsonschema-runtypes).

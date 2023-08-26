@@ -206,7 +206,7 @@ export function endpointsWithOpenAPI<
         ? openAPIDocumentFull
         : openAPIDocumentUnauth;
       if (returnMD) {
-        const host = req.headers["host"];
+        const host = req.get("host");
         if (host) {
           const scheme = req.socket instanceof tls.TLSSocket ? "https" : "http";
           returnMD = {

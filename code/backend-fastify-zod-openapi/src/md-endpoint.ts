@@ -4,12 +4,12 @@
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type * as protocol from "@ty-ras/protocol"; // Imported only for JSDoc
-import * as dataIO from "@ty-ras/data-backend-runtypes";
+import * as dataIO from "@ty-ras/data-backend-zod";
 import type * as ep from "@ty-ras/endpoint";
-import type * as server from "@ty-ras/server-express";
+import type * as server from "@ty-ras/server-fastify";
 import type * as epSpecBase from "@ty-ras/endpoint-spec";
 import * as md from "@ty-ras/metadata-openapi";
-import * as t from "runtypes";
+import * as t from "zod";
 import * as tls from "node:tls";
 import * as epSpec from "./endpoint-spec";
 
@@ -188,7 +188,10 @@ export function endpointsWithOpenAPI<
     @noURLParameters<OpenAPIEndpointProtocol>({})({
       ...(additionalData as object),
       method: "GET",
-      responseBody: dataIO.responseBody(t.Unknown, params.responseContentType),
+      responseBody: dataIO.responseBody(
+        t.unknown(),
+        params.responseContentType,
+      ),
       state: stateSpec,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
@@ -200,13 +203,16 @@ export function endpointsWithOpenAPI<
       typeof noURLParameters,
       typeof stateSpec
     >) {
-      let returnMD = params.stateKeys.every((stateKey) =>
-        params.authState[stateKey].guard(state[stateKey as keyof typeof state]),
+      let returnMD = params.stateKeys.every(
+        (stateKey) =>
+          params.authState[stateKey].safeParse(
+            state[stateKey as keyof typeof state],
+          ).success,
       )
         ? openAPIDocumentFull
         : openAPIDocumentUnauth;
       if (returnMD) {
-        const host = req.get("host");
+        const host = req.headers["host"];
         if (host) {
           const scheme = req.socket instanceof tls.TLSSocket ? "https" : "http";
           returnMD = {
