@@ -80,9 +80,9 @@ jobs:
     needs:
       - construct_matrix_input
     # Without this if, the job will fail on empty input
-    if: needs.construct_matrix_input.outputs.matrix_output != ''
+    if: needs.construct_matrix_input.outputs.matrix_spec != ''
     strategy:
-      matrix: ${{ fromJson(needs.construct_matrix_input.outputs.matrix_output) }}
+      matrix: ${{ fromJson(needs.construct_matrix_input.outputs.matrix_spec) }}
     runs-on: ubuntu-latest
     name: Build and test ${{ matrix.dir }}
     steps:
