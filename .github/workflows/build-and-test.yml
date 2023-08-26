@@ -62,7 +62,7 @@ jobs:
       - name: Mark all components to be run
         if: steps.changed-files-yaml.outputs.global_any_modified == 'true'
         run: |
-          echo "$(find . -type d -maxdepth 2 -mindepth 2 -print0 | while IFS= read -r -d '' line; do jq -n --arg dirname "$(basename "$line")" '$dirname'; done | jq -s)" > __output.txt
+          echo "$(find code -type d -maxdepth 1 -mindepth 1 -print0 | while IFS= read -r -d '' line; do jq -nM --arg dirname "$(basename "$line")" '$dirname'; done | jq -sMc)" > __output.txt
           cat __output.txt
 
       - name: Mark only affected components to be run
@@ -73,7 +73,7 @@ jobs:
       - name: Save job output
         id: set_output
         run: |
-          echo "$(cat __output.txt || echo '')" > "${GITHUB_OUTPUT}"
+          echo "matrix_spec=$(cat __output.txt || echo '')" > "${GITHUB_OUTPUT}"
 
   build_and_test:
     needs:
