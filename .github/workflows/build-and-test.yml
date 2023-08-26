@@ -112,7 +112,7 @@ jobs:
           # Our install script uses this as yarn cache directory
           path: .yarn
           # We don't need OS in cache key, as we run yarn always via Docker (Alpine image)
-          key: ${{ env.cache-name }}-${{ matrix.dir }}-${{ hashFiles(format('code/{0}/yarn.lock', matrix.dir)) }}
+          key: ${{ env.cache-name }}-${{ matrix.dir }}-${{ hashFiles(format('{0}/yarn.lock', matrix.dir)) }}
 
       - id: cache-modules
         name: Cache installed Yarn packages
@@ -121,9 +121,9 @@ jobs:
           cache-name: cache-modules
         with:
           # Our install script uses this as yarn cache directory
-          path: code/${{ matrix.dir }}/node_modules
+          path: ${{ matrix.dir }}/node_modules
           # We don't need OS in cache key, as we run yarn always via Docker (Alpine image)
-          key: ${{ env.cache-name }}-${{ matrix.dir }}-${{ hashFiles(format('code/{0}/yarn.lock', matrix.dir)) }}
+          key: ${{ env.cache-name }}-${{ matrix.dir }}-${{ hashFiles(format('{0}/yarn.lock', matrix.dir)) }}
       
       - id: install-fresh
         if: steps.cache-dl.outputs.cache-hit != 'true' || steps.cache-modules.outputs.cache-hit != 'true'
