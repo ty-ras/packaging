@@ -48,6 +48,7 @@ jobs:
           dir_names: true
           dir_names_max_depth: 2
           json: true
+          quotepath: false
           files_yaml: |
             global:
               - 'code/.c8rc.json'
@@ -71,9 +72,8 @@ jobs:
         # steps.changed-files-yaml.outputs.global_any_modified == 'false' &&
         if: steps.changed-files-yaml.outputs.code_any_modified == 'true'
         run: |
-          echo "TEST"
-          echo '${{ steps.changed-files-yaml.outputs.code_all_modified_files }}'
-          echo "" > __output.txt
+          echo '${{ steps.changed-files-yaml.outputs.code_all_modified_files }}' > __output.txt
+          cat __output.txt
       
       - name: Save job output
         id: set_output
