@@ -73,7 +73,8 @@ jobs:
       - name: Save job output
         id: set_output
         run: |
-          echo "matrix_spec=$(cat __output.txt || echo '')" > "${GITHUB_OUTPUT}"
+          echo "matrix_spec={\"dir\":$(cat __output.txt || echo '[]')}" > "${GITHUB_OUTPUT}"
+          cat "${GITHUB_OUTPUT}"
 
   build_and_test:
     needs:
