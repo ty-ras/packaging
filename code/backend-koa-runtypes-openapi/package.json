@@ -1,17 +1,18 @@
 {
-  "name": "@ty-ras/backend-node-runtypes-openapi",
-  "version": "2.2.0",
+  "name": "@ty-ras/backend-koa-runtypes-openapi",
+  "version": "2.0.0",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
     "url": "https://github.com/stazz"
   },
   "license": "MIT",
-  "description": "Bundle of TyRAS libraries suitable to use in backends which run on Node HTTP(S) 1 or 2 server, use `runtypes` as data validation library, and OpenAPI as metadata about the endpoints.",
+  "description": "Bundle of TyRAS libraries suitable to use in backends which run on Koa HTTP(S) 1 or 2 server, use `runtypes` as data validation library, and OpenAPI as metadata about the endpoints.",
   "keywords": [
     "backend",
     "http",
     "node",
+    "koa",
     "server",
     "data",
     "validation",
@@ -44,12 +45,13 @@
     }
   },
   "dependencies": {
-    "@ty-ras/server-node": "^2.2.0",
+    "@ty-ras/server-koa": "^2.2.0",
     "@ty-ras/data-backend-runtypes": "^2.0.0",
     "@ty-ras/endpoint-spec": "^2.0.1",
     "@ty-ras/metadata-jsonschema-runtypes": "^2.0.0",
     "@ty-ras/metadata-openapi": "^2.0.2",
     "@ty-ras/state-runtypes": "^2.0.0",
+    "koa": "^2.14.2",
     "openapi-types": "^12.0.2",
     "raw-body": "^2.5.1",
     "runtypes": "^6.7.0"
@@ -58,6 +60,7 @@
     "@ava/get-port": "2.0.0",
     "@babel/core": "7.22.10",
     "@babel/eslint-parser": "7.22.10",
+    "@types/koa": "2.13.8",
     "@types/node": "18.16.3",
     "@typescript-eslint/eslint-plugin": "6.3.0",
     "@typescript-eslint/parser": "6.3.0",
