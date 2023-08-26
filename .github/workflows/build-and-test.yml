@@ -41,6 +41,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - name: Get all global and project-specific changes
         id: changed-files-yaml
         uses: tj-actions/changed-files@v38
@@ -67,20 +68,16 @@ jobs:
         if: steps.changed-files-yaml.outputs.global_any_modified == 'true'
         run: |
           echo "$(find code -type d -maxdepth 1 -mindepth 1 -print0 | while IFS= read -r -d '' line; do jq -nM --arg dirname "$line" '$dirname'; done | jq -sMc)" > __output.txt
-          cat __output.txt
 
       - name: Mark only affected components to be run
-        # steps.changed-files-yaml.outputs.global_any_modified == 'false' &&
-        if: steps.changed-files-yaml.outputs.code_any_modified == 'true'
+        if: steps.changed-files-yaml.outputs.global_any_modified == 'false' && steps.changed-files-yaml.outputs.code_any_modified == 'true'
         run: |
           echo '${{ steps.changed-files-yaml.outputs.code_all_modified_files }}' > __output.txt
-          cat __output.txt
       
       - name: Save job output
         id: set_output
         run: |
           echo "matrix_spec={\"dir\":$(cat __output.txt || echo '[]')}" > "${GITHUB_OUTPUT}"
-          cat "${GITHUB_OUTPUT}"
 
   build_and_test:
     needs:
@@ -101,9 +98,6 @@ jobs:
         shell: bash
         run: |
           set -e
-
-          echo "MATRIX DIR ${{ matrix.dir }}"
-          exit 5
 
           ${{ inputs.pre-run-function }}
           tyras_pre_run '${{ matrix.dir }}'
