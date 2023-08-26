@@ -23,6 +23,7 @@ yarn ()
     --rm \
     -t \
     --volume "${TYRAS_ROOT_DIR}/code/:${TYRAS_ROOT_DIR}/code/:rw" \
+    --volume "${TYRAS_ROOT_DIR}/scripts/:${TYRAS_ROOT_DIR}/scripts/:ro" \
     --volume "${TYRAS_ROOT_DIR}/.yarn/:/yarn_dir/:rw" \
     --entrypoint yarn \
     --workdir "${TYRAS_ROOT_DIR}/code/${TYRAS_LIB_DIR}" \
