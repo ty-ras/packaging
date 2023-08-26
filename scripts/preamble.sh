@@ -19,11 +19,14 @@ yarn ()
   docker run \
     --rm \
     -t \
-    --volume "${TYRAS_ROOT_DIR}:${TYRAS_ROOT_DIR}:rw" \
+    --volume "${TYRAS_ROOT_DIR}/code/:${TYRAS_ROOT_DIR}/code/:rw" \
+    --volume "${TYRAS_ROOT_DIR}/.yarn/:/yarn_dir/:rw" \
     --entrypoint yarn \
     --workdir "${TYRAS_ROOT_DIR}/${TYRAS_LIB_DIR}" \
-    --env YARN_CACHE_FOLDER="${TYRAS_ROOT_DIR}/.yarn" \
-    --env NODE_PATH="${TYRAS_ROOT_DIR}/${TYRAS_LIB_DIR}/node_modules" \
+    --env YARN_CACHE_FOLDER="/yarn_dir/" \
+    --env NODE_PATH="${TYRAS_ROOT_DIR}/code/${TYRAS_LIB_DIR}/node_modules" \
     "node:${TYRAS_NODE_VERSION}" \
     "$@"
 }
+
+cd code

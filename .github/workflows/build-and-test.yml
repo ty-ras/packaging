@@ -32,22 +32,56 @@ on:
         required: false
 
 jobs:
+  construct_matrix_input:
+    runs-on: ubuntu-latest
+    name: Construct input for matrix job
+    outputs:
+      matrix_spec: ${{ steps.set_output.outputs.matrix_spec }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get all global and project-specific changes
+        id: changed-files-yaml
+        uses: tj-actions/changed-files@v38
+        with:
+          dir_names_max_depth: 2
+          files_yaml: |
+            global:
+              - 'code/.c8rc.json'
+              - 'code/.eslintrc.*'
+              - 'code/.pretterrc'
+              - 'code/ava.config.mjs'
+              - 'code/tsconfig.*'
+              - '.codecov.yml'
+              - '.github/**'
+            code:
+              - 'code/*/**'
+              - '!code/*/**.md'
+
+      - name: Mark all components to be run
+        if: steps.changed-files-yaml.outputs.global_any_modified == 'true'
+        run: |
+          echo "$(find . -type d -maxdepth 2 -mindepth 2 -print0 | while IFS= read -r -d '' line; do jq -n --arg dirname "$(basename "$line")" '$dirname'; done | jq -s)" > __output.txt
+          cat __output.txt
+
+      - name: Mark only affected components to be run
+        if: steps.changed-files-yaml.outputs.global_any_modified == 'false' && steps.changed-files-yaml.outputs.code_any_modified == 'true'
+        run: |
+          echo "" > __output.txt
+      
+      - name: Save job output
+        id: set_output
+        run: |
+          echo "$(cat __output.txt || echo '')" > "${GITHUB_OUTPUT}"
+
   build_and_test:
+    needs:
+      - construct_matrix_input
+    # Without this if, the job will fail on empty input
+    if: needs.construct_matrix_input.outputs.matrix_output != ''
     strategy:
-      matrix:
-        dir:
-          - backend-node-io-ts-openapi
-          - frontend-fetch-io-ts
-          - extras-backend-io-ts
-          - extras-frontend-io-ts
-          - backend-node-zod-openapi
-          - frontend-fetch-zod
-          - extras-backend-zod
-          - extras-frontend-zod
-          - backend-node-runtypes-openapi
-          - frontend-fetch-runtypes
-          - extras-backend-runtypes
-          - extras-frontend-runtypes
+      matrix: ${{ fromJson(needs.construct_matrix_input.outputs.matrix_output) }}
     runs-on: ubuntu-latest
     name: Build and test ${{ matrix.dir }}
     steps:
@@ -60,6 +94,9 @@ jobs:
         shell: bash
         run: |
           set -e
+
+          echo "MATRIX DIR ${{ matrix.dir }}"
+          exit 5
 
           ${{ inputs.pre-run-function }}
           tyras_pre_run '${{ matrix.dir }}'
