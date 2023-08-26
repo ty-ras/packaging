@@ -20,8 +20,9 @@ on:
         default: |
           tyras_post_run ()
           {
+            TYRAS_GIT_ROOT="$(pwd)"
             cd "$1"
-            cp ../LICENSE ./LICENSE.txt
+            cp "${TYRAS_GIT_ROOT}/LICENSE" ./LICENSE.txt
             # Note - yarn doesn't have functionality to install package without saving it to package.json (!)
             # So we use global install instead.
             yarn global add "@jsdevtools/npm-publish@$(cat ../versions/npm-publish)"

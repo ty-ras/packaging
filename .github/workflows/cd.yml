@@ -20,8 +20,10 @@ jobs:
       post-run-function: |
         tyras_post_run ()
         {
-          PACKAGE_VERSION="$(cat "$1/package.json" | jq -rM .version)"
-          GIT_TAG_NAME="$1-v${PACKAGE_VERSION}"
+          TYRAS_LIB_DIR="$1"
+          TYRAS_LIB_NAME="$(basename "${TYRAS_LIB_DIR}")"
+          PACKAGE_VERSION="$(cat "${TYRAS_LIB_DIR}/package.json" | jq -rM .version)"
+          GIT_TAG_NAME="${TYRAS_LIB_NAME}-v${PACKAGE_VERSION}"
           if [[ -n "$(git ls-remote --tags origin "${GIT_TAG_NAME}")" ]]; then
             echo "Detected that tag ${GIT_TAG_NAME} already is existing, not proceeding to publish package $1"
           else
@@ -31,12 +33,13 @@ jobs:
             git config --global user.name "CD Automation"
             git tag \
               -a \
-              -m "Component $1 release ${PACKAGE_VERSION}" \
+              -m "Component ${TYRAS_LIB_NAME} release ${PACKAGE_VERSION}" \
               "${GIT_TAG_NAME}"
 
             # Publish NPM package
-            cd "$1"
-            cp ../LICENSE ./LICENSE.txt
+            TYRAS_GIT_ROOT="$(pwd)"
+            cd "${TYRAS_LIB_DIR}"
+            cp "${TYRAS_GIT_ROOT}/LICENSE" ./LICENSE.txt
             # Note - yarn doesn't have functionality to install package without saving it to package.json (!)
             # So we use global install instead.
             yarn global add "@jsdevtools/npm-publish@$(cat ../versions/npm-publish)"
