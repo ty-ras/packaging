@@ -12,10 +12,10 @@ else
 fi
 
 if [[ "${TYRAS_LIB_NAME}" == backend-* ]]; then
+  TYRAS_LIB_VALIDATION="$(extract_tyras_lib_validation 2)"
   mkdir -p "${TYRAS_LIB_DIR}/src/__test__/"
   cp -r './test-components/backend/.' "${TYRAS_LIB_DIR}/src/__test__/"
   cp -r "./test-components/openapi-${TYRAS_LIB_VALIDATION}/." "${TYRAS_LIB_DIR}/src/__test__"
-  TYRAS_LIB_VALIDATION="$(extract_tyras_lib_validation 2)"
   cp -r "./test-components/protocol-${TYRAS_LIB_VALIDATION}/." "${TYRAS_LIB_DIR}/src/__test__/api/"
 elif [[ "${TYRAS_LIB_NAME}" == frontend-* ]]; then
   mkdir -p "${TYRAS_LIB_DIR}/src/__test__/"
