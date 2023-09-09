@@ -4,5 +4,4 @@
 
 import type { OpenAPIV3 as openapi } from "openapi-types";
 
-export default {
-} as const satisfies openapi.SchemaObject;
+export default {} as const satisfies openapi.SchemaObject;
