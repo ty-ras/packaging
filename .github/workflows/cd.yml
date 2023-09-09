@@ -25,7 +25,7 @@ jobs:
           PACKAGE_VERSION="$(cat "${TYRAS_LIB_DIR}/package.json" | jq -rM .version)"
           GIT_TAG_NAME="${TYRAS_LIB_NAME}-v${PACKAGE_VERSION}"
           if [[ -n "$(git ls-remote --tags origin "${GIT_TAG_NAME}")" ]]; then
-            echo "Detected that tag ${GIT_TAG_NAME} already is existing, not proceeding to publish package $1"
+            echo "Detected that tag ${GIT_TAG_NAME} already is existing, not proceeding to publish package ${TYRAS_LIB_NAME}"
           else
             # The release can be performed, start by creating Git tag locally
             # If there are any errors here, we won't end up in situation where NPM package is published, but no Git tag exists for it
