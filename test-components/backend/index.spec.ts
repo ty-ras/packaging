@@ -7,6 +7,7 @@ import getPort from "@ava/get-port";
 import * as tyras from "..";
 import endpoints from "./api";
 import { request } from "undici";
+import schemaAdditionalProperties from "./schema-additional-properties";
 
 test("Verify that using server works", async (c) => {
   c.plan(3);
@@ -70,7 +71,7 @@ test("Verify that using server works", async (c) => {
             name: "target",
             required: true,
             schema: {
-              description: "string",
+              ...schemaAdditionalProperties,
               pattern: "[^/]+",
               type: "string",
             },
@@ -84,7 +85,7 @@ test("Verify that using server works", async (c) => {
                 "application/json": {
                   example: "Hello, world!",
                   schema: {
-                    description: "string",
+                    ...schemaAdditionalProperties,
                     type: "string",
                   },
                 },
