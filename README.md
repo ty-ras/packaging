@@ -26,8 +26,10 @@ This repository contains the following aggregator libraries for [`io-ts`](https:
 - [`@ty-ras/backend-express-io-ts-openapi`](./code/backend-express-io-ts-openapi) for backends using Express HTTP(S) 1 server, `io-ts` as data validation library, and OpenAPI as metadata format,
 - [`@ty-ras/backend-fastify-io-ts-openapi`](./code/backend-fastify-io-ts-openapi) for backends using Fastify HTTP(S) 1/2 server, `io-ts` as data validation library, and OpenAPI as metadata format,
 - [`@ty-ras/frontend-fetch-io-ts`](./code/frontend-fetch-io-ts) for frontend clients using Fetch API to send HTTP requests and `io-ts` as data validation library,
-- [`@ty-ras-extras/backend-io-ts](./code/extras-backend-io-ts) for most typically used extra functionality (caching, configuration, resource pool, main invocation, SQL) in backend, and
-- [`@ty-ras-extras/frontend-io-ts](./code/extras-frontend-io-ts) for most typically used extra functionality (caching, configuration) in frontend.
+- [`@ty-ras/frontend-node-io-ts`](./code/frontend-node-io-ts) for frontend clients using Node runtime to send HTTP requests and `io-ts` as data validation library,
+- [`@ty-ras/frontend-axios-io-ts`](./code/frontend-axios-io-ts) for frontend clients using [Axios](https://github.com/axios/axios) library to send HTTP requests and `io-ts` as data validation library,
+- [`@ty-ras-extras/backend-io-ts`](./code/extras-backend-io-ts) for most typically used extra functionality (caching, configuration, resource pool, main invocation, SQL) in backend, and
+- [`@ty-ras-extras/frontend-io-ts`](./code/extras-frontend-io-ts) for most typically used extra functionality (caching, configuration) in frontend.
 
 # Data validation using `zod`
 This repository contains the following aggregator libraries for [`zod`](https://github.com/colinhacks/zod) framework:
@@ -36,8 +38,10 @@ This repository contains the following aggregator libraries for [`zod`](https://
 - [`@ty-ras/backend-express-io-ts-openapi`](./code/backend-express-io-ts-openapi) for backends using Express HTTP(S) 1 server, `zod` as data validation library, and OpenAPI as metadata format,
 - [`@ty-ras/backend-fastify-io-ts-openapi`](./code/backend-fastify-io-ts-openapi) for backends using Fastify HTTP(S) 1/2 server, `zod` as data validation library, and OpenAPI as metadata format,
 - [`@ty-ras/frontend-fetch-zod`](./code/frontend-fetch-zod) for frontend clients using Fetch API to send HTTP requests and `zod` as data validation library,
-- [`@ty-ras-extras/backend-zod](./code/extras-backend-zod) for most typically used extra functionality (caching, configuration, resource pool, main invocation, SQL) in backend, and
-- [`@ty-ras-extras/frontend-zod](./code/extras-frontend-zod) for most typically used extra functionality (caching, configuration) in frontend.
+- [`@ty-ras/frontend-node-zod`](./code/frontend-node-zod) for frontend clients using Node runtime to send HTTP requests and `zod` as data validation library,
+- [`@ty-ras/frontend-axios-zod`](./code/frontend-axios-zod) for frontend clients using [Axios](https://github.com/axios/axios) library to send HTTP requests and `zod` as data validation library,
+- [`@ty-ras-extras/backend-zod`](./code/extras-backend-zod) for most typically used extra functionality (caching, configuration, resource pool, main invocation, SQL) in backend, and
+- [`@ty-ras-extras/frontend-zod`](./code/extras-frontend-zod) for most typically used extra functionality (caching, configuration) in frontend.
 
 # Data validation using `runtypes`
 This repository contains the following aggregator libraries for [`runtypes`](https://github.com/pelotom/runtypes) framework:
@@ -46,5 +50,7 @@ This repository contains the following aggregator libraries for [`runtypes`](htt
 - [`@ty-ras/backend-express-io-ts-openapi`](./code/backend-express-io-ts-openapi) for backends using Express HTTP(S) 1 server, `runtype` as data validation library, and OpenAPI as metadata format,
 - [`@ty-ras/backend-fastify-io-ts-openapi`](./code/backend-fastify-io-ts-openapi) for backends using Fastify HTTP(S) 1/ server, `runtype` as data validation library, and OpenAPI as metadata format,
 - [`@ty-ras/frontend-fetch-runtypes`](./code/frontend-fetch-runtypes) for frontend clients using Fetch API to send HTTP requests and `runtypes` as data validation library,
-- [`@ty-ras-extras/backend-runtypes](./code/extras-backend-runtypes) for most typically used extra functionality (caching, configuration, resource pool, main invocation, SQL) in backend, and
-- [`@ty-ras-extras/frontend-runtypes](./code/extras-frontend-zod) for most typically used extra functionality (caching, configuration) in frontend.
+- [`@ty-ras/frontend-node-runtypes`](./code/frontend-node-runtypes) for frontend clients using Node runtime to send HTTP requests and `runtypes` as data validation library,
+- [`@ty-ras/frontend-axios-runtypes`](./code/frontend-axios-runtypes) for frontend clients using [Axios](https://github.com/axios/axios) library to send HTTP requests and `runtypes` as data validation library,
+- [`@ty-ras-extras/backend-runtypes`](./code/extras-backend-runtypes) for most typically used extra functionality (caching, configuration, resource pool, main invocation, SQL) in backend, and
+- [`@ty-ras-extras/frontend-runtypes`](./code/extras-frontend-zod) for most typically used extra functionality (caching, configuration) in frontend.

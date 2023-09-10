@@ -13,6 +13,8 @@ if [ -z "${TYRAS_LIB_DIR}" ]; then
 fi
 shift
 
+TYRAS_LIB_NAME="$(basename "${TYRAS_LIB_DIR}")"
+
 yarn ()
 {
   docker run \
@@ -29,3 +31,9 @@ yarn ()
     "$@"
 }
 
+extract_tyras_lib_validation ()
+{
+  # With arg "2" it will get 'io-ts' from 'backend-express-io-ts-openapi' and 'zod' from 'backend-node-zod-openapi'
+  # With arg "1" it will get 'io-ts' from 'frontend-fetch-io-ts' and 'zod' from 'frontend-axios-zod'
+  echo "${TYRAS_LIB_NAME}" | cut -d '-' -f 3- | rev | cut -d '-' -f "${1}-" | rev
+}

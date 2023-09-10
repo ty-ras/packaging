@@ -5,3 +5,4 @@ coverage
 */.eslintrc*.cjs
 */tsconfig*.json
 yarn-error.log
+__test__
