@@ -15,6 +15,20 @@
     "@jridgewell/gen-mapping" "^0.3.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
+"@ava/cooperate@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ava/cooperate/-/cooperate-1.0.0.tgz#e9b7fbf0e6cdeab5d30f14f7e283eddc22d51f0d"
+  integrity sha512-jdf8Fd3cuj/Gk7XM67p1u4IZ7ohbv93x8e4Z+J7A9rRrolOU6v6oQ9ZsilYfgKnuPE72t/GorTC4ArtUP5m3Wg==
+  dependencies:
+    never "^1.0.3"
+
+"@ava/get-port@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@ava/get-port/-/get-port-2.0.0.tgz#9bd789d113ffeb666753bca9000de0f66390c7c8"
+  integrity sha512-n8DTwgjjeps/9lkTAzhdhxCGWeZJbL8jAgICFJHv5eNKvbF9onvh4tqd5blPWZ07uJYtpLySli6l/+lc2Wxakw==
+  dependencies:
+    "@ava/cooperate" "^1.0.0"
+
 "@babel/code-frame@^7.22.13":
   version "7.22.13"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.22.13.tgz#e3c1c099402598483b7a8c46a721d1038803755e"
@@ -2352,6 +2366,11 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
+
+never@^1.0.3:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/never/-/never-1.1.0.tgz#567b50d1fa4cfa123226e5e039706e7c18bba20f"
+  integrity sha512-K0xfZVKUX7hrmbZKmyD1KB+PT8I9b9Ffxvmht8FhRjMIoe7/XyTfgyQko7G6RKvfnT9oxCrq0CARm1De5uXEbQ==
 
 node-fetch@2.6.7:
   version "2.6.7"

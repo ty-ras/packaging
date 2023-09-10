@@ -20,7 +20,11 @@ if [[ "${TYRAS_LIB_NAME}" == backend-* ]]; then
 elif [[ "${TYRAS_LIB_NAME}" == frontend-* ]]; then
   mkdir -p "${TYRAS_LIB_DIR}/src/__test__/"
   cp -r './test-components/frontend/.' "${TYRAS_LIB_DIR}/src/__test__/"
-  cp -r "./test-components/frontend-$(echo "${TYRAS_LIB_NAME}" | cut -d '-' -f 2)/." "${TYRAS_LIB_DIR}/src/__test__/"
+  TYRAS_CLIENT_KIND="$(echo "${TYRAS_LIB_NAME}" | cut -d '-' -f 2)"
+  if [[ -d "./test-components/frontend-${TYRAS_CLIENT_KIND}" ]]; then
+    TYRAS_CLIENT_KIND='generic'
+  fi
+  cp -r "./test-components/frontend-${TYRAS_CLIENT_KIND}/." "${TYRAS_LIB_DIR}/src/__test__/"
   cp -r "./test-components/protocol-$(extract_tyras_lib_validation 1)/." "${TYRAS_LIB_DIR}/src/__test__/backend/"
 fi
 
