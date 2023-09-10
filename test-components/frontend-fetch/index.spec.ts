@@ -6,6 +6,7 @@ import test from "ava";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type * as _ from "./fetch"; // Otherwise TS-Node will not work
 import backend from "./backend";
+import config from "./config";
 // Notice that using fetch-mock forces downgrade of node-fetch to 2.x series.
 // This is because fetch-mock uses 'require' to load node-fetch, and versions 3.x of node-fetch do not support that.
 import fetchMock, { type MockRequest } from "fetch-mock";
@@ -32,6 +33,8 @@ test("Verify that using client works", async (c) => {
   c.plan(4);
   returnedResponses.push(JSON.stringify("Hello, world!"));
 
+  const port = config.backend.substring(config.backend.lastIndexOf(":") + 1);
+
   c.deepEqual(
     await backend.greeting.getGreeting({ url: { target: "world" } }),
     {
@@ -45,7 +48,7 @@ test("Verify that using client works", async (c) => {
         headers: {},
         method: "GET",
       },
-      url: "http://localhost:123/api/greet/world",
+      url: `http://localhost:${port}/api/greet/world`,
     },
   ]);
 
