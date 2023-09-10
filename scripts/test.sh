@@ -21,7 +21,7 @@ elif [[ "${TYRAS_LIB_NAME}" == frontend-* ]]; then
   mkdir -p "${TYRAS_LIB_DIR}/src/__test__/"
   cp -r './test-components/frontend/.' "${TYRAS_LIB_DIR}/src/__test__/"
   TYRAS_CLIENT_KIND="$(echo "${TYRAS_LIB_NAME}" | cut -d '-' -f 2)"
-  if [[ -d "./test-components/frontend-${TYRAS_CLIENT_KIND}" ]]; then
+  if [[ ! -d "./test-components/frontend-${TYRAS_CLIENT_KIND}" ]]; then
     TYRAS_CLIENT_KIND='generic'
   fi
   cp -r "./test-components/frontend-${TYRAS_CLIENT_KIND}/." "${TYRAS_LIB_DIR}/src/__test__/"
