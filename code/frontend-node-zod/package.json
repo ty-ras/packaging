@@ -1,5 +1,5 @@
 {
-  "name": "@ty-ras/frontend-fetch-io-ts",
+  "name": "@ty-ras/frontend-node-zod",
   "version": "2.0.0",
   "author": {
     "name": "Stanislav Muhametsin",
@@ -7,15 +7,15 @@
     "url": "https://github.com/stazz"
   },
   "license": "MIT",
-  "description": "Bundle of TyRAS libraries suitable to use in frontends/clients which use Fetch API to send HTTP requests, and `io-ts` as data validation library.",
+  "description": "Bundle of TyRAS libraries suitable to use in frontends/clients which use Axios library to send HTTP requests, and `zod` as data validation library.",
   "keywords": [
     "frontend",
     "http",
-    "fetch",
+    "node",
     "client",
     "data",
     "validation",
-    "io-ts",
+    "zod",
     "runtime"
   ],
   "repository": {
@@ -42,33 +42,29 @@
     }
   },
   "dependencies": {
-    "@ty-ras/data-frontend-io-ts": "^2.0.1",
-    "@ty-ras/client-fetch": "^2.0.0",
-    "fp-ts": "^2.13.1",
-    "io-ts": "^2.2.19"
+    "@ty-ras/data-frontend-zod": "^2.0.0",
+    "@ty-ras/client-node": "^2.1.1",
+    "zod": "^3.20.6"
   },
   "devDependencies": {
-    "@babel/core": "7.21.5",
-    "@babel/eslint-parser": "7.21.3",
-    "@typescript-eslint/eslint-plugin": "5.59.2",
-    "@typescript-eslint/parser": "5.59.2",
+    "@babel/core": "7.22.17",
+    "@babel/eslint-parser": "7.22.15",
+    "@typescript-eslint/eslint-plugin": "6.6.0",
+    "@typescript-eslint/parser": "6.6.0",
     "@types/node": "18.16.3",
-    "ava": "5.2.0",
-    "c8": "7.13.0",
-    "eslint": "8.39.0",
-    "eslint-plugin-jsdoc": "43.1.1",
+    "ava": "5.3.1",
+    "c8": "8.0.1",
+    "eslint": "8.49.0",
+    "eslint-plugin-jsdoc": "46.5.1",
     "eslint-plugin-path-import-extension": "0.9.0",
     "eslint-plugin-type-only-import": "0.9.0",
-    "eslint-config-prettier": "8.8.0",
-    "eslint-plugin-prettier": "4.2.1",
-    "eslint-plugin-sonarjs": "0.19.0",
-    "fetch-mock": "9.11.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-plugin-prettier": "5.0.0",
+    "eslint-plugin-sonarjs": "0.21.0",
     "madge": "6.1.0",
-    "node-fetch": "2.6.7",
-    "prettier": "2.8.8",
-    "typescript": "5.0.4",
-    "ts-node": "10.9.1",
-    "undici": "5.23.0"
+    "prettier": "3.0.3",
+    "typescript": "5.2.2",
+    "ts-node": "10.9.1"
   },
   "scripts": {
     "build:run": "yarn run lint && yarn run tsc",
@@ -91,6 +87,7 @@
   "resolutions": {
     "detective-typescript": "11.1.0",
     "dependency-tree": "10.0.9",
-    "precinct": "11.0.5"
+    "precinct": "11.0.5",
+    "typescript": "5.2.2"
   }
 }
