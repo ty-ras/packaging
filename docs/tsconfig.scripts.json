@@ -1,0 +1,20 @@
+// This file is provided only for IDE experience, it is not used during build/dev
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": [
+      "ESNext"
+    ],
+    "target": "ES2022",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
+    "resolveJsonModule": true
+  },
+  "include": [
+    "scripts/**/*"
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+}

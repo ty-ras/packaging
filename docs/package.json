@@ -1,0 +1,63 @@
+{
+  "name": "@ty-ras-docs/all",
+  "private": true,
+  "version": "1.0.0",
+  "author": {
+    "name": "Stanislav Muhametsin",
+    "email": "346799+stazz@users.noreply.github.com",
+    "url": "https://github.com/stazz"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ty-ras/packaging"
+  },
+  "type": "module",
+  "dependencies": {
+    "@solidjs/router": "0.8.3",
+    "@suid/material": "0.15.1",
+    "@suid/icons-material": "0.6.11",
+    "solid-js": "1.7.12"
+  },
+  "devDependencies": {
+    "@babel/core": "7.23.0",
+    "@babel/eslint-parser": "7.22.15",
+    "@typescript-eslint/eslint-plugin": "6.7.3",
+    "@typescript-eslint/parser": "6.7.3",
+    "ava": "5.3.1",
+    "c8": "8.0.1",
+    "eslint": "8.50.0",
+    "eslint-plugin-jsdoc": "46.8.2",
+    "eslint-plugin-type-only-import": "0.9.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-plugin-prettier": "5.0.0",
+    "eslint-plugin-sonarjs": "0.21.0",
+    "madge": "6.1.0",
+    "prettier": "3.0.3",
+    "typedoc": "0.25.1",
+    "typescript": "5.2.2",
+    "vite": "4.4.9",
+    "vite-plugin-solid": "2.7.0",
+    "@suid/vite-plugin": "0.1.5"
+  },
+  "scripts": {
+    "build": "vite build",
+    "build:clean": "yarn run clear-build-artifacts && yarn run build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "clear-build-artifacts": "rm -rf dist build",
+    "lint": "yarn run lint:eslint && yarn run lint:circular",
+    "lint:circular": "madge --circular --no-color --no-spinner --extensions ts --warning ./src",
+    "lint:eslint": "eslint ./src --ext .ts,.tsx",
+    "tsc": "tsc --project tsconfig.build.json",
+    "tsc:plain": "tsc",
+    "test:coverage": "c8 --temp-directory /tmp ava",
+    "test:run": "c8 --temp-directory /tmp --reporter text ava"
+  },
+  "resolutions": {
+    "dependency-tree": "10.0.9",
+    "detective-typescript": "11.1.0",
+    "precinct": "11.0.5",
+    "typescript": "5.2.2"
+  }
+}

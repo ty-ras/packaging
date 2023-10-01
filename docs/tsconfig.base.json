@@ -1,0 +1,18 @@
+// This file is provided only for IDE experience, it is not used during build/dev
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "sourceMap": false,
+    "strict": true,
+    "exactOptionalPropertyTypes": false,
+    "declaration": false,
+    "noErrorTruncation": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+  }
+}

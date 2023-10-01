@@ -1,0 +1,20 @@
+// This file is provided only for IDE experience, it is not used during build/dev
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
+    "resolveJsonModule": true
+  },
+  "include": [
+    "src/**/*",
+    "vite.config.ts",
+    "scripts/**/*"
+  ],
+}
