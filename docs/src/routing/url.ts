@@ -1,6 +1,5 @@
 import type * as types from "./routing.types";
 import type * as version from "./tyras-versions";
-import * as defaults from "./defaults";
 import * as structure from "./tyras-structure";
 
 export const ROUTE_PATH =
@@ -24,18 +23,20 @@ export const buildDataURL = (
 export const buildNavigationURL = (params: types.DocumentationParams) =>
   `/${params.dataValidation}/${params.server}/${params.serverVersion}/${params.client}/${params.clientVersion}`;
 
-export const buildFromURL = (url: string): types.DocumentationParams => {
+export const buildFromURL = (
+  url: string,
+): Partial<types.DocumentationParams> => {
   const fragments = url.split("/");
   if (fragments[0]?.length < 1) {
     fragments.splice(0, 1);
   }
   const [dataValidation, server, serverVersion, client, clientVersion] =
     fragments;
-  return defaults.withDefaultParams({
+  return {
     ...(dataValidation && { dataValidation }),
     ...(server && { server }),
     ...(serverVersion && { serverVersion }),
     ...(client && { client }),
-    ...(clientVersion ? { clientVersion } : {}),
-  });
+    ...(clientVersion && { clientVersion }),
+  };
 };

@@ -6,6 +6,8 @@ export const withDefaultParams = (
   params: types.DocumentationParamsFromRouter,
 ): types.DocumentationParams => {
   const withoutVersions = Object.assign({}, DEFAULTS, params);
+  // TODO check for scenario when both server and client are "none" and change accordingly
+  // It should never happen when redirecting within app, but if e.g. user inputs such url manually, we still need to handle it
   return {
     ...withoutVersions,
     serverVersion:

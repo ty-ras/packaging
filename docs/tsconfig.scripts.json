@@ -6,8 +6,8 @@
       "ESNext"
     ],
     "target": "ES2022",
-    "rootDir": "./src",
-    "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
+    "rootDir": ".",
+    "tsBuildInfoFile": "./build/tsconfig-scripts.tsbuildinfo",
     "resolveJsonModule": true
   },
   "include": [
