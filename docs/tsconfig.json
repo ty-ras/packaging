@@ -8,7 +8,7 @@
     ],
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "rootDir": "./src",
+    "rootDir": ".",
     "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
     "resolveJsonModule": true
   },

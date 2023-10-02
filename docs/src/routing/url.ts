@@ -1,5 +1,5 @@
 import type * as types from "./routing.types";
-import type * as version from "./tyras-versions";
+import type * as version from "./tyras-versions.types";
 import * as structure from "./tyras-structure";
 
 export const ROUTE_PATH =

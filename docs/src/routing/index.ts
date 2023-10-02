@@ -1,5 +1,7 @@
 export type * from "./routing.types";
 export type * from "./data.types";
+export type * from "./tyras-structure.types";
+export type * from "./tyras-versions.types";
 export * from "./url";
 export * from "./defaults";
 export * from "./tyras-structure";

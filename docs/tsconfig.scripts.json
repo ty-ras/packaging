@@ -2,8 +2,9 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    // Lib and target needs to be compatible with Node18 tho
     "lib": [
-      "ESNext"
+      "ES2022"
     ],
     "target": "ES2022",
     "rootDir": ".",
@@ -11,7 +12,9 @@
     "resolveJsonModule": true
   },
   "include": [
-    "scripts/**/*"
+    "scripts/**/*",
+    "src/routing/tyras-structure.types.ts",
+    "src/routing/tyras-versions.types.ts",
   ],
   "ts-node": {
     "esm": true,
