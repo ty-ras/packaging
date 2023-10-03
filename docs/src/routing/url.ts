@@ -13,7 +13,7 @@ export const buildDataURL = (
     ? undefined
     : `${DOCS_ROOT_URL}${params.dataValidation}/${
         versionKind === undefined
-          ? "protocol"
+          ? `protocol/TODO.json`
           : versionKind === "server"
           ? `server-${params.server}/${params.serverVersion}`
           : `client-${params.client}/${params.clientVersion}`
@@ -24,7 +24,7 @@ export const buildNavigationURL = (params: types.DocumentationParams) =>
 
 export const buildFromURL = (
   url: string,
-): Partial<types.DocumentationParams> => {
+): types.DocumentationParamsFromRouter => {
   const fragments = url.split("/");
   if (fragments[0]?.length < 1) {
     fragments.splice(0, 1);

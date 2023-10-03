@@ -7,6 +7,6 @@ export interface CodeInfo {
   structure: Structure;
 }
 
-export type Packages = versions.TyrasVersions<fs.PathLike>;
+export type Packages<TVersions = string> = versions.TyrasVersions<TVersions>;
 export type Structure = structure.TyrasStructure<Set<string>>;
 export type PathLike = fs.PathLike;
