@@ -1,8 +1,10 @@
 import * as process from "node:process";
 import * as folderSrc from "./folder-src";
+import * as folderPublic from "./folder-public";
 
 const main = async () => {
-  await folderSrc.acquireCodeInfo();
+  const codeInfo = await folderSrc.acquireCodeInfo();
+  await folderPublic.writeVersionedTypeDocs(codeInfo);
 };
 
 void (async () => {

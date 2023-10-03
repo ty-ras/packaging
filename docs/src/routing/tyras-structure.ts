@@ -7,8 +7,3 @@ import type * as types from "./tyras-structure.types";
 
 export const tyrasStructure: Readonly<types.TyrasStructure> =
   Object.freeze(tyrasStructureJson);
-
-/**
- * Only applicable for server or client, not data validation
- */
-export const ASPECT_NONE = "none";

@@ -1,6 +1,5 @@
 import type * as types from "./routing.types";
 import type * as version from "./tyras-versions.types";
-import * as structure from "./tyras-structure";
 
 export const ROUTE_PATH =
   "/:dataValidation?/:server?/:serverVersion?/:client?/:clientVersion?";
@@ -9,10 +8,10 @@ export const buildDataURL = (
   params: types.DocumentationParams,
   versionKind: version.VersionKind | undefined,
 ): string | undefined =>
-  (versionKind === "server" && params.server === structure.ASPECT_NONE) ||
-  (versionKind === "client" && params.client === structure.ASPECT_NONE)
+  (versionKind === "server" && params.server === ASPECT_NONE) ||
+  (versionKind === "client" && params.client === ASPECT_NONE)
     ? undefined
-    : `/docs/${params.dataValidation}/${
+    : `${DOCS_ROOT_URL}${params.dataValidation}/${
         versionKind === undefined
           ? "protocol"
           : versionKind === "server"
@@ -40,3 +39,10 @@ export const buildFromURL = (
     ...(clientVersion && { clientVersion }),
   };
 };
+
+/**
+ * Only applicable for server or client, not data validation
+ */
+export const ASPECT_NONE = "none";
+
+export const DOCS_ROOT_URL = "/docs/";

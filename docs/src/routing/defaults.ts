@@ -1,6 +1,7 @@
 import type * as types from "./routing.types";
 import * as tyrasStructure from "./tyras-structure";
 import * as versions from "./tyras-versions";
+import * as url from "./url";
 
 export const withDefaultParams = (
   params: types.DocumentationParamsFromRouter,
@@ -15,13 +16,13 @@ export const withDefaultParams = (
         withoutVersions.dataValidation,
         "server",
         withoutVersions.server,
-      ) ?? tyrasStructure.ASPECT_NONE,
+      ) ?? url.ASPECT_NONE,
     clientVersion:
       versions.getLatestVersion(
         withoutVersions.dataValidation,
         "client",
         withoutVersions.client,
-      ) ?? tyrasStructure.ASPECT_NONE,
+      ) ?? url.ASPECT_NONE,
   };
 };
 

@@ -1,6 +1,6 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import * as git from "isomorphic-git";
+// import * as git from "isomorphic-git";
 import type * as codeInfo from "./code-info.types";
 
 export const acquireCodeInfo = async () => {
@@ -45,9 +45,10 @@ export const acquireCodeInfo = async () => {
   // If we don't specify gitdir, the isomorphic-git will crash... Not very trust-inspiring or convincing, but that's what we got.
   // The code has: gitdir = join(dir, '.git')
   // While typings claim that both gitdir and dir are optional...
-  const tags = await git.listTags({ fs, dir: ".." });
+  // const tags = await git.listTags({ fs, dir: ".." });
   // eslint-disable-next-line no-console
-  console.log("DEBUG", codeInfo.packages, tags);
+  // console.log("DEBUG", codeInfo.packages, tags);
+  return codeInfo;
 };
 
 // We curry first parameter because otherwise compiler lets us do code which isn't super typesafe

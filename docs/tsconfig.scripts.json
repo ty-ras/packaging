@@ -11,10 +11,11 @@
     "tsBuildInfoFile": "./build/tsconfig-scripts.tsbuildinfo",
     "resolveJsonModule": true
   },
+  "exclude": [
+    "src/**/*"
+  ],
   "include": [
     "scripts/**/*",
-    "src/routing/tyras-structure.types.ts",
-    "src/routing/tyras-versions.types.ts",
   ],
   "ts-node": {
     "esm": true,
