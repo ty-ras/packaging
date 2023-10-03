@@ -277,24 +277,19 @@ const generateDocsForVersionInDir = async (
       : "/dummy";
 
   const json = path.join(versionDir, `${version}.json`);
-  process.chdir(sourceDir);
-  const app = await td.Application.bootstrap(
-    {
-      json,
-      tsconfig: "tsconfig.json",
-      entryPoints: ["src/index.ts"],
-      entryPointStrategy: "expand",
-      logLevel: "Verbose",
-      // For some reason the TSC ran by TD fails - this doesn't matter, as we validate TS code elsewhere
-      skipErrorChecking: true,
-      emit: "none",
-    },
-    [
-      // new td.TypeDocReader(),
-      // new td.PackageJsonReader(),
-      // new td.TSConfigReader(),
-    ],
-  );
+  const app = await td.Application.bootstrap({
+    json,
+    tsconfig: path.join(sourceDir, "tsconfig.json"),
+    entryPoints: [path.join(sourceDir, "src", "index.ts")],
+    entryPointStrategy: "expand",
+    logLevel: "Verbose",
+    // For some reason the TSC ran by TD fails - this doesn't matter, as we validate TS code elsewhere
+    skipErrorChecking: true,
+    // Don't emit any .js files
+    emit: "none",
+    // Don't search for README
+    // readme: "none",
+  });
 
   const project = await app.convert();
   if (!project) {
