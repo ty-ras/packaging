@@ -2,7 +2,8 @@
 import tyrasVersionsJson from "./tyras-versions.json";
 import type * as types from "./tyras-versions.types";
 
-export const tyrasVersions: types.TyrasVersions =
+// TODO DeepReadOnly
+export const tyrasVersions: Readonly<types.TyrasVersions> =
   Object.freeze(tyrasVersionsJson);
 
 export const getVersions = (

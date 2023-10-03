@@ -5,7 +5,7 @@ import type * as types from "./tyras-structure.types";
 // Need to wait for this before doing advanced type tricks on json files:
 // https://stackoverflow.com/questions/69314862/typescript-json-module-deep-type-information
 
-export const tyrasStructure: types.TyrasStructure =
+export const tyrasStructure: Readonly<types.TyrasStructure> =
   Object.freeze(tyrasStructureJson);
 
 /**

@@ -12,7 +12,7 @@ export const useParams = () => {
   const paramsOrNavigate = useParamsOrNavigate();
   if (paramsOrNavigate.kind === "navigate") {
     throw new Error(
-      "At least some ancestor component should call useParamsOrNavigate and handle result",
+      "At least some ancestor component must call useParamsOrNavigate and handle result",
     );
   }
   return paramsOrNavigate.params;
