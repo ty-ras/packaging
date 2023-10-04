@@ -1,8 +1,8 @@
 import * as process from "node:process";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import * as folderSrc from "./folder-src";
-import * as folderPublic from "./folder-public";
+import * as folderSrc from "./generate-docs";
+import * as folderPublic from "./read-structure";
 
 const main = async () => {
   const codeInfo = await folderSrc.acquireCodeInfo();
