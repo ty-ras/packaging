@@ -3,17 +3,15 @@ import * as path from "node:path";
 // import * as git from "isomorphic-git";
 import type * as codeInfo from "./code-info.types";
 
-export const acquireCodeInfo = async () => {
+export const acquireCodeInfo = async (): Promise<codeInfo.CodeInfo> => {
   const codeDir = "../code";
-  const codeInfo: codeInfo.CodeInfo = {
-    packages: {},
-    structure: {
-      dataValidation: new Set(),
-      client: new Set(),
-      server: new Set(),
-    },
+  const packages: codeInfo.VersionsSpecific = {};
+  const structure: codeInfo.Structure<Set<string>> = {
+    dataValidation: new Set(),
+    client: new Set(),
+    server: new Set(),
   };
-  const putServerOrClientRecord = getOrCreate(codeInfo.packages);
+  const putServerOrClientRecord = getOrCreate(packages);
   (
     await fs.readdir(codeDir, {
       encoding: "utf8",
@@ -28,12 +26,12 @@ export const acquireCodeInfo = async () => {
       const isServer = name.startsWith("backend-");
       const serverOrClient = isServer ? "server" : "client";
       const serverOrClientKind = name.substring(firstDash + 1, secondDash);
-      codeInfo.structure[serverOrClient].add(serverOrClientKind);
+      structure[serverOrClient].add(serverOrClientKind);
       const dataValidation = name.substring(
         secondDash + 1,
         isServer ? name.lastIndexOf("-") : undefined,
       );
-      codeInfo.structure.dataValidation.add(dataValidation);
+      structure.dataValidation.add(dataValidation);
       getOrCreate(
         putServerOrClientRecord(dataValidation, () => ({
           server: {},
@@ -42,13 +40,14 @@ export const acquireCodeInfo = async () => {
       )(serverOrClientKind, () => path.resolve(codeDir, name));
     }
   });
-  // If we don't specify gitdir, the isomorphic-git will crash... Not very trust-inspiring or convincing, but that's what we got.
-  // The code has: gitdir = join(dir, '.git')
-  // While typings claim that both gitdir and dir are optional...
-  // const tags = await git.listTags({ fs, dir: ".." });
-  // eslint-disable-next-line no-console
-  // console.log("DEBUG", codeInfo.packages, tags);
-  return codeInfo;
+  return {
+    packages,
+    structure: {
+      dataValidation: Array.from(structure.dataValidation.values()),
+      server: Array.from(structure.server.values()),
+      client: Array.from(structure.client.values()),
+    },
+  };
 };
 
 // We curry first parameter because otherwise compiler lets us do code which isn't super typesafe

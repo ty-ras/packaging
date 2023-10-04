@@ -14,5 +14,6 @@ export type VersionList = versions.Versions;
 
 export type VersionsSpecific<TVersions = string> =
   versions.TyrasVersionsSpecific<TVersions>;
-export type Structure = structure.TyrasStructure<Set<string>>;
+export type Structure<TKinds = ReadonlyArray<string>> =
+  structure.TyrasStructure<TKinds>;
 export type PathLike = fs.PathLike;

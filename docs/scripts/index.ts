@@ -1,10 +1,25 @@
 import * as process from "node:process";
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
 import * as folderSrc from "./folder-src";
 import * as folderPublic from "./folder-public";
 
 const main = async () => {
   const codeInfo = await folderSrc.acquireCodeInfo();
-  await folderPublic.writeVersionedTypeDocs(codeInfo);
+  const versionContent = await folderPublic.writeVersionedTypeDocs(codeInfo);
+  const routingDir = "./src/routing";
+  await Promise.all([
+    fs.writeFile(
+      path.join(routingDir, "tyras-structure.json"),
+      JSON.stringify(codeInfo.structure, undefined, 2),
+      "utf8",
+    ),
+    fs.writeFile(
+      path.join(routingDir, "tyras-versions.json"),
+      JSON.stringify(versionContent, undefined, 2),
+      "utf8",
+    ),
+  ]);
 };
 
 void (async () => {

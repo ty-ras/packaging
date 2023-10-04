@@ -14,7 +14,7 @@ import * as url from "../src/routing/url";
 export const writeVersionedTypeDocs = async ({
   packages,
   structure,
-}: codeInfo.CodeInfo) => {
+}: codeInfo.CodeInfo): Promise<codeInfo.Versions<codeInfo.VersionList>> => {
   const versionDirs: codeInfo.Versions<VersionInfo> = {
     specific: {},
     protocol: {},
@@ -133,11 +133,14 @@ const getVersionInfo = async (
   );
   let currentVersions: Array<string>;
   try {
+    const jsonExtension = ".json";
     currentVersions = (
       await fs.readdir(versionDir, { withFileTypes: true, encoding: "utf8" })
     )
-      .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
-      .map((entry) => entry.name);
+      .filter((entry) => entry.isFile() && entry.name.endsWith(jsonExtension))
+      .map((entry) =>
+        entry.name.substring(0, entry.name.length - jsonExtension.length),
+      );
   } catch (e) {
     if (e instanceof Error && (e as NodeJS.ErrnoException).code === "ENOENT") {
       currentVersions = [];
