@@ -1,8 +1,12 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import * as zlib from "node:zlib";
+import * as os from "node:os";
+import * as tar from "tar";
 import * as git from "isomorphic-git";
 import * as semver from "semver";
 import * as td from "typedoc";
+import { request } from "undici";
 import type * as codeInfo from "./code-info.types";
 import * as url from "../src/routing/url";
 
@@ -60,36 +64,26 @@ export const writeVersionedTypeDocs = async ({
   };
 
   for (const [dataValidation, info] of Object.entries(versionDirs.specific)) {
+    const protocol = versionDirs.protocol[dataValidation];
+    await generateDocs(protocol);
+    versions.protocol[dataValidation] = getAllVersions(protocol);
     const specific: (typeof versions)["specific"][string] = {
       client: {},
       server: {},
     };
+    versions.specific[dataValidation] = specific;
     for (const [server, versionInfo] of Object.entries(info.server)) {
       await generateDocs(versionInfo);
-      specific.server[server] = [
-        ...versionInfo.versionsToGenerate,
-        ...versionInfo.currentVersions,
-      ];
+      specific.server[server] = getAllVersions(versionInfo);
     }
     for (const [client, versionInfo] of Object.entries(info.client)) {
       await generateDocs(versionInfo);
+      specific.client[client] = getAllVersions(versionInfo);
     }
   }
-};
 
-// async function* readDirRecursive(
-//   dir: string,
-// ): AsyncGenerator<string, void, unknown> {
-//   const entries = await fs.readdir(dir, { withFileTypes: true });
-//   for (const entry of entries) {
-//     const res = path.resolve(dir, entry.name);
-//     if (entry.isDirectory()) {
-//       yield* readDirRecursive(res);
-//     } else if (entry.isFile()) {
-//       yield res;
-//     }
-//   }
-// }
+  return versions;
+};
 
 const doThrow = (msg: string) => {
   throw new Error(msg);
@@ -114,7 +108,7 @@ interface VersionInfo extends VersionInfoBase, VersionInfoDirs {
 }
 
 const getVersionInfo = async (
-  packages: codeInfo.Packages,
+  packages: codeInfo.VersionsSpecific,
   tags: ReadonlyArray<string>,
   dataValidation: string,
   server: string | undefined,
@@ -161,10 +155,7 @@ const getVersionInfo = async (
             "package.json",
           ),
         }
-      : {
-          source: "npm",
-          packageName: `@ty-ras/data-${dataValidation}`,
-        };
+      : await getNPMPackageSource(dataValidation);
   let taggedVersions: Array<string>;
   if (packageSource.source === "local") {
     const tagStart = `${path.basename(path.dirname(packageSource.path))}-v`;
@@ -172,7 +163,7 @@ const getVersionInfo = async (
       .filter((tag) => tag.startsWith(tagStart))
       .map((tag) => tag.substring(tagStart.length));
   } else {
-    taggedVersions = ["TODO"];
+    taggedVersions = Object.keys(packageSource.tarballs);
   }
   // Sort all versions in descending order (switch arg order when passing to semver.compare)
   const descendingOrder = (x: string, y: string) => semver.compare(y, x);
@@ -202,7 +193,7 @@ const getVersionInfo = async (
 
 type PackageSource =
   | { source: "local"; path: string }
-  | { source: "npm"; packageName: string };
+  | { source: "npm"; packageName: string; tarballs: Record<string, string> };
 
 const getVersionsToGenerateDocs = ({
   taggedVersions,
@@ -254,7 +245,7 @@ const generateDocsForVersion = async (
   const sourceDir =
     packageSource.source === "local"
       ? path.dirname(packageSource.path)
-      : "/todo clone from npm to temp dir";
+      : await extractNpmToFolder(packageSource.tarballs[version]);
 
   const json = path.join(versionDir, `${version}.json`);
   const app = await td.Application.bootstrap({
@@ -288,4 +279,68 @@ const generateDocsForVersion = async (
   // }
 
   await app.generateJson(project, json);
+};
+
+const getAllVersions = ({ currentVersions, versionsToGenerate }: VersionInfo) =>
+  // Both versions are sorted in descending order, and versions to generate are always newer than latest current version
+  [...versionsToGenerate, ...currentVersions];
+
+interface Packument {
+  versions: Record<string, { dist: { tarball: string } }>;
+}
+
+const getNPMPackageSource = async (
+  dataValidation: string,
+): Promise<PackageSource> => {
+  const packageName = `@ty-ras/data-${dataValidation}`;
+  return {
+    source: "npm",
+    packageName,
+    tarballs: Object.fromEntries(
+      Object.entries(
+        (
+          (await (
+            await request(`https://registry.npmjs.com/${packageName}`)
+          ).body.json()) as Packument
+        ).versions,
+      ).map(
+        ([
+          version,
+          {
+            dist: { tarball },
+          },
+        ]) => [version, tarball] as const,
+      ),
+    ),
+  };
+};
+
+const extractNpmToFolder = async (tarballURL: string) => {
+  const targetDir = await fs.mkdtemp(path.join(os.tmpdir(), "ty-ras-docs-"));
+  const responseBody = (await request(tarballURL)).body;
+  await new Promise<void>((resolve, reject) => {
+    responseBody.once("error", reject);
+    const tarStream = responseBody.pipe(zlib.createUnzip()).pipe(
+      tar.x({
+        C: targetDir,
+      }),
+    );
+    tarStream.once("error", reject);
+    tarStream.on("close", resolve);
+  });
+  const packageDir = path.join(targetDir, "package");
+  await fs.writeFile(
+    path.join(packageDir, "tsconfig.json"),
+    JSON.stringify({
+      compilerOptions: {
+        noEmit: true,
+        rootDir: "./src",
+        esModuleInterop: true,
+        strict: true,
+      },
+      include: ["src/**/*"],
+    }),
+  );
+  // TODO run yarn install (no dev deps) here
+  return packageDir;
 };
