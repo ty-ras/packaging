@@ -2,6 +2,7 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import * as zlib from "node:zlib";
 import * as os from "node:os";
+import * as process from "node:child_process";
 import * as tar from "tar";
 import * as git from "isomorphic-git";
 import * as semver from "semver";
@@ -245,7 +246,7 @@ const generateDocsForVersion = async (
   const sourceDir =
     packageSource.source === "local"
       ? path.dirname(packageSource.path)
-      : await extractNpmToFolder(packageSource.tarballs[version]);
+      : await preparePackageFromNpm(packageSource.tarballs[version]);
 
   const json = path.join(versionDir, `${version}.json`);
   const app = await td.Application.bootstrap({
@@ -285,10 +286,6 @@ const getAllVersions = ({ currentVersions, versionsToGenerate }: VersionInfo) =>
   // Both versions are sorted in descending order, and versions to generate are always newer than latest current version
   [...versionsToGenerate, ...currentVersions];
 
-interface Packument {
-  versions: Record<string, { dist: { tarball: string } }>;
-}
-
 const getNPMPackageSource = async (
   dataValidation: string,
 ): Promise<PackageSource> => {
@@ -315,7 +312,24 @@ const getNPMPackageSource = async (
   };
 };
 
-const extractNpmToFolder = async (tarballURL: string) => {
+const preparePackageFromNpm = async (tarballURL: string) => {
+  const packageDir = await downloadNpmTarBall(tarballURL);
+  // Generate dummy tsconfig so that Typedoc will work
+  await generateTSConfigFile(packageDir);
+  // Tweak package.json because we don't want yarn to resolve dev deps
+  // Also, we want to install peer deps
+  // If we don't do this, yarn install will take ages as it tries to resolve dev deps as well (but not install them):
+  // https://github.com/yarnpkg/yarn/issues/3630
+  await tweakDownloadedPackageJsonFile(packageDir);
+  // Now run yarn install (the --production flag is not needed after tweaking package.json but just in case)
+  await installDependencies(packageDir);
+  // Add extra "export * from" statements to index.ts so that sub packages would get documented as well
+  await tweakDownloadedPackageIndexTSFile(packageDir);
+  // Now we are done
+  return packageDir;
+};
+
+const downloadNpmTarBall = async (tarballURL: string) => {
   const targetDir = await fs.mkdtemp(path.join(os.tmpdir(), "ty-ras-docs-"));
   const responseBody = (await request(tarballURL)).body;
   await new Promise<void>((resolve, reject) => {
@@ -328,7 +342,10 @@ const extractNpmToFolder = async (tarballURL: string) => {
     tarStream.once("error", reject);
     tarStream.on("close", resolve);
   });
-  const packageDir = path.join(targetDir, "package");
+  return path.join(targetDir, "package");
+};
+
+const generateTSConfigFile = async (packageDir: string) => {
   await fs.writeFile(
     path.join(packageDir, "tsconfig.json"),
     JSON.stringify({
@@ -341,6 +358,80 @@ const extractNpmToFolder = async (tarballURL: string) => {
       include: ["src/**/*"],
     }),
   );
-  // TODO run yarn install (no dev deps) here
-  return packageDir;
+};
+
+const tweakDownloadedPackageJsonFile = async (packageDir: string) => {
+  const packageJson = path.join(packageDir, "package.json");
+  await fs.writeFile(
+    packageJson,
+    JSON.stringify(
+      modifyDownloadedPackageJsonFile(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        JSON.parse(await fs.readFile(packageJson, "utf8")),
+      ),
+    ),
+    "utf8",
+  );
+};
+
+const modifyDownloadedPackageJsonFile = ({
+  dependencies = {},
+  peerDependencies = {},
+  devDependencies, // eslint-disable-line @typescript-eslint/no-unused-vars
+  resolutions, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ...packageJson
+}: PackageJson): PackageJson => ({
+  ...packageJson,
+  dependencies: { ...dependencies, ...peerDependencies },
+});
+
+const installDependencies = async (packageDir: string) => {
+  const child = process.spawn(
+    "yarn",
+    [
+      "install",
+      "--non-interactive",
+      "--production",
+      "--ignore-scripts",
+      "--no-lockfile",
+    ],
+    {
+      cwd: packageDir,
+      shell: false,
+      // Don't provide stdin, and make all out/err output to be printed to this process
+      stdio: ["ignore", "inherit", "inherit"],
+    },
+  );
+  const exitCode = await new Promise<number | NodeJS.Signals>((resolve) =>
+    child.once("exit", (code, signal) => resolve(code ?? signal ?? -1)),
+  );
+  if (exitCode !== 0) {
+    throw new Error(`Failed to install runtime dependencies for ${packageDir}`);
+  }
+};
+
+const tweakDownloadedPackageIndexTSFile = async (packageDir: string) => {
+  const indexTS = path.join(packageDir, "src", "index.ts");
+  await fs.writeFile(
+    indexTS,
+    modifyDownloadedPackageIndexTSFile(await fs.readFile(indexTS, "utf8")),
+    "utf-8",
+  );
+};
+
+const modifyDownloadedPackageIndexTSFile = (
+  fileContents: string,
+): string => `${fileContents}
+export * from "@ty-ras/data";
+export * from "@ty-ras/protocol";
+`;
+
+interface Packument {
+  versions: Record<string, { dist: { tarball: string } }>;
+}
+type PackageJson = Record<string, unknown> & {
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  resolutions?: Record<string, string>;
 };
