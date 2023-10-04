@@ -10,7 +10,8 @@ export const getVersions = (
   dataValidation: string,
   kind: types.VersionKind,
   component: string,
-): types.Versions | undefined => tyrasVersions[dataValidation][kind][component];
+): types.Versions | undefined =>
+  tyrasVersions.specific[dataValidation][kind][component];
 
 export const getLatestVersion = (...args: Parameters<typeof getVersions>) =>
   getVersions(...args)?.[0];

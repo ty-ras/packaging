@@ -10,10 +10,7 @@ export const writeVersionedTypeDocs = async ({
   packages,
   structure,
 }: codeInfo.CodeInfo) => {
-  const versionDirs: {
-    specific: codeInfo.Packages<VersionInfo>;
-    protocol: Record<string, VersionInfo>;
-  } = {
+  const versionDirs: codeInfo.Versions<VersionInfo> = {
     specific: {},
     protocol: {},
   };
@@ -30,7 +27,7 @@ export const writeVersionedTypeDocs = async ({
       undefined,
       undefined,
     );
-    const specific: (typeof versionDirs)["specific"][string] = {
+    const specific: codeInfo.VersionsSpecific<VersionInfo>[string] = {
       server: {},
       client: {},
     };
@@ -57,47 +54,27 @@ export const writeVersionedTypeDocs = async ({
     }
   }
 
-  for (const info of Object.values(versionDirs.specific)) {
-    for (const versionInfo of Object.values(info.server)) {
+  const versions: codeInfo.Versions<codeInfo.VersionList> = {
+    specific: {},
+    protocol: {},
+  };
+
+  for (const [dataValidation, info] of Object.entries(versionDirs.specific)) {
+    const specific: (typeof versions)["specific"][string] = {
+      client: {},
+      server: {},
+    };
+    for (const [server, versionInfo] of Object.entries(info.server)) {
       await generateDocs(versionInfo);
+      specific.server[server] = [
+        ...versionInfo.versionsToGenerate,
+        ...versionInfo.currentVersions,
+      ];
     }
-    for (const versionInfo of Object.values(info.client)) {
+    for (const [client, versionInfo] of Object.entries(info.client)) {
       await generateDocs(versionInfo);
     }
   }
-
-  // const json = "/path/to/file.json";
-  // const app = await td.Application.bootstrap(
-  //   {
-  //     json,
-  //     tsconfig: "/path/to/tsconfig.json", // This tsconfig must include necessary setup to resolve @ty-ras/xyz imports into src folder.
-  //   },
-  //   [
-  //     // new td.TypeDocReader(),
-  //     // new td.PackageJsonReader(),
-  //     // new td.TSConfigReader(),
-  //   ],
-  // );
-
-  // const project = await app.convert();
-  // if (!project) {
-  //   throw new Error("Failed to generate Typedoc project");
-  // }
-  // if (app.logger.hasWarnings()) {
-  //   throw new Error("Typedoc found warnings");
-  // }
-  // const preValidationWarnCount = app.logger.warningCount;
-  // app.validate(project);
-  // const hadValidationWarnings =
-  //   app.logger.warningCount !== preValidationWarnCount;
-  // if (app.logger.hasErrors()) {
-  //   throw new Error("Failed to validate Typedoc project");
-  // }
-  // if (hadValidationWarnings) {
-  //   throw new Error("Typedoc validation found warnings");
-  // }
-
-  // await app.generateJson(project, json);
 };
 
 // async function* readDirRecursive(
@@ -197,9 +174,10 @@ const getVersionInfo = async (
   } else {
     taggedVersions = ["TODO"];
   }
-  // Sort versions in ascending order
-  taggedVersions.sort(semver.compare);
-  currentVersions.sort(semver.compare);
+  // Sort all versions in descending order (switch arg order when passing to semver.compare)
+  const descendingOrder = (x: string, y: string) => semver.compare(y, x);
+  taggedVersions.sort(descendingOrder);
+  currentVersions.sort(descendingOrder);
   const base: VersionInfoBase = {
     latestVersion:
       packageSource.source === "local"
@@ -208,15 +186,17 @@ const getVersionInfo = async (
               version: string;
             }
           ).version
-        : taggedVersions[taggedVersions.length - 1],
+        : taggedVersions[0],
     currentVersions,
     taggedVersions,
   };
+  const versionsToGenerate = getVersionsToGenerateDocs(base);
+  versionsToGenerate.sort(descendingOrder);
   return {
     ...base,
     versionDir,
     packageSource,
-    versionsToGenerate: getVersionsToGenerateDocs(base),
+    versionsToGenerate,
   };
 };
 
@@ -232,7 +212,7 @@ const getVersionsToGenerateDocs = ({
   let versions: Array<string>;
   if (currentVersions.length > 0) {
     // When there are current versions present, we want to generate docs only for newer versions
-    const latestCurrent = currentVersions[currentVersions.length - 1];
+    const latestCurrent = currentVersions[0];
     versions = Array.from(
       new Set(
         [...taggedVersions, latestVersion].filter(
@@ -263,18 +243,18 @@ const generateDocs = async ({
         "Not implemented: generating docs for other version than current one.",
       );
     }
-    await generateDocsForVersionInDir(versionInfo, version);
+    await generateDocsForVersion(versionInfo, version);
   }
 };
 
-const generateDocsForVersionInDir = async (
+const generateDocsForVersion = async (
   { versionDir, packageSource }: VersionInfoDirs,
   version: string,
 ) => {
   const sourceDir =
     packageSource.source === "local"
       ? path.dirname(packageSource.path)
-      : "/dummy";
+      : "/todo clone from npm to temp dir";
 
   const json = path.join(versionDir, `${version}.json`);
   const app = await td.Application.bootstrap({
@@ -287,8 +267,6 @@ const generateDocsForVersionInDir = async (
     skipErrorChecking: true,
     // Don't emit any .js files
     emit: "none",
-    // Don't search for README
-    // readme: "none",
   });
 
   const project = await app.convert();
