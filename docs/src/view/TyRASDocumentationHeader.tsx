@@ -32,9 +32,10 @@ export default function TyRASDocumentation() {
           </Box>
           {/* Navigation */}
           <MenuDropDown
-            kind="dataValidation"
-            params={params}
             kindText="Data Validation"
+            items={routing.tyrasStructure.dataValidation}
+            currentlySelected={params.dataValidation}
+            getURLForItem={(dataValidation) => `/${dataValidation}`}
           />
           <MenuDropDown kind="server" params={params} kindText="Server" />
           <MenuDropDown
@@ -60,21 +61,17 @@ export default function TyRASDocumentation() {
   );
 }
 
-function MenuDropDown({ kind, params, kindText }: MenuDropDownProps) {
+function MenuDropDown({
+  kindText,
+  items,
+  currentlySelected,
+  getParamsForItem,
+}: MenuDropDownProps) {
   const [anchorEl, setAnchorEl] = createSignal<null | HTMLElement>(null);
   const open = () => Boolean(anchorEl());
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const items =
-    kind === "serverVersion"
-      ? routing.getVersions(params.dataValidation, "server", params.server)
-      : kind === "clientVersion"
-      ? routing.getVersions(params.dataValidation, "client", params.client)
-      : kind === "dataValidation" ||
-        params[kind === "server" ? "client" : "server"] === NONE
-      ? routing.tyrasStructure[kind]
-      : [...routing.tyrasStructure[kind], NONE];
   return (
     <Box>
       <Button
@@ -89,7 +86,7 @@ function MenuDropDown({ kind, params, kindText }: MenuDropDownProps) {
         size="small"
         disabled={!items}
       >
-        {kindText}: {params[kind]}
+        {kindText}: {currentlySelected}
       </Button>
       <Menu
         anchorEl={anchorEl()}
@@ -99,7 +96,7 @@ function MenuDropDown({ kind, params, kindText }: MenuDropDownProps) {
       >
         {items?.map((item) => (
           <MenuItem onClick={handleClose} disableRipple>
-            <A href={routing.buildNavigationURL({ ...params, [kind]: item })}>
+            <A href={routing.buildNavigationURL(getParamsForItem(item))}>
               {item}
             </A>
           </MenuItem>
@@ -110,9 +107,10 @@ function MenuDropDown({ kind, params, kindText }: MenuDropDownProps) {
 }
 
 interface MenuDropDownProps {
-  kind: keyof routing.DocumentationParams;
-  params: routing.DocumentationParams;
   kindText: string;
+  items: ReadonlyArray<string>;
+  currentlySelected: string;
+  getURLForItem: (item: string) => string;
 }
 
 const NONE = "none";

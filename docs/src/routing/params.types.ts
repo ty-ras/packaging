@@ -35,9 +35,14 @@ export interface DocumentationParamsServerAndClient
   kind: "server-and-client";
 }
 
-export interface DocumentationParamsProtocol extends DocumentationParamsBase {
-  kind: "protocol";
+export interface DocumentationParamsProtocolBase {
   protocolVersion: ComponentAndVersion["version"];
+}
+
+export interface DocumentationParamsProtocol
+  extends DocumentationParamsBase,
+    DocumentationParamsProtocolBase {
+  kind: "protocol";
 }
 
 export interface ComponentAndVersion {

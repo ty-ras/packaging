@@ -9,15 +9,15 @@ export default function TyRASDocumentation() {
   return routing.isNavigate(paramsOrNavigate) ? (
     <Navigate href={paramsOrNavigate} />
   ) : (
-    <TyRASDocumentationActual />
+    <TyRASDocumentationActual params={paramsOrNavigate} />
   );
 }
 
 // This is separate component because useRouteData calls useParams which will throw if redirect is neede
-function TyRASDocumentationActual() {
-  const serverDocs = routing.useRouteData("server");
-  const clientDocs = routing.useRouteData("client");
-  const protocolDocs = routing.useRouteData(undefined);
+function TyRASDocumentationActual({ params }: DocumentationProps) {
+  const serverDocs = routing.useRouteData(params, "server");
+  const clientDocs = routing.useRouteData(params, "client");
+  const protocolDocs = routing.useRouteData(params, undefined);
   return (
     <>
       <Header />
@@ -28,4 +28,8 @@ function TyRASDocumentationActual() {
       />
     </>
   );
+}
+
+interface DocumentationProps {
+  params: routing.DocumentationParams;
 }

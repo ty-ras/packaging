@@ -1,6 +1,5 @@
 import { createResource } from "solid-js";
 import type * as types from "./data.types";
-import * as params from "./params";
 import * as url from "./url";
 
 /**
@@ -9,11 +8,8 @@ import * as url from "./url";
  * Instead, we need to build own `useRouteData`, losing the benefit of side-by-side dynamic loading + data fetching, but at least making this app to work.
  * @returns The result of {@link createResource} with correct URL.
  */
-export const useRouteData = (
-  versionKind: Parameters<typeof url.buildDataURL>[1],
-) => {
-  const paramsObject = params.useParams();
-  const dataURL = url.buildDataURL(paramsObject, versionKind);
+export const useRouteData = (...args: Parameters<typeof url.buildDataURL>) => {
+  const dataURL = url.buildDataURL(...args);
   const [resource] = createResource<types.RouteData | undefined, string>(
     dataURL,
     async () =>

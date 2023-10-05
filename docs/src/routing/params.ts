@@ -18,8 +18,12 @@ export const useParams = (): types.DocumentationParams => {
   return paramsOrNavigate;
 };
 
-export const useParamsOrNavigate = (): DocumentationParamsOrNavigate => {
-  const { pathname } = useLocation();
+export const useParamsOrNavigate = (): DocumentationParamsOrNavigate =>
+  parseParamsFromPathname(useLocation().pathname);
+
+export const parseParamsFromPathname = (
+  pathname: string,
+): DocumentationParamsOrNavigate => {
   const fragments = pathname
     .split("/")
     .filter((fragment) => fragment.length > 0);
