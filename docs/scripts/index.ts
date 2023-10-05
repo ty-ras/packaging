@@ -1,12 +1,12 @@
 import * as process from "node:process";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import * as folderSrc from "./generate-docs";
-import * as folderPublic from "./read-structure";
+import readStructure from "./read-structure";
+import generateDocs from "./generate-docs";
 
 const main = async () => {
-  const codeInfo = await folderSrc.acquireCodeInfo();
-  const versionContent = await folderPublic.writeVersionedTypeDocs(codeInfo);
+  const codeInfo = await readStructure();
+  const versionContent = await generateDocs(codeInfo);
   const routingDir = "./src/routing";
   await Promise.all([
     fs.writeFile(

@@ -6,8 +6,8 @@ import Contents from "./Documentation";
 export default function TyRASDocumentation() {
   const paramsOrNavigate = routing.useParamsOrNavigate();
 
-  return paramsOrNavigate.kind === "navigate" ? (
-    <Navigate href={paramsOrNavigate.url} />
+  return routing.isNavigate(paramsOrNavigate) ? (
+    <Navigate href={paramsOrNavigate} />
   ) : (
     <TyRASDocumentationActual />
   );

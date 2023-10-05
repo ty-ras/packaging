@@ -34,10 +34,9 @@ const MATCH_FILTERS = {
   // We can't do spread of just routing.tyrasStructure, because MatchFilter can only be mutable array, not ReadonlyArray
   dataValidation: [...routing.tyrasStructure.dataValidation],
   server: [...routing.tyrasStructure.server, routing.ASPECT_NONE],
-  serverVersion: /[^/]/,
+  serverVersion: /[^/]+/,
   client: [...routing.tyrasStructure.client, routing.ASPECT_NONE],
-  clientVersion: /[^/]/,
+  clientVersion: /[^/]+/,
 } satisfies {
-  [P in keyof (MatchFilters<typeof routing.ROUTE_PATH> &
-    routing.DocumentationParams)]-?: MatchFilter;
+  [P in keyof MatchFilters<typeof routing.ROUTE_PATH>]-?: MatchFilter;
 };

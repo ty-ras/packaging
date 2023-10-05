@@ -1,45 +1,113 @@
 import { useLocation } from "@solidjs/router";
 import * as url from "./url";
-import * as defaults from "./defaults";
-import type * as types from "./routing.types";
-
+import type * as types from "./params.types";
+import { tyrasStructure } from "./tyras-structure";
+import { tyrasVersions } from "./tyras-versions";
 /**
  * Because routes are used like this (one route which always matches), the navigations between/within routes will be special: [see GH issue on this](https://github.com/solidjs/solid-router/issues/264).
  * This means that `useParams` from Solid.JS Router library **CAN NOT BE USED**, as it will **NOT** be updated by router between re-renders (even with RematchDynamic trick).
  * Instead, we need to build own `useParams`, which will parse them from the result of `useLocation`, which, thankfully, **WILL** be updated when navigating within same route.
  */
-export const useParams = () => {
+export const useParams = (): types.DocumentationParams => {
   const paramsOrNavigate = useParamsOrNavigate();
-  if (paramsOrNavigate.kind === "navigate") {
+  if (isNavigate(paramsOrNavigate)) {
     throw new Error(
       "At least some ancestor component must call useParamsOrNavigate and handle result",
     );
   }
-  return paramsOrNavigate.params;
+  return paramsOrNavigate;
 };
 
 export const useParamsOrNavigate = (): DocumentationParamsOrNavigate => {
-  const location = useLocation();
-  const parsed = url.buildFromURL(location.pathname);
-  const actual = defaults.withDefaultParams(parsed);
-  return Object.keys(actual).some(
-    (propName) =>
-      actual[propName as keyof typeof actual] !==
-      parsed[propName as keyof typeof parsed],
-  )
-    ? {
-        kind: "navigate",
-        url: url.buildNavigationURL(actual),
-      }
-    : {
-        kind: "params",
-        params: actual,
+  const { pathname } = useLocation();
+  const fragments = pathname
+    .split("/")
+    .filter((fragment) => fragment.length > 0);
+
+  const [
+    dataValidationFragment,
+    serverFragment,
+    serverVersionFragment,
+    clientFragment,
+    clientVersionFragment,
+  ] = fragments;
+  const dataValidation = inArrayOrFirst(
+    dataValidationFragment,
+    tyrasStructure.dataValidation,
+  );
+  let urlValid = dataValidation === dataValidationFragment;
+  const dvValid = urlValid;
+  const protocolVersion = inArrayOrFirst(
+    serverFragment,
+    tyrasVersions.protocol[dataValidation],
+  );
+  let params: types.DocumentationParams;
+  if (urlValid && protocolVersion === serverFragment) {
+    params = { kind: "protocol", dataValidation, protocolVersion };
+  } else {
+    const versions = tyrasVersions.specific[dataValidation];
+    const server = inArrayOrFirst(serverFragment, tyrasStructure.server);
+    const serverVersion = inArrayOrFirst(
+      serverVersionFragment,
+      versions.server[server],
+    );
+    urlValid =
+      urlValid &&
+      server === serverFragment &&
+      serverVersion === serverVersionFragment;
+    if (urlValid && clientFragment === undefined) {
+      params = {
+        kind: "server",
+        dataValidation,
+        server: { name: server, version: serverVersion },
       };
+    } else {
+      const client = inArrayOrFirst(clientFragment, tyrasStructure.client);
+      const clientVersion = inArrayOrFirst(
+        clientVersionFragment,
+        versions.client[client],
+      );
+      urlValid =
+        urlValid &&
+        client === clientFragment &&
+        clientVersion === clientVersionFragment;
+      params =
+        dvValid &&
+        server === url.ASPECT_NONE &&
+        serverVersion === url.ASPECT_NONE
+          ? {
+              kind: "client",
+              dataValidation,
+              client: {
+                name: client,
+                version: clientVersion,
+              },
+            }
+          : {
+              kind: "server-and-client",
+              dataValidation,
+              server: {
+                name: server,
+                version: serverVersion,
+              },
+              client: {
+                name: client,
+                version: clientVersion,
+              },
+            };
+    }
+  }
+
+  return urlValid ? params : url.buildNavigationURL(params);
 };
 
-export type DocumentationParamsOrNavigate =
-  | {
-      kind: "params";
-      params: types.DocumentationParams;
-    }
-  | { kind: "navigate"; url: string };
+export type DocumentationParamsOrNavigate = types.DocumentationParams | string;
+
+export const isNavigate = (
+  paramsOrNavigate: DocumentationParamsOrNavigate,
+): paramsOrNavigate is string => typeof paramsOrNavigate === "string";
+
+const inArrayOrFirst = (
+  item: string | undefined,
+  array: ReadonlyArray<string>,
+): string => (!!item && array.indexOf(item) >= 0 ? item : array[0]);

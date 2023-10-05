@@ -1,4 +1,4 @@
-import type * as types from "./routing.types";
+import type * as types from "./params.types";
 import type * as version from "./tyras-versions.types";
 
 export const ROUTE_PATH =
@@ -7,37 +7,62 @@ export const ROUTE_PATH =
 export const buildDataURL = (
   params: types.DocumentationParams,
   versionKind: version.VersionKind | undefined,
-): string | undefined =>
-  (versionKind === "server" && params.server === ASPECT_NONE) ||
-  (versionKind === "client" && params.client === ASPECT_NONE)
-    ? undefined
-    : `${DOCS_ROOT_URL}${params.dataValidation}/${
+): string | undefined => {
+  let urlSuffix: string | undefined;
+  switch (params.kind) {
+    case "server-and-client":
+      urlSuffix =
+        versionKind === "server"
+          ? getServerDataURLSuffix(params)
+          : versionKind === "client"
+          ? getClientDataURLSuffix(params)
+          : undefined;
+      break;
+    case "protocol":
+      urlSuffix =
         versionKind === undefined
-          ? `protocol/TODO.json`
-          : versionKind === "server"
-          ? `server-${params.server}/${params.serverVersion}`
-          : `client-${params.client}/${params.clientVersion}`
-      }.json`;
-
-export const buildNavigationURL = (params: types.DocumentationParams) =>
-  `/${params.dataValidation}/${params.server}/${params.serverVersion}/${params.client}/${params.clientVersion}`;
-
-export const buildFromURL = (
-  url: string,
-): types.DocumentationParamsFromRouter => {
-  const fragments = url.split("/");
-  if (fragments[0]?.length < 1) {
-    fragments.splice(0, 1);
+          ? `protocol/${params.protocolVersion}`
+          : undefined;
+      break;
+    case "server":
+      urlSuffix =
+        versionKind === "server" ? getServerDataURLSuffix(params) : undefined;
+      break;
+    case "client":
+      urlSuffix =
+        versionKind === "client" ? getClientDataURLSuffix(params) : undefined;
+      break;
   }
-  const [dataValidation, server, serverVersion, client, clientVersion] =
-    fragments;
-  return {
-    ...(dataValidation && { dataValidation }),
-    ...(server && { server }),
-    ...(serverVersion && { serverVersion }),
-    ...(client && { client }),
-    ...(clientVersion && { clientVersion }),
-  };
+  return urlSuffix === undefined
+    ? undefined
+    : `docs/${params.dataValidation}/${urlSuffix}.json`;
+};
+
+export const buildNavigationURL = (params: types.DocumentationParams) => {
+  let urlSuffix: string;
+  switch (params.kind) {
+    case "server-and-client":
+      urlSuffix = `${getURLSuffix(params.server)}/${getURLSuffix(
+        params.client,
+      )}`;
+      break;
+    case "protocol":
+      urlSuffix = params.protocolVersion;
+      break;
+    case "server":
+      urlSuffix = getURLSuffix(params.server);
+      break;
+    case "client":
+      urlSuffix = `${getURLSuffix({
+        name: ASPECT_NONE,
+        version: ASPECT_NONE,
+      })}/${getURLSuffix(params.client)}`;
+      break;
+
+    default:
+      throw new Error("New params kind not supported");
+  }
+  return `/${params.dataValidation}/${urlSuffix}`;
 };
 
 /**
@@ -45,4 +70,13 @@ export const buildFromURL = (
  */
 export const ASPECT_NONE = "none";
 
-export const DOCS_ROOT_URL = "/docs/";
+const getURLSuffix = ({ name, version }: types.ComponentAndVersion) =>
+  `${name}/${version}`;
+
+const getServerDataURLSuffix = ({
+  server: { name, version },
+}: types.DocumentationParamsServerBase) => `server-${name}/${version}`;
+
+const getClientDataURLSuffix = ({
+  client: { name, version },
+}: types.DocumentationParamsClientBase) => `client-${name}/${version}`;
