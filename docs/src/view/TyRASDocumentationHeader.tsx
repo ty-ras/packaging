@@ -13,8 +13,18 @@ import {
 import { KeyboardArrowDown } from "@suid/icons-material";
 import * as routing from "../routing";
 
+// TODO Cypress tests to verify that all combinations work
+
 export default function TyRASDocumentation() {
   const params = routing.useParams();
+  const currentServer =
+    params.kind === "protocol" || params.kind === "client"
+      ? undefined
+      : params.server;
+  const currentClient =
+    params.kind === "protocol" || params.kind === "server"
+      ? undefined
+      : params.client;
   return (
     <Box sx={{ flexGrow: 1 }} component="header">
       <AppBar position="static">
@@ -37,17 +47,51 @@ export default function TyRASDocumentation() {
             currentlySelected={params.dataValidation}
             getURLForItem={(dataValidation) => `/${dataValidation}`}
           />
-          <MenuDropDown kind="server" params={params} kindText="Server" />
           <MenuDropDown
-            kind="serverVersion"
-            params={params}
-            kindText="Version"
+            kindText="Server"
+            items={SERVERS}
+            currentlySelected={currentServer?.name ?? NONE}
+            getURLForItem={(server) => `/${params.dataValidation}/${server}`}
           />
-          <MenuDropDown kind="client" params={params} kindText="Client" />
           <MenuDropDown
-            kind="clientVersion"
-            params={params}
             kindText="Version"
+            items={
+              currentServer
+                ? routing.tyrasVersions.specific[params.dataValidation].server[
+                    currentServer.name
+                  ]
+                : undefined
+            }
+            currentlySelected={currentServer?.name ?? NONE}
+            getURLForItem={(serverVersion) =>
+              `/${params.dataValidation}/${currentServer?.name}/${serverVersion}`
+            }
+          />
+          <MenuDropDown
+            kindText="Client"
+            items={CLIENTS}
+            currentlySelected={currentClient?.name ?? NONE}
+            getURLForItem={(client) =>
+              `/${params.dataValidation}/${currentServer?.name ?? NONE}/${
+                currentServer?.version ?? NONE
+              }/${client}`
+            }
+          />
+          <MenuDropDown
+            kindText="Version"
+            items={
+              currentClient
+                ? routing.tyrasVersions.specific[params.dataValidation].client[
+                    currentClient.name
+                  ]
+                : undefined
+            }
+            currentlySelected={currentClient?.name ?? NONE}
+            getURLForItem={(clientVersion) =>
+              `/${params.dataValidation}/${currentServer?.name ?? NONE}/${
+                currentServer?.version ?? NONE
+              }/${currentClient?.name}/${clientVersion}`
+            }
           />
           {/* Spacer between the navigation and settings */}
           <Box sx={{ ml: "auto" }} />
@@ -65,7 +109,7 @@ function MenuDropDown({
   kindText,
   items,
   currentlySelected,
-  getParamsForItem,
+  getURLForItem,
 }: MenuDropDownProps) {
   const [anchorEl, setAnchorEl] = createSignal<null | HTMLElement>(null);
   const open = () => Boolean(anchorEl());
@@ -96,9 +140,7 @@ function MenuDropDown({
       >
         {items?.map((item) => (
           <MenuItem onClick={handleClose} disableRipple>
-            <A href={routing.buildNavigationURL(getParamsForItem(item))}>
-              {item}
-            </A>
+            <A href={getFullNavigationURL(getURLForItem(item))}>{item}</A>
           </MenuItem>
         ))}
       </Menu>
@@ -108,9 +150,30 @@ function MenuDropDown({
 
 interface MenuDropDownProps {
   kindText: string;
-  items: ReadonlyArray<string>;
+  items: ReadonlyArray<string> | undefined;
   currentlySelected: string;
   getURLForItem: (item: string) => string;
 }
 
 const NONE = "none";
+
+const SERVERS = [...routing.tyrasStructure.server, NONE];
+const CLIENTS = [...routing.tyrasStructure.client, NONE];
+
+const getFullNavigationURL = (maybePartialNavigationURL: string): string => {
+  let paramsOrFullURL = routing.parseParamsFromPathname(
+    maybePartialNavigationURL,
+  );
+  if (routing.isNavigate(paramsOrFullURL)) {
+    // The given URL was really partial
+    paramsOrFullURL = routing.parseParamsFromPathname(paramsOrFullURL);
+    if (routing.isNavigate(paramsOrFullURL)) {
+      // If we get partial URL again even after rsult of parseParamsFromPathname, we have encountered internal error
+      throw new Error(
+        `The given partial navigation URL "${maybePartialNavigationURL}" was resolved to be partial even on 2nd attempt, this signals error in URL parsing logic.`,
+      );
+    }
+  }
+
+  return routing.buildNavigationURL(paramsOrFullURL);
+};
