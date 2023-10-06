@@ -1,26 +1,41 @@
-import { Navigate } from "@solidjs/router";
+import { createSignal, createResource, createEffect } from "solid-js";
 import * as routing from "../routing";
 import Header from "./TyRASDocumentationHeader";
-import Contents from "./Documentation";
+import Contents, { type Documentation } from "./Documentation";
 
 export default function TyRASDocumentation() {
-  const paramsOrNavigate = routing.useParamsOrNavigate();
-
-  return routing.isNavigate(paramsOrNavigate) ? (
-    <Navigate href={paramsOrNavigate} />
-  ) : (
-    <TyRASDocumentationActual params={paramsOrNavigate} />
+  const [params, setParams] = createSignal(
+    routing.parseParamsAndMaybeNewURL(window.location.hash).params,
   );
-}
 
-// This is separate component because useRouteData calls useParams which will throw if redirect is neede
-function TyRASDocumentationActual({ params }: DocumentationProps) {
-  const serverDocs = routing.useRouteData(params, "server");
-  const clientDocs = routing.useRouteData(params, "client");
-  const protocolDocs = routing.useRouteData(params, undefined);
+  createEffect(() => {
+    const paramsValue = params();
+    const fromParams = routing.buildNavigationURL(paramsValue);
+    if (window.location.hash !== fromParams) {
+      window.location.hash = fromParams;
+    }
+  });
+
+  const useResource = (versionKind: routing.VersionKind | undefined) => {
+    const [resource] = createResource<
+      Documentation | undefined,
+      routing.DocumentationParams
+    >(params, async (paramsValue) => {
+      const dataURL = routing.buildDataURL(paramsValue, versionKind);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return dataURL === undefined
+        ? undefined
+        : await (await fetch(dataURL)).json();
+    });
+    return resource;
+  };
+
+  const serverDocs = useResource("server");
+  const clientDocs = useResource("client");
+  const protocolDocs = useResource(undefined);
   return (
     <>
-      <Header />
+      <Header params={params} setParams={setParams} />
       <Contents
         protocolDocs={protocolDocs()}
         serverDocs={serverDocs()}
@@ -28,8 +43,4 @@ function TyRASDocumentationActual({ params }: DocumentationProps) {
       />
     </>
   );
-}
-
-interface DocumentationProps {
-  params: routing.DocumentationParams;
 }

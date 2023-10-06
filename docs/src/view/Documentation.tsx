@@ -2,7 +2,7 @@ import { Typography } from "@suid/material";
 import type * as model from "typedoc/dist/lib/serialization/schema";
 
 export default function Documentation({ serverDocs }: DocumentationProps) {
-  return <Typography>{serverDocs?.name}</Typography>;
+  return <Typography>Hello {serverDocs?.name}</Typography>;
 }
 
 export interface DocumentationProps {

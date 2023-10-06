@@ -596,11 +596,6 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
-"@solidjs/router@0.8.3":
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/@solidjs/router/-/router-0.8.3.tgz#4623cda699c4f47b3520222529b72e3cb77ec415"
-  integrity sha512-oJuqQo10rVTiQYhe1qXIG1NyZIZ2YOwHnlLc8Xx+g/iJhFCJo1saLOIrD/Dkh2fpIaIny5ZMkz1cYYqoTYGJbg==
-
 "@suid/base@0.8.5":
   version "0.8.5"
   resolved "https://registry.yarnpkg.com/@suid/base/-/base-0.8.5.tgz#dee33b78ce63cb7ea93d657870d3cd279a112e8b"
