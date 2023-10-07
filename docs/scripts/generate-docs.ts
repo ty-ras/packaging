@@ -9,7 +9,7 @@ import * as semver from "semver";
 import * as td from "typedoc";
 import { request } from "undici";
 import type * as codeInfo from "./code-info.types";
-import * as url from "../src/routing/url";
+import * as url from "../src/structure/url";
 
 export default async ({
   packages,

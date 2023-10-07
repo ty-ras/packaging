@@ -18,7 +18,7 @@ import {
   MenuItem,
 } from "@suid/material";
 import { KeyboardArrowDown } from "@suid/icons-material";
-import * as routing from "../routing";
+import * as routing from "../structure";
 
 /* eslint-disable sonarjs/no-duplicate-string */
 
