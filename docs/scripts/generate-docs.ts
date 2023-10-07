@@ -278,6 +278,8 @@ const generateDocsForVersion = async (
     skipErrorChecking: true,
     // Don't emit any .js files
     emit: "none",
+    // Include 'packageVersion' property
+    includeVersion: true,
   });
 
   const project = await app.convert();

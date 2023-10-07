@@ -1,8 +1,20 @@
-import { Typography } from "@suid/material";
+import { Stack, Typography } from "@suid/material";
 import type * as model from "typedoc/dist/lib/serialization/schema";
 
-export default function Documentation({ serverDocs }: DocumentationProps) {
-  return <Typography>Hello {serverDocs?.name}</Typography>;
+export default function Documentation(props: DocumentationProps) {
+  return (
+    <Stack direction="column">
+      <Typography>
+        {props.serverDocs?.name} {props.serverDocs?.packageVersion}
+      </Typography>
+      <Typography>
+        {props.clientDocs?.name} {props.clientDocs?.packageVersion}
+      </Typography>
+      <Typography>
+        {props.protocolDocs?.name} {props.protocolDocs?.packageVersion}
+      </Typography>
+    </Stack>
+  );
 }
 
 export interface DocumentationProps {

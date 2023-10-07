@@ -21,6 +21,7 @@ export default function TyRASDocumentation() {
       Documentation | undefined,
       routing.DocumentationParams
     >(params, async (paramsValue) => {
+      // TODO maybe cache value here? key: data URL, value: promise
       const dataURL = routing.buildDataURL(paramsValue, versionKind);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return dataURL === undefined
