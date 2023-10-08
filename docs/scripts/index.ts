@@ -7,7 +7,7 @@ import generateDocs from "./generate-docs";
 const main = async () => {
   const codeInfo = await readStructure();
   const versionContent = await generateDocs(codeInfo);
-  const routingDir = "./src/routing";
+  const routingDir = "./src/structure";
   await Promise.all([
     fs.writeFile(
       path.join(routingDir, "tyras-structure.json"),

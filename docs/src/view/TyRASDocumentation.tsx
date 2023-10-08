@@ -1,7 +1,12 @@
-import { createSignal, createResource, createEffect } from "solid-js";
+import {
+  createSignal,
+  createResource,
+  createEffect,
+  createMemo,
+} from "solid-js";
 import * as routing from "../structure";
 import Header from "./TyRASDocumentationHeader";
-import Contents, { type Documentation } from "./Documentation";
+import Contents from "./Documentation";
 
 export default function TyRASDocumentation() {
   const [params, setParams] = createSignal(
@@ -18,10 +23,11 @@ export default function TyRASDocumentation() {
 
   const useResource = (versionKind: routing.VersionKind | undefined) => {
     const [resource] = createResource<
-      Documentation | undefined,
+      routing.Documentation | undefined,
       routing.DocumentationParams
     >(params, async (paramsValue) => {
       // TODO maybe cache value here? key: data URL, value: promise
+      // Not sure how much that really helps, as server probably can optimize that already with etags and such
       const dataURL = routing.buildDataURL(paramsValue, versionKind);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return dataURL === undefined
@@ -31,17 +37,25 @@ export default function TyRASDocumentation() {
     return resource;
   };
 
-  const serverDocs = useResource("server");
-  const clientDocs = useResource("client");
-  const protocolDocs = useResource(undefined);
+  const docs = createMemo(() => {
+    const paramsValue = params();
+    const retVal: Record<string, ReturnType<typeof useResource>> = {};
+    if (paramsValue.kind === "protocol") {
+      retVal.protocol = useResource(undefined);
+    } else {
+      if (paramsValue.kind !== "client") {
+        retVal.server = useResource("server");
+      }
+      if (paramsValue.kind !== "server") {
+        retVal.client = useResource("client");
+      }
+    }
+    return retVal;
+  });
   return (
     <>
       <Header params={params} setParams={setParams} />
-      <Contents
-        protocolDocs={protocolDocs()}
-        serverDocs={serverDocs()}
-        clientDocs={clientDocs()}
-      />
+      <Contents docs={docs} />
     </>
   );
 }

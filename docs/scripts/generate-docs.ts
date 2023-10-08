@@ -10,6 +10,7 @@ import * as td from "typedoc";
 import { request } from "undici";
 import type * as codeInfo from "./code-info.types";
 import * as url from "../src/structure/url";
+import type * as docs from "../src/structure/docs.types";
 
 export default async ({
   packages,
@@ -300,7 +301,13 @@ const generateDocsForVersion = async (
   //   throw new Error("Typedoc validation found warnings");
   // }
 
-  await app.generateJson(project, json);
+  const docs: docs.Documentation = {
+    version: 1,
+    project: app.serializer.projectToObject(project, sourceDir),
+  };
+
+  await fs.mkdir(path.dirname(json), { recursive: true });
+  await fs.writeFile(json, JSON.stringify(docs));
 };
 
 const getAllVersions = ({ currentVersions, versionsToGenerate }: VersionInfo) =>
