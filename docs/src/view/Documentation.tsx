@@ -1,7 +1,17 @@
 import { Accessor, For, createEffect, createMemo } from "solid-js";
 import { createStore, produce } from "solid-js/store";
-import { Chip, Divider, Grid, List, Stack, Typography } from "@suid/material";
-import type * as structure from "../structure";
+import {
+  Chip,
+  Divider,
+  Grid,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Stack,
+} from "@suid/material";
+import * as structure from "../structure";
+import { ReflectionKind } from "typedoc";
 
 export default function Documentation(props: DocumentationProps) {
   const groupNames = createMemo(() => {
@@ -19,25 +29,31 @@ export default function Documentation(props: DocumentationProps) {
   );
 
   createEffect(() => {
-    setGroupStates({
-      ...Object.fromEntries(
+    setGroupStates(
+      Object.fromEntries(
         groupNames().map((key) => [key, groupStates[key] ?? true] as const),
       ),
-    });
+    );
   });
+
+  const [topLevelNames, setTopLevelNames] = createStore<
+    Record<string, Record<number, string>>
+  >({});
+
+  createEffect(() => {});
 
   const topLevelIds = createMemo(() =>
     Object.values(props.docs()).flatMap(
       (doc) =>
-        doc()?.project.groups?.map(({ title, children }) =>
-          groupStates[title] === true ? children : undefined,
+        doc()?.project.groups?.flatMap(({ title, children }) =>
+          groupStates[title] === true ? children ?? [] : [],
         ) ?? [],
     ),
   );
 
   return (
     <Grid container>
-      <Grid item>
+      <Grid item sx={{ maxHeight: "100vh", overflow: "auto" }}>
         <Stack direction="row" spacing={1}>
           <For each={groupNames()}>
             {(title) => (
@@ -55,11 +71,19 @@ export default function Documentation(props: DocumentationProps) {
             )}
           </For>
         </Stack>
-        <List>
-          <For each={topLevelIds()}>
-            {(id) => <Typography>{id}</Typography>}
-          </For>
-        </List>
+        <nav aria-label={`Documented entities: ${groupNames().join(", ")}.`}>
+          <List dense>
+            <For each={topLevelIds()}>
+              {(id) => (
+                <ListItem disablePadding>
+                  <ListItemButton>
+                    <ListItemText primary={id} />
+                  </ListItemButton>
+                </ListItem>
+              )}
+            </For>
+          </List>
+        </nav>
       </Grid>
       <Divider orientation="vertical" flexItem />
       <Grid item xs>
@@ -75,3 +99,17 @@ export interface DocumentationProps {
 
 const getGroupNames = (docs: structure.Documentation | undefined) =>
   docs?.project.groups?.map(({ title }) => title) ?? [];
+
+const getElementText = (project: structure.Documentation, id: number) => {
+  const element =
+    project.project.children?.[id] ??
+    structure.doThrow(`Could not find element with ID ${id}`);
+  // eslint-disable-next-line sonarjs/no-small-switch
+  switch (element.kind) {
+    case ReflectionKind.Class:
+      // For classes, we are happy with the name
+      return element.name;
+    default:
+      throw new Error(`Add implementation for ${element.kind}`);
+  }
+};

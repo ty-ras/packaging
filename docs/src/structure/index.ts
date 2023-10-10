@@ -5,3 +5,4 @@ export type * from "./docs.types";
 export * from "./url";
 export * from "./tyras-structure";
 export * from "./tyras-versions";
+export * from "./errors";

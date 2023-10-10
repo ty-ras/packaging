@@ -11,6 +11,7 @@ import { request } from "undici";
 import type * as codeInfo from "./code-info.types";
 import * as url from "../src/structure/url";
 import type * as docs from "../src/structure/docs.types";
+import * as errors from "../src/structure/errors";
 
 export default async ({
   packages,
@@ -87,10 +88,6 @@ export default async ({
   return versions;
 };
 
-const doThrow = (msg: string) => {
-  throw new Error(msg);
-};
-
 const PUBLIC = path.resolve("public");
 
 const urlToPath = (url: string) => path.join(PUBLIC, path.dirname(url));
@@ -144,7 +141,7 @@ const getVersionInfo = async (
           },
       server ? "server" : client ? "client" : undefined,
     ) ??
-      doThrow(
+      errors.doThrow(
         `Failed to build data URL for ${dataValidation}, ${server}, ${client}`,
       ),
   );
@@ -171,7 +168,7 @@ const getVersionInfo = async (
           source: "local",
           path: path.join(
             packages[dataValidation][server ? "server" : "client"][
-              server ?? client ?? doThrow("This should never happen")
+              server ?? client ?? errors.doThrow("This should never happen")
             ],
             "package.json",
           ),
