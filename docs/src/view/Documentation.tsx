@@ -1,4 +1,10 @@
-import { Accessor, For, createEffect, createMemo } from "solid-js";
+import {
+  Accessor,
+  For,
+  createEffect,
+  createMemo,
+  createSignal,
+} from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import {
   Chip,
@@ -9,9 +15,9 @@ import {
   ListItemButton,
   ListItemText,
   Stack,
+  Typography,
 } from "@suid/material";
 import * as structure from "../structure";
-import { ReflectionKind } from "typedoc";
 
 export default function Documentation(props: DocumentationProps) {
   const groupNames = createMemo(() => {
@@ -36,20 +42,39 @@ export default function Documentation(props: DocumentationProps) {
     );
   });
 
-  const [topLevelNames, setTopLevelNames] = createStore<
-    Record<string, Record<number, string>>
-  >({});
+  const [topLevelElements, setTopLevelElements] = createStore<
+    Array<{ docKind: string; id: number; text: string }>
+  >([]);
 
-  createEffect(() => {});
+  // TODO make sticky headers
+  createEffect(() => {
+    setTopLevelElements(
+      groupNames()
+        .filter((groupName) => groupStates[groupName] === true)
+        .flatMap((groupName) =>
+          Object.entries(props.docs()).flatMap(([docKind, doc]) => {
+            const docObj = doc();
+            return (
+              docObj?.project?.groups
+                ?.filter(({ title }) => title === groupName)
+                .flatMap(({ title, children }) =>
+                  groupStates[title] === true
+                    ? children?.map((id) => ({
+                        docKind,
+                        id,
+                        text: getElementText(docObj, id),
+                      })) ?? []
+                    : [],
+                ) ?? []
+            );
+          }),
+        ),
+    );
+  });
 
-  const topLevelIds = createMemo(() =>
-    Object.values(props.docs()).flatMap(
-      (doc) =>
-        doc()?.project.groups?.flatMap(({ title, children }) =>
-          groupStates[title] === true ? children ?? [] : [],
-        ) ?? [],
-    ),
-  );
+  const [currentContent, setCurrentContent] = createSignal<
+    { docKind: string; id: number } | undefined
+  >();
 
   return (
     <Grid container>
@@ -73,11 +98,13 @@ export default function Documentation(props: DocumentationProps) {
         </Stack>
         <nav aria-label={`Documented entities: ${groupNames().join(", ")}.`}>
           <List dense>
-            <For each={topLevelIds()}>
-              {(id) => (
+            <For each={topLevelElements}>
+              {({ docKind, id, text }) => (
                 <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemText primary={id} />
+                  <ListItemButton
+                    onClick={() => setCurrentContent({ docKind, id })}
+                  >
+                    <ListItemText primary={text} />
                   </ListItemButton>
                 </ListItem>
               )}
@@ -87,7 +114,9 @@ export default function Documentation(props: DocumentationProps) {
       </Grid>
       <Divider orientation="vertical" flexItem />
       <Grid item xs>
-        Content of each item
+        <Typography>
+          Content for {currentContent()?.docKind} and {currentContent()?.id}
+        </Typography>
       </Grid>
     </Grid>
   );
@@ -102,14 +131,50 @@ const getGroupNames = (docs: structure.Documentation | undefined) =>
 
 const getElementText = (project: structure.Documentation, id: number) => {
   const element =
-    project.project.children?.[id] ??
-    structure.doThrow(`Could not find element with ID ${id}`);
+    project.project.children?.find(({ id: childId }) => childId === id) ??
+    structure.doThrow(
+      `Could not find element with ID ${id} in ${project.project.packageName}`,
+    );
   // eslint-disable-next-line sonarjs/no-small-switch
   switch (element.kind) {
+    case ReflectionKind.Interface:
     case ReflectionKind.Class:
-      // For classes, we are happy with the name
+    case ReflectionKind.Function:
+    case ReflectionKind.TypeAlias:
+    case ReflectionKind.ObjectLiteral:
+    case ReflectionKind.Variable:
       return element.name;
     default:
       throw new Error(`Add implementation for ${element.kind}`);
   }
 };
+
+// We can't include this from typedoc package in browsers
+// See: https://github.com/TypeStrong/typedoc/issues/1861
+enum ReflectionKind {
+  Project = 0x1,
+  Module = 0x2,
+  Namespace = 0x4,
+  Enum = 0x8,
+  EnumMember = 0x10,
+  Variable = 0x20,
+  Function = 0x40,
+  Class = 0x80,
+  Interface = 0x100,
+  Constructor = 0x200,
+  Property = 0x400,
+  Method = 0x800,
+  CallSignature = 0x1000,
+  IndexSignature = 0x2000,
+  ConstructorSignature = 0x4000,
+  Parameter = 0x8000,
+  TypeLiteral = 0x10000,
+  TypeParameter = 0x20000,
+  Accessor = 0x40000,
+  GetSignature = 0x80000,
+  SetSignature = 0x100000,
+  ObjectLiteral = 0x200000,
+  TypeAlias = 0x400000,
+  Event = 0x800000,
+  Reference = 0x1000000,
+}
