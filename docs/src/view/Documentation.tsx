@@ -1,12 +1,14 @@
 import {
   Accessor,
   For,
+  batch,
   createEffect,
   createMemo,
   createSignal,
 } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import {
+  AppBar,
   Chip,
   Divider,
   Grid,
@@ -18,6 +20,7 @@ import {
   Stack,
   Typography,
 } from "@suid/material";
+import { CheckBoxRounded } from "@suid/icons-material";
 import * as structure from "../structure";
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 
@@ -70,26 +73,41 @@ export default function Documentation(props: DocumentationProps) {
     TopLevelElement | undefined
   >();
 
+  const [lastSelectedGroup, setLastSelectedGroup] = createSignal<
+    string | undefined
+  >();
+
+  // TODO if we make deleteIcon variable, then delete will trigger only once.
+  // Maybe create separate DocListChip component?
   return (
     <Grid container>
       <Grid item sx={{ maxHeight: "100vh", overflow: "auto" }}>
-        <Stack direction="row" spacing={1}>
-          <For each={groupNames()}>
-            {(title) => (
-              <Chip
-                label={title}
-                variant={groupStates[title] === false ? "outlined" : "filled"}
-                onClick={() => {
-                  setGroupStates(
-                    produce((s) => {
-                      s[title] = !s[title];
-                    }),
-                  );
-                }}
-              />
-            )}
-          </For>
-        </Stack>
+        <AppBar position="sticky">
+          <Stack direction="row" spacing={1}>
+            <For each={groupNames()}>
+              {(title) => (
+                <Chip
+                  label={title}
+                  variant={groupStates[title] === false ? "outlined" : "filled"}
+                  deleteIcon={<CheckBoxRounded />}
+                  onDelete={() => {
+                    batch(() => {
+                      setLastSelectedGroup(undefined);
+                      setGroupStates(
+                        produce((s) => {
+                          s[title] = !s[title];
+                        }),
+                      );
+                    });
+                  }}
+                  onClick={() => {
+                    setLastSelectedGroup(title);
+                  }}
+                />
+              )}
+            </For>
+          </Stack>
+        </AppBar>
         <nav aria-label={`Documented entities: ${groupNames().join(", ")}.`}>
           <List dense sx={{ "& ul": { padding: 0 } }} subheader={<li />}>
             <For each={topLevelElements}>
@@ -98,12 +116,20 @@ export default function Documentation(props: DocumentationProps) {
                   <ul>
                     <ListSubheader>{groupName}</ListSubheader>
                     <For each={items}>
-                      {(element) => (
+                      {(element, index) => (
                         <ListItem disablePadding>
                           <ListItemButton
+                            autoFocus={
+                              index() === 0 && lastSelectedGroup() === groupName
+                            }
                             onClick={() => setCurrentContent(element)}
                           >
-                            <ListItemText primary={element.text} />
+                            <ListItemText
+                              primary={element.text}
+                              secondary={
+                                element.showKind ? element.docKind : undefined
+                              }
+                            />
                           </ListItemButton>
                         </ListItem>
                       )}
@@ -172,7 +198,6 @@ const getAllTopLevelElements = (
     ) ?? [];
 
 const getElementText = (element: typedoc.DeclarationReflection) => {
-  // eslint-disable-next-line sonarjs/no-small-switch
   switch (element.kind) {
     case ReflectionKind.Interface:
     case ReflectionKind.Class:
@@ -190,47 +215,45 @@ const deduplicateTopLevelElements = (
   elements: ReturnType<typeof getAllTopLevelElements>,
 ) => {
   const retVal = Object.values(
-    elements.reduce<{
-      names: Record<string, Record<string, TopLevelElement>>;
-      elements: Array<TopLevelElement>;
-    }>(
+    elements.reduce<Record<string, Record<string, TopLevelElement>>>(
       (state, item) => {
         const key = item.text;
-        let addElement = true;
-        if (key in state.names) {
-          const otherElement = state.names[key];
-          if (otherElement.docKind !== item.docKind) {
-            // This is acceptable situation, just need to adjust the element
-            otherElement.showKind = true;
-            item.showKind = true;
-          } else if (
-            otherElement.element.sources?.length !==
-              item.element.sources?.length ||
-            otherElement.element.sources?.some(
-              (other, idx) =>
-                other.fileName !== item.element.sources?.[idx].fileName,
-            )
-          ) {
+        if (key in state) {
+          const sameByDocKind = state[key];
+          if (item.docKind in sameByDocKind) {
             throw new Error(
-              `Duplicate exported member ${item.text} which was not identical based on file name.`,
+              `Duplicate exported member ${item.text} in kind ${item.docKind}.`,
             );
           } else {
-            addElement = false;
+            if (
+              Object.values(sameByDocKind).some(
+                (otherElement) =>
+                  otherElement.element.sources?.length !==
+                    item.element.sources?.length ||
+                  otherElement.element.sources?.some(
+                    (other, idx) =>
+                      other.fileName !== item.element.sources?.[idx].fileName,
+                  ),
+              )
+            ) {
+              // This is not a shared top-level element (= not in "protocol" packages)
+              sameByDocKind[item.docKind] = item;
+            }
           }
         } else {
-          state.names[key][item.docKind] = item;
-        }
-        if (addElement) {
-          state.elements.push(item);
+          state[key] = { [item.docKind]: item };
         }
         return state;
       },
-      {
-        names: {},
-        elements: [],
-      },
+      {},
     ),
-  );
+  ).flatMap((byDocKind) => {
+    const retVal = Object.values(byDocKind);
+    if (retVal.length > 1) {
+      retVal.forEach((otherItem) => (otherItem.showKind = true));
+    }
+    return retVal;
+  });
 
   retVal.sort(({ text: xText }, { text: yText }) => xText.localeCompare(yText));
   return retVal;
