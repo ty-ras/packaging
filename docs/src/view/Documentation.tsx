@@ -20,7 +20,10 @@ import {
   Stack,
   Typography,
 } from "@suid/material";
-import { CheckBoxRounded } from "@suid/icons-material";
+import {
+  CheckBoxRounded,
+  CheckBoxOutlineBlankRounded,
+} from "@suid/icons-material";
 import * as structure from "../structure";
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 
@@ -85,26 +88,36 @@ export default function Documentation(props: DocumentationProps) {
         <AppBar position="sticky">
           <Stack direction="row" spacing={1}>
             <For each={groupNames()}>
-              {(title) => (
-                <Chip
-                  label={title}
-                  variant={groupStates[title] === false ? "outlined" : "filled"}
-                  deleteIcon={<CheckBoxRounded />}
-                  onDelete={() => {
-                    batch(() => {
-                      setLastSelectedGroup(undefined);
-                      setGroupStates(
-                        produce((s) => {
-                          s[title] = !s[title];
-                        }),
-                      );
-                    });
-                  }}
-                  onClick={() => {
-                    setLastSelectedGroup(title);
-                  }}
-                />
-              )}
+              {(title) => {
+                const onIconClick = () => {
+                  batch(() => {
+                    setLastSelectedGroup(undefined);
+                    setGroupStates(
+                      produce((s) => {
+                        s[title] = !s[title];
+                      }),
+                    );
+                  });
+                };
+                return (
+                  <Chip
+                    label={title}
+                    variant={
+                      groupStates[title] === false ? "outlined" : "filled"
+                    }
+                    icon={
+                      groupStates[title] === false ? (
+                        <CheckBoxOutlineBlankRounded onClick={onIconClick} />
+                      ) : (
+                        <CheckBoxRounded onClick={onIconClick} />
+                      )
+                    }
+                    onClick={() => {
+                      setLastSelectedGroup(title);
+                    }}
+                  />
+                );
+              }}
             </For>
           </Stack>
         </AppBar>
