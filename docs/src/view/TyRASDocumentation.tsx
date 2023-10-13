@@ -4,7 +4,7 @@ import {
   createEffect,
   createMemo,
 } from "solid-js";
-import * as routing from "../structure";
+import * as structure from "../structure";
 import Header from "./TyRASDocumentationHeader";
 import Contents from "./Documentation";
 
@@ -15,20 +15,20 @@ export default function TyRASDocumentation() {
 
   createEffect(() => {
     const paramsValue = params();
-    const fromParams = routing.buildNavigationURL(paramsValue);
+    const fromParams = structure.buildNavigationURL(paramsValue);
     if (window.location.hash !== fromParams) {
       window.location.hash = fromParams;
     }
   });
 
-  const useResource = (versionKind: routing.VersionKind | undefined) => {
+  const useResource = (versionKind: structure.VersionKind | undefined) => {
     const [resource] = createResource<
-      routing.Documentation | undefined,
-      routing.DocumentationParams
+      structure.Documentation | undefined,
+      structure.DocumentationParams
     >(params, async (paramsValue) => {
       // TODO maybe cache value here? key: data URL, value: promise
       // Not sure how much that really helps, as server probably can optimize that already with etags and such
-      const dataURL = routing.buildDataURL(paramsValue, versionKind);
+      const dataURL = structure.buildDataURL(paramsValue, versionKind);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return dataURL === undefined
         ? undefined
@@ -52,10 +52,16 @@ export default function TyRASDocumentation() {
     }
     return retVal;
   });
+
+  const actualDocs = createMemo(() => {
+    return Object.fromEntries(
+      Object.entries(docs()).map(([id, doc]) => [id, doc()?.project] as const),
+    );
+  });
   return (
     <>
       <Header params={params} setParams={setParams} />
-      <Contents docs={docs} />
+      <Contents docs={actualDocs} />
     </>
   );
 }
@@ -94,22 +100,22 @@ const parseParamsFromPathname = (
   ] = fragments;
   const dataValidation = inArrayOrFirst(
     dataValidationFragment,
-    routing.tyrasStructure.dataValidation,
+    structure.tyrasStructure.dataValidation,
   );
   let urlValid = dataValidation === dataValidationFragment;
   const dvValid = urlValid;
   const protocolVersion = inArrayOrFirst(
     serverFragment,
-    routing.tyrasVersions.protocol[dataValidation],
+    structure.tyrasVersions.protocol[dataValidation],
   );
-  let params: routing.DocumentationParams;
+  let params: structure.DocumentationParams;
   if (urlValid && protocolVersion === serverFragment) {
     params = { kind: "protocol", dataValidation, protocolVersion };
   } else {
-    const versions = routing.tyrasVersions.specific[dataValidation];
+    const versions = structure.tyrasVersions.specific[dataValidation];
     const server = inArrayOrFirst(
       serverFragment,
-      routing.tyrasStructure.server,
+      structure.tyrasStructure.server,
     );
     const serverVersion = inArrayOrFirst(
       serverVersionFragment,
@@ -128,7 +134,7 @@ const parseParamsFromPathname = (
     } else {
       const client = inArrayOrFirst(
         clientFragment,
-        routing.tyrasStructure.client,
+        structure.tyrasStructure.client,
       );
       const clientVersion = inArrayOrFirst(
         clientVersionFragment,
@@ -140,8 +146,8 @@ const parseParamsFromPathname = (
         clientVersion === clientVersionFragment;
       params =
         dvValid &&
-        server === routing.ASPECT_NONE &&
-        serverVersion === routing.ASPECT_NONE
+        server === structure.ASPECT_NONE &&
+        serverVersion === structure.ASPECT_NONE
           ? {
               kind: "client",
               dataValidation,
@@ -165,10 +171,10 @@ const parseParamsFromPathname = (
     }
   }
 
-  return urlValid ? params : routing.buildNavigationURL(params);
+  return urlValid ? params : structure.buildNavigationURL(params);
 };
 
-type DocumentationParamsOrNavigate = routing.DocumentationParams | string;
+type DocumentationParamsOrNavigate = structure.DocumentationParams | string;
 
 const isNavigate = (
   paramsOrNavigate: DocumentationParamsOrNavigate,

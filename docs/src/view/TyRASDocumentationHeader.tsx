@@ -62,113 +62,111 @@ export default function TyRASDocumentation(props: DocumentationHeaderProps) {
       : undefined;
   });
   return (
-    <Box sx={{ flexGrow: 1 }} component="header">
-      <AppBar position="static">
-        <Toolbar>
-          {/* Header */}
-          <Box>
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-            >
-              TyRAS
-            </Typography>
-          </Box>
-          {/* Navigation */}
-          <MenuDropDown
-            setParams={props.setParams}
-            kindText="Data Validation"
-            items={routing.tyrasStructure.dataValidation}
-            currentlySelected={() => props.params().dataValidation}
-            getParamsForItem={(dataValidation) =>
-              changeDataValidation(props.params(), dataValidation)
-            }
-          />
-          <Show when={maybeProtocolVersions()}>
-            {(protocolVersions) => (
-              <MenuDropDown
-                setParams={props.setParams}
-                kindText="Protocol version"
-                items={protocolVersions().items}
-                currentlySelected={() =>
-                  protocolVersions().params.protocolVersion
-                }
-                getParamsForItem={(protocolVersion) =>
-                  changeProtocolVersion(
-                    protocolVersions().params,
-                    protocolVersion,
-                  )
-                }
-              />
-            )}
-          </Show>
-          <MenuDropDown
-            setParams={props.setParams}
-            kindText="Server"
-            items={SERVERS}
-            currentlySelected={() => currentServer()?.name ?? NONE}
-            getParamsForItem={(server) =>
-              changeServer(props.params(), server === NONE ? undefined : server)
-            }
-          />
-          <MenuDropDown
-            setParams={props.setParams}
-            kindText="Version"
-            items={currentServer()?.items}
-            currentlySelected={() => currentServer()?.version ?? NONE}
-            getParamsForItem={(serverVersion) => {
-              const params = props.params();
-              if (
-                params.kind === "server-and-client" ||
-                params.kind === "server"
-              ) {
-                return changeServerVersion(params, serverVersion);
-              } else {
-                throw new Error(
-                  "This method must not be called when no server selected",
-                );
+    <AppBar position="sticky">
+      <Toolbar>
+        {/* Header */}
+        <Box>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
+          >
+            TyRAS
+          </Typography>
+        </Box>
+        {/* Navigation */}
+        <MenuDropDown
+          setParams={props.setParams}
+          kindText="Data Validation"
+          items={routing.tyrasStructure.dataValidation}
+          currentlySelected={() => props.params().dataValidation}
+          getParamsForItem={(dataValidation) =>
+            changeDataValidation(props.params(), dataValidation)
+          }
+        />
+        <Show when={maybeProtocolVersions()}>
+          {(protocolVersions) => (
+            <MenuDropDown
+              setParams={props.setParams}
+              kindText="Protocol version"
+              items={protocolVersions().items}
+              currentlySelected={() =>
+                protocolVersions().params.protocolVersion
               }
-            }}
-          />
-          <MenuDropDown
-            setParams={props.setParams}
-            kindText="Client"
-            items={CLIENTS}
-            currentlySelected={() => currentClient()?.name ?? NONE}
-            getParamsForItem={(client) =>
-              changeClient(props.params(), client === NONE ? undefined : client)
-            }
-          />
-          <MenuDropDown
-            setParams={props.setParams}
-            kindText="Version"
-            items={currentClient()?.items}
-            currentlySelected={() => currentClient()?.version ?? NONE}
-            getParamsForItem={(clientVersion) => {
-              const params = props.params();
-              if (
-                params.kind === "server-and-client" ||
-                params.kind === "client"
-              ) {
-                return changeClientVersion(params, clientVersion);
-              } else {
-                throw new Error(
-                  "This method must not be called when no client selection",
-                );
+              getParamsForItem={(protocolVersion) =>
+                changeProtocolVersion(
+                  protocolVersions().params,
+                  protocolVersion,
+                )
               }
-            }}
-          />
-          {/* Spacer between the navigation and settings */}
-          <Box sx={{ ml: "auto" }} />
-          {/* Settings (GH link + Theme switcher)*/}
-          <Stack direction="row" spacing={1}>
-            <Typography>Settings here</Typography>
-          </Stack>
-        </Toolbar>
-      </AppBar>
-    </Box>
+            />
+          )}
+        </Show>
+        <MenuDropDown
+          setParams={props.setParams}
+          kindText="Server"
+          items={SERVERS}
+          currentlySelected={() => currentServer()?.name ?? NONE}
+          getParamsForItem={(server) =>
+            changeServer(props.params(), server === NONE ? undefined : server)
+          }
+        />
+        <MenuDropDown
+          setParams={props.setParams}
+          kindText="Version"
+          items={currentServer()?.items}
+          currentlySelected={() => currentServer()?.version ?? NONE}
+          getParamsForItem={(serverVersion) => {
+            const params = props.params();
+            if (
+              params.kind === "server-and-client" ||
+              params.kind === "server"
+            ) {
+              return changeServerVersion(params, serverVersion);
+            } else {
+              throw new Error(
+                "This method must not be called when no server selected",
+              );
+            }
+          }}
+        />
+        <MenuDropDown
+          setParams={props.setParams}
+          kindText="Client"
+          items={CLIENTS}
+          currentlySelected={() => currentClient()?.name ?? NONE}
+          getParamsForItem={(client) =>
+            changeClient(props.params(), client === NONE ? undefined : client)
+          }
+        />
+        <MenuDropDown
+          setParams={props.setParams}
+          kindText="Version"
+          items={currentClient()?.items}
+          currentlySelected={() => currentClient()?.version ?? NONE}
+          getParamsForItem={(clientVersion) => {
+            const params = props.params();
+            if (
+              params.kind === "server-and-client" ||
+              params.kind === "client"
+            ) {
+              return changeClientVersion(params, clientVersion);
+            } else {
+              throw new Error(
+                "This method must not be called when no client selection",
+              );
+            }
+          }}
+        />
+        {/* Spacer between the navigation and settings */}
+        <Box sx={{ ml: "auto" }} />
+        {/* Settings (GH link + Theme switcher)*/}
+        <Stack direction="row" spacing={1}>
+          <Typography>Settings here</Typography>
+        </Stack>
+      </Toolbar>
+    </AppBar>
   );
 }
 
