@@ -4,7 +4,7 @@ import type * as types from "./types";
 export default function SingleElementView(props: SingleElementViewProps) {
   return (
     <Typography>
-      {JSON.stringify(props.currentElement ?? {}, undefined, 2)}
+      {JSON.stringify(props.currentElement?.element ?? {}, undefined, 2)}
     </Typography>
   );
 }
