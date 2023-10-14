@@ -4,9 +4,14 @@ import {
   createEffect,
   createMemo,
 } from "solid-js";
+import { createStore } from "solid-js/store";
+import { AppBar, Divider, Grid } from "@suid/material";
 import * as structure from "../structure";
-import Header from "./TyRASDocumentationHeader";
-import Contents from "./Documentation";
+import TyRASDocumentationToolbar from "./TyRASDocumentationToolbar";
+import * as documentation from "./documentation/functionality";
+import TopLevelElementsToolbar from "./documentation/views/TopLevelElementsToolbar";
+import TopLevelElementsList from "./documentation/views/TopLevelElementsList";
+import SingleElementContents from "./documentation/views/SingleElementContents";
 
 export default function TyRASDocumentation() {
   const [params, setParams] = createSignal(
@@ -21,7 +26,9 @@ export default function TyRASDocumentation() {
     }
   });
 
-  const useResource = (versionKind: structure.VersionKind | undefined) => {
+  const createDocumentationResource = (
+    versionKind: structure.VersionKind | undefined,
+  ) => {
     const [resource] = createResource<
       structure.Documentation | undefined,
       structure.DocumentationParams
@@ -39,15 +46,18 @@ export default function TyRASDocumentation() {
 
   const docs = createMemo(() => {
     const paramsValue = params();
-    const retVal: Record<string, ReturnType<typeof useResource>> = {};
+    const retVal: Record<
+      string,
+      ReturnType<typeof createDocumentationResource>
+    > = {};
     if (paramsValue.kind === "protocol") {
-      retVal.protocol = useResource(undefined);
+      retVal.protocol = createDocumentationResource(undefined);
     } else {
       if (paramsValue.kind !== "client") {
-        retVal.server = useResource("server");
+        retVal.server = createDocumentationResource("server");
       }
       if (paramsValue.kind !== "server") {
-        retVal.client = useResource("client");
+        retVal.client = createDocumentationResource("client");
       }
     }
     return retVal;
@@ -58,10 +68,72 @@ export default function TyRASDocumentation() {
       Object.entries(docs()).map(([id, doc]) => [id, doc()?.project] as const),
     );
   });
+
+  const groupNames = createMemo(() => {
+    const arr = Array.from(
+      new Set(
+        Object.values(actualDocs()).flatMap((doc) =>
+          documentation.getGroupNames(doc),
+        ),
+      ).values(),
+    );
+    arr.sort();
+    return arr;
+  });
+
+  const [groupStates, setGroupStates] = createStore<documentation.GroupStates>(
+    {},
+  );
+
+  const topLevelElements = createMemo(() => {
+    return documentation.getTopLevelElementsFromMultipleDocumentations(
+      groupNames(),
+      groupStates,
+      actualDocs(),
+    );
+  });
+
+  createEffect(() => {
+    setGroupStates(
+      Object.fromEntries(
+        groupNames().map((key) => [key, groupStates[key] ?? true] as const),
+      ),
+    );
+  });
+
+  const [lastSelectedGroup, setLastSelectedGroup] = createSignal<
+    string | undefined
+  >();
+  const [currentElement, setCurrentContent] = createSignal<
+    documentation.TopLevelElement | undefined
+  >();
+
   return (
     <>
-      <Header params={params} setParams={setParams} />
-      <Contents docs={actualDocs} />
+      <AppBar position="sticky">
+        <TyRASDocumentationToolbar params={params()} setParams={setParams} />
+        <TopLevelElementsToolbar
+          groupStates={groupStates}
+          setGroupStates={setGroupStates}
+          groupNames={groupNames()}
+          setLastSelectedGroup={setLastSelectedGroup}
+        />
+      </AppBar>
+      <main>
+        <Grid container>
+          <Grid item sx={{ maxHeight: "100vh", overflow: "auto" }}>
+            <TopLevelElementsList
+              elements={topLevelElements()}
+              lastSelectedGroup={lastSelectedGroup()}
+              setCurrentElement={setCurrentContent}
+            />
+          </Grid>
+          <Divider orientation="vertical" flexItem />
+          <Grid item xs>
+            <SingleElementContents currentElement={currentElement()} />
+          </Grid>
+        </Grid>
+      </main>
     </>
   );
 }

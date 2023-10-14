@@ -9,7 +9,6 @@ import {
 } from "solid-js";
 import {
   Box,
-  AppBar,
   Typography,
   Toolbar,
   Stack,
@@ -27,7 +26,7 @@ import * as routing from "../structure";
 // Notice: we can't destructure props in Solid: https://github.com/solidjs/solid/discussions/287
 export default function TyRASDocumentation(props: DocumentationHeaderProps) {
   const currentServer = createMemo(() => {
-    const params = props.params();
+    const params = props.params;
     return params.kind === "protocol" || params.kind === "client"
       ? undefined
       : {
@@ -40,7 +39,7 @@ export default function TyRASDocumentation(props: DocumentationHeaderProps) {
   });
 
   const currentClient = createMemo(() => {
-    const params = props.params();
+    const params = props.params;
     return params.kind === "protocol" || params.kind === "server"
       ? undefined
       : {
@@ -53,7 +52,7 @@ export default function TyRASDocumentation(props: DocumentationHeaderProps) {
   });
 
   const maybeProtocolVersions = createMemo(() => {
-    const params = props.params();
+    const params = props.params;
     return params.kind === "protocol"
       ? {
           params,
@@ -62,116 +61,103 @@ export default function TyRASDocumentation(props: DocumentationHeaderProps) {
       : undefined;
   });
   return (
-    <AppBar position="sticky">
-      <Toolbar>
-        {/* Header */}
-        <Box>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-          >
-            TyRAS
-          </Typography>
-        </Box>
-        {/* Navigation */}
-        <MenuDropDown
-          setParams={props.setParams}
-          kindText="Data Validation"
-          items={routing.tyrasStructure.dataValidation}
-          currentlySelected={() => props.params().dataValidation}
-          getParamsForItem={(dataValidation) =>
-            changeDataValidation(props.params(), dataValidation)
-          }
-        />
-        <Show when={maybeProtocolVersions()}>
-          {(protocolVersions) => (
-            <MenuDropDown
-              setParams={props.setParams}
-              kindText="Protocol version"
-              items={protocolVersions().items}
-              currentlySelected={() =>
-                protocolVersions().params.protocolVersion
-              }
-              getParamsForItem={(protocolVersion) =>
-                changeProtocolVersion(
-                  protocolVersions().params,
-                  protocolVersion,
-                )
-              }
-            />
-          )}
-        </Show>
-        <MenuDropDown
-          setParams={props.setParams}
-          kindText="Server"
-          items={SERVERS}
-          currentlySelected={() => currentServer()?.name ?? NONE}
-          getParamsForItem={(server) =>
-            changeServer(props.params(), server === NONE ? undefined : server)
-          }
-        />
-        <MenuDropDown
-          setParams={props.setParams}
-          kindText="Version"
-          items={currentServer()?.items}
-          currentlySelected={() => currentServer()?.version ?? NONE}
-          getParamsForItem={(serverVersion) => {
-            const params = props.params();
-            if (
-              params.kind === "server-and-client" ||
-              params.kind === "server"
-            ) {
-              return changeServerVersion(params, serverVersion);
-            } else {
-              throw new Error(
-                "This method must not be called when no server selected",
-              );
+    <Toolbar>
+      {/* Header */}
+      <Box>
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
+        >
+          TyRAS
+        </Typography>
+      </Box>
+      {/* Navigation */}
+      <MenuDropDown
+        setParams={props.setParams}
+        kindText="Data Validation"
+        items={routing.tyrasStructure.dataValidation}
+        currentlySelected={() => props.params.dataValidation}
+        getParamsForItem={(dataValidation) =>
+          changeDataValidation(props.params, dataValidation)
+        }
+      />
+      <Show when={maybeProtocolVersions()}>
+        {(protocolVersions) => (
+          <MenuDropDown
+            setParams={props.setParams}
+            kindText="Protocol version"
+            items={protocolVersions().items}
+            currentlySelected={() => protocolVersions().params.protocolVersion}
+            getParamsForItem={(protocolVersion) =>
+              changeProtocolVersion(protocolVersions().params, protocolVersion)
             }
-          }}
-        />
-        <MenuDropDown
-          setParams={props.setParams}
-          kindText="Client"
-          items={CLIENTS}
-          currentlySelected={() => currentClient()?.name ?? NONE}
-          getParamsForItem={(client) =>
-            changeClient(props.params(), client === NONE ? undefined : client)
+          />
+        )}
+      </Show>
+      <MenuDropDown
+        setParams={props.setParams}
+        kindText="Server"
+        items={SERVERS}
+        currentlySelected={() => currentServer()?.name ?? NONE}
+        getParamsForItem={(server) =>
+          changeServer(props.params, server === NONE ? undefined : server)
+        }
+      />
+      <MenuDropDown
+        setParams={props.setParams}
+        kindText="Version"
+        items={currentServer()?.items}
+        currentlySelected={() => currentServer()?.version ?? NONE}
+        getParamsForItem={(serverVersion) => {
+          const params = props.params;
+          if (params.kind === "server-and-client" || params.kind === "server") {
+            return changeServerVersion(params, serverVersion);
+          } else {
+            throw new Error(
+              "This method must not be called when no server selected",
+            );
           }
-        />
-        <MenuDropDown
-          setParams={props.setParams}
-          kindText="Version"
-          items={currentClient()?.items}
-          currentlySelected={() => currentClient()?.version ?? NONE}
-          getParamsForItem={(clientVersion) => {
-            const params = props.params();
-            if (
-              params.kind === "server-and-client" ||
-              params.kind === "client"
-            ) {
-              return changeClientVersion(params, clientVersion);
-            } else {
-              throw new Error(
-                "This method must not be called when no client selection",
-              );
-            }
-          }}
-        />
-        {/* Spacer between the navigation and settings */}
-        <Box sx={{ ml: "auto" }} />
-        {/* Settings (GH link + Theme switcher)*/}
-        <Stack direction="row" spacing={1}>
-          <Typography>Settings here</Typography>
-        </Stack>
-      </Toolbar>
-    </AppBar>
+        }}
+      />
+      <MenuDropDown
+        setParams={props.setParams}
+        kindText="Client"
+        items={CLIENTS}
+        currentlySelected={() => currentClient()?.name ?? NONE}
+        getParamsForItem={(client) =>
+          changeClient(props.params, client === NONE ? undefined : client)
+        }
+      />
+      <MenuDropDown
+        setParams={props.setParams}
+        kindText="Version"
+        items={currentClient()?.items}
+        currentlySelected={() => currentClient()?.version ?? NONE}
+        getParamsForItem={(clientVersion) => {
+          const params = props.params;
+          if (params.kind === "server-and-client" || params.kind === "client") {
+            return changeClientVersion(params, clientVersion);
+          } else {
+            throw new Error(
+              "This method must not be called when no client selection",
+            );
+          }
+        }}
+      />
+      {/* Spacer between the navigation and settings */}
+      <Box sx={{ ml: "auto" }} />
+      {/* Settings (GH link + Theme switcher)*/}
+      <Stack direction="row" spacing={1}>
+        <Typography>Settings here</Typography>
+      </Stack>
+    </Toolbar>
   );
 }
 
 export interface DocumentationHeaderProps {
-  params: Accessor<routing.DocumentationParams>;
+  params: routing.DocumentationParams;
   setParams: Setter<routing.DocumentationParams>;
 }
 
