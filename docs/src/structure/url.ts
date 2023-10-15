@@ -1,5 +1,6 @@
 import type * as types from "./params.types";
 import type * as version from "./tyras-versions.types";
+import * as errors from "./errors";
 
 export const ROUTE_PATH =
   "/:dataValidation?/:server?/:serverVersion?/:client?/:clientVersion?";
@@ -7,7 +8,7 @@ export const ROUTE_PATH =
 export const buildDataURL = (
   params: types.DocumentationParams,
   versionKind: version.VersionKind | undefined,
-): string | undefined => {
+): string => {
   let urlSuffix: string | undefined;
   switch (params.kind) {
     case "server-and-client":
@@ -33,9 +34,14 @@ export const buildDataURL = (
         versionKind === "client" ? getClientDataURLSuffix(params) : undefined;
       break;
   }
-  return urlSuffix === undefined
-    ? undefined
-    : `docs/${params.dataValidation}/${urlSuffix}.json`;
+  return `docs/${params.dataValidation}/${
+    urlSuffix ??
+    errors.doThrow(
+      `Could not resolve data URL for parameters and version kind`,
+      params,
+      versionKind,
+    )
+  }.json`;
 };
 
 export const buildNavigationURL = (params: types.DocumentationParams) => {

@@ -3,9 +3,10 @@ import {
   createResource,
   createEffect,
   createMemo,
+  Show,
 } from "solid-js";
 import { createStore } from "solid-js/store";
-import { AppBar, Divider, Grid } from "@suid/material";
+import { AppBar, Divider, Grid, Typography } from "@suid/material";
 import * as structure from "../structure";
 import TyRASDocumentationToolbar from "./TyRASDocumentationToolbar";
 import * as documentation from "./documentation/functionality";
@@ -21,59 +22,49 @@ export default function TyRASDocumentation() {
   createEffect(() => {
     const paramsValue = params();
     const fromParams = structure.buildNavigationURL(paramsValue);
+    // TODO use history API here.
     if (window.location.hash !== fromParams) {
       window.location.hash = fromParams;
     }
   });
 
-  const createDocumentationResource = (
-    versionKind: structure.VersionKind | undefined,
-  ) => {
-    const [resource] = createResource<
-      structure.Documentation | undefined,
-      structure.DocumentationParams
-    >(params, async (paramsValue) => {
-      // TODO maybe cache value here? key: data URL, value: promise
-      // Not sure how much that really helps, as server probably can optimize that already with etags and such
-      const dataURL = structure.buildDataURL(paramsValue, versionKind);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return dataURL === undefined
-        ? undefined
-        : await (await fetch(dataURL)).json();
-    });
-    return resource;
-  };
-
-  const docs = createMemo(() => {
-    const paramsValue = params();
-    const retVal: Record<
-      string,
-      ReturnType<typeof createDocumentationResource>
-    > = {};
+  const [docs] = createResource<
+    Record<string, structure.Documentation>,
+    structure.DocumentationParams
+  >(params, async (paramsValue) => {
+    const docsInfo: Array<[string, structure.VersionKind | undefined]> = [];
     if (paramsValue.kind === "protocol") {
-      retVal.protocol = createDocumentationResource(undefined);
+      docsInfo.push(["protocol", undefined]);
     } else {
       if (paramsValue.kind !== "client") {
-        retVal.server = createDocumentationResource("server");
+        docsInfo.push(["server", "server"]);
       }
       if (paramsValue.kind !== "server") {
-        retVal.client = createDocumentationResource("client");
+        docsInfo.push(["client", "client"]);
       }
     }
-    return retVal;
-  });
-
-  const actualDocs = createMemo(() => {
     return Object.fromEntries(
-      Object.entries(docs()).map(([id, doc]) => [id, doc()?.project] as const),
+      await Promise.all(
+        docsInfo.map(
+          async ([key, versionKind]) =>
+            [
+              key,
+              (await // TODO maybe cache value here? key: data URL, value: promise
+              // Not sure how much that really helps, as server probably can optimize that already with etags and such
+              (
+                await fetch(structure.buildDataURL(paramsValue, versionKind))
+              ).json()) as structure.Documentation,
+            ] as const,
+        ),
+      ),
     );
   });
 
   const groupNames = createMemo(() => {
     const arr = Array.from(
       new Set(
-        Object.values(actualDocs()).flatMap((doc) =>
-          documentation.getGroupNames(doc),
+        Object.values(docs() ?? {}).flatMap((doc) =>
+          documentation.getGroupNames(doc.project),
         ),
       ).values(),
     );
@@ -89,7 +80,11 @@ export default function TyRASDocumentation() {
     return documentation.getTopLevelElementsFromMultipleDocumentations(
       groupNames(),
       groupStates,
-      actualDocs(),
+      Object.fromEntries(
+        Object.entries(docs() ?? {}).map(
+          ([key, doc]) => [key, doc.project] as const,
+        ),
+      ),
     );
   });
 
@@ -130,7 +125,14 @@ export default function TyRASDocumentation() {
           </Grid>
           <Divider orientation="vertical" flexItem />
           <Grid item xs>
-            <SingleElementContents currentElement={currentElement()} />
+            <Show
+              when={currentElement()}
+              fallback={
+                <Typography>Please select element from the list</Typography>
+              }
+            >
+              {(elem) => <SingleElementContents currentElement={elem()} />}
+            </Show>
           </Grid>
         </Grid>
       </main>

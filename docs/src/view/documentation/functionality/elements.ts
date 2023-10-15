@@ -4,7 +4,7 @@ import type * as types from "./types";
 export const getTopLevelElementsFromMultipleDocumentations = (
   groupNames: ReadonlyArray<string>,
   groupStates: Record<string, boolean>,
-  docs: Record<string, types.Documentation | undefined>,
+  docs: Record<string, types.Documentation>,
 ) =>
   groupNames
     .filter((groupName) => groupStates[groupName] === true)
@@ -19,11 +19,11 @@ export const getTopLevelElementsFromMultipleDocumentations = (
 
 export const getTopLevelElements = (
   docKind: string,
-  documentation: types.Documentation | undefined,
+  documentation: types.Documentation,
   groupName: string,
   groupStates: Record<string, boolean>,
 ): Array<TopLevelElement> =>
-  documentation?.groups
+  documentation.groups
     ?.filter(({ title }) => title === groupName)
     .flatMap(({ title, children }) =>
       groupStates[title] === true

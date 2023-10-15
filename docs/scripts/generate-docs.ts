@@ -304,6 +304,8 @@ const generateDocsForVersion = async (
     project: app.serializer.projectToObject(project, sourceDir),
   };
 
+  // TODO: merge project groups: interfaces, (classes), type aliases into one
+
   await fs.mkdir(path.dirname(json), { recursive: true });
   await fs.writeFile(json, JSON.stringify(docs));
 };
