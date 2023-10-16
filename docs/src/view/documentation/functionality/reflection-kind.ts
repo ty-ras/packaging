@@ -10,6 +10,10 @@ export const getReflectionKindTitle = (kind: ReflectionKind): string => {
       return "class";
     case ReflectionKind.Interface:
       return "interface";
+    case ReflectionKind.Constructor:
+      return "constructor";
+    default:
+      throw new Error(`Implement title name for ${kind}.`);
   }
 };
 

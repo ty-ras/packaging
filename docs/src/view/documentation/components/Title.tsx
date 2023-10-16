@@ -4,13 +4,15 @@ import * as functionality from "../functionality";
 
 export default function Title(props: TitleProps) {
   return (
-    <Typography variant="h1">
+    // <Box sx={{ overflow: "hidden", textOverflow: "ellipsis", width: "auto" }}>
+    <Typography variant={props.variant}>
       {functionality.getReflectionKindTitle(props.element.kind)}{" "}
       {props.element.name}
     </Typography>
+    // </Box>
   );
 }
 
 export interface TitleProps extends types.ReflectionElementProps {
-  // No additional properties yet
+  variant: Parameters<typeof Typography>[0]["variant"];
 }
