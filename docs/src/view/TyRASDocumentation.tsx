@@ -6,7 +6,7 @@ import {
   Show,
 } from "solid-js";
 import { createStore } from "solid-js/store";
-import { AppBar, Divider, Grid, Typography } from "@suid/material";
+import { AppBar, Box, Typography } from "@suid/material";
 import * as structure from "../structure";
 import TyRASDocumentationToolbar from "./TyRASDocumentationToolbar";
 import * as documentation from "./documentation/functionality";
@@ -114,28 +114,88 @@ export default function TyRASDocumentation() {
           setLastSelectedGroup={setLastSelectedGroup}
         />
       </AppBar>
-      <main>
-        <Grid container>
-          <Grid item sx={{ maxHeight: "100vh", overflow: "auto" }}>
-            <TopLevelElementsList
-              elements={topLevelElements()}
-              lastSelectedGroup={lastSelectedGroup()}
-              setCurrentElement={setCurrentContent}
-            />
-          </Grid>
-          <Divider orientation="vertical" flexItem />
-          <Grid item xs>
-            <Show
-              when={currentElement()}
-              fallback={
-                <Typography>Please select element from the list</Typography>
-              }
+      <Box>
+        <Box
+          sx={{
+            maxWidth: "100%",
+            marginLeft: "auto",
+            marginRight: "auto",
+            display: "flex",
+            flexWrap: "wrap",
+          }}
+        >
+          <Box
+            sx={{
+              maxWidth: "100%",
+              display: "flex",
+              flexGrow: 1,
+              flexShrink: 1,
+              flexBasis: "100%",
+              flexWrap: "wrap",
+            }}
+          >
+            <Box sx={{ width: "auto" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "auto",
+                  height: "100vh",
+                  maxHeight: "100vh !important",
+                  position: "sticky",
+                  top: "0px",
+                  flexDirection: "row-reverse",
+                  minWidth: "0px",
+                }}
+              >
+                <Box
+                  sx={{
+                    height: "100%",
+                    position: "relative",
+                    width: "1px",
+                    backgroundColor: "black",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: "0px -2px",
+                      cursor: "col-resize",
+                      backgroundColor: "transparent",
+                      transitionDelay: "0.1s",
+                    }}
+                  />
+                </Box>
+                <Box sx={{ overflow: "auto", width: "320px" }}>
+                  <TopLevelElementsList
+                    elements={topLevelElements()}
+                    lastSelectedGroup={lastSelectedGroup()}
+                    setCurrentElement={setCurrentContent}
+                  />
+                </Box>
+              </Box>
+            </Box>
+            <Box
+              component="main"
+              sx={{
+                display: "flex",
+                flexGrow: 1,
+                flexShrink: 1,
+                flexBasis: "0px",
+                minWidth: "1px",
+              }}
             >
-              {(elem) => <SingleElementContents currentElement={elem()} />}
-            </Show>
-          </Grid>
-        </Grid>
-      </main>
+              <Show
+                when={currentElement()}
+                fallback={
+                  <Typography>Please select element from the list</Typography>
+                }
+              >
+                {(elem) => <SingleElementContents currentElement={elem()} />}
+              </Show>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     </>
   );
 }
