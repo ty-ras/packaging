@@ -102,10 +102,17 @@ export default function TyRASDocumentation() {
   const [currentElement, setCurrentContent] = createSignal<
     documentation.TopLevelElement | undefined
   >();
+  const [appBarHeight, setAppBarHeight] = createSignal<number>(0);
+  let appBarElement: HTMLDivElement | undefined;
+  createEffect(() => {
+    if (appBarElement) {
+      setAppBarHeight(appBarElement.clientHeight);
+    }
+  });
 
   return (
     <>
-      <AppBar position="sticky">
+      <AppBar ref={appBarElement} position="sticky">
         <TyRASDocumentationToolbar params={params()} setParams={setParams} />
         <TopLevelElementsToolbar
           groupStates={groupStates}
@@ -139,8 +146,8 @@ export default function TyRASDocumentation() {
                 sx={{
                   display: "flex",
                   width: "auto",
-                  height: "100vh",
-                  maxHeight: "100vh !important",
+                  height: `calc(100vh - ${appBarHeight()}px)`,
+                  maxHeight: `calc(100vh - ${appBarHeight()}px) !important`,
                   position: "sticky",
                   top: "0px",
                   flexDirection: "row-reverse",
@@ -184,14 +191,22 @@ export default function TyRASDocumentation() {
                 minWidth: "1px",
               }}
             >
-              <Show
-                when={currentElement()}
-                fallback={
-                  <Typography>Please select element from the list</Typography>
-                }
+              <Box
+                sx={{
+                  width: "100%",
+                  maxWidth: "100%",
+                  flexGrow: 1,
+                }}
               >
-                {(elem) => <SingleElementContents currentElement={elem()} />}
-              </Show>
+                <Show
+                  when={currentElement()}
+                  fallback={
+                    <Typography>Please select element from the list</Typography>
+                  }
+                >
+                  {(elem) => <SingleElementContents currentElement={elem()} />}
+                </Show>
+              </Box>
             </Box>
           </Box>
         </Box>
