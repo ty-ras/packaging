@@ -1,6 +1,7 @@
 import { Typography } from "@suid/material";
 import { For, Match, Switch } from "solid-js";
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import SingleLineCode from "./SingleLineCode";
 
 export default function Comment(props: CommentProps) {
   // TODO multi-line code blocks might need breaking props.comment.summary into multiple arrays, each being its own <p>aragraph.
@@ -22,18 +23,12 @@ export default function Comment(props: CommentProps) {
             </Match>
             <Match when={tryGetCode(summary)}>
               {(summaryCode) => (
-                <Typography
-                  component="code"
-                  fontFamily="monospace"
-                  sx={{
-                    backgroundColor: "grey.200",
-                  }}
-                >
+                <SingleLineCode>
                   {
                     // Typedoc leaves the backtick characters in the string, we probably want to detect the ```-case and use multiline <pre> in this case.
                     indexTrim(summaryCode().text, "`")
                   }
-                </Typography>
+                </SingleLineCode>
               )}
             </Match>
             <Match when={tryGetLink(summary)}>

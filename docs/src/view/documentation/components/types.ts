@@ -1,5 +1,7 @@
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 
 export interface ReflectionElementProps {
-  element: typedoc.DeclarationReflection;
+  element: Element;
 }
+
+export type Element = typedoc.DeclarationReflection;

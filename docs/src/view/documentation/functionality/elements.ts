@@ -109,6 +109,6 @@ export interface TopLevelElementGroup {
   items: Array<TopLevelElement>;
 }
 
-const doThrow = (msg: string) => {
+export const doThrow = (msg: string) => {
   throw new Error(msg);
 };

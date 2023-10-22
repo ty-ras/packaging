@@ -4,6 +4,10 @@ import {
   createEffect,
   createMemo,
   Show,
+  onMount,
+  onCleanup,
+  batch,
+  lazy,
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { AppBar, Box, Typography } from "@suid/material";
@@ -12,7 +16,9 @@ import TyRASDocumentationToolbar from "./TyRASDocumentationToolbar";
 import * as documentation from "./documentation/functionality";
 import TopLevelElementsToolbar from "./documentation/views/TopLevelElementsToolbar";
 import TopLevelElementsList from "./documentation/views/TopLevelElementsList";
-import SingleElementContents from "./documentation/views/SingleElementContents";
+const SingleElementContents = lazy(
+  async () => await import("./documentation/views/SingleElementContents"),
+);
 
 export default function TyRASDocumentation() {
   const [params, setParams] = createSignal(
@@ -99,16 +105,19 @@ export default function TyRASDocumentation() {
   const [lastSelectedGroup, setLastSelectedGroup] = createSignal<
     string | undefined
   >();
-  const [currentElement, setCurrentContent] = createSignal<
+  const [currentElement, setCurrentElement] = createSignal<
     documentation.TopLevelElement | undefined
   >();
-  const [appBarHeight, setAppBarHeight] = createSignal<number>(0);
+  const [observedAppBarHeight, setObservedAppBarHeight] =
+    createSignal<number>(0);
   let appBarElement: HTMLDivElement | undefined;
   createEffect(() => {
     if (appBarElement) {
-      setAppBarHeight(appBarElement.clientHeight);
+      setObservedAppBarHeight(appBarElement.clientHeight);
     }
   });
+
+  const { width, enableResize } = useResize(50, 400);
 
   return (
     <>
@@ -146,8 +155,8 @@ export default function TyRASDocumentation() {
                 sx={{
                   display: "flex",
                   width: "auto",
-                  height: `calc(100vh - ${appBarHeight()}px)`,
-                  maxHeight: `calc(100vh - ${appBarHeight()}px) !important`,
+                  height: `calc(100vh - ${observedAppBarHeight()}px)`,
+                  maxHeight: `calc(100vh - ${observedAppBarHeight()}px) !important`,
                   position: "sticky",
                   top: "0px",
                   flexDirection: "row-reverse",
@@ -170,13 +179,19 @@ export default function TyRASDocumentation() {
                       backgroundColor: "transparent",
                       transitionDelay: "0.1s",
                     }}
+                    onMouseDown={enableResize}
                   />
                 </Box>
-                <Box sx={{ overflow: "auto", width: "320px" }}>
+                <Box
+                  sx={{
+                    overflow: "auto",
+                    width: width(),
+                  }}
+                >
                   <TopLevelElementsList
                     elements={topLevelElements()}
                     lastSelectedGroup={lastSelectedGroup()}
-                    setCurrentElement={setCurrentContent}
+                    setCurrentElement={setCurrentElement}
                   />
                 </Box>
               </Box>
@@ -333,3 +348,47 @@ const inArrayOrFirst = (
   item: string | undefined,
   array: ReadonlyArray<string>,
 ): string => (!!item && array.indexOf(item) >= 0 ? item : array[0]);
+
+const useResize = (minWidth: number, initialWidth?: number) => {
+  const [width, setWidth] = createSignal(initialWidth ?? minWidth);
+  const [isResizing, setIsResizing] = createSignal(false);
+  const [initialX, setInitialX] = createSignal<number | undefined>();
+
+  const onMouseMove = (e: MouseEvent) => {
+    if (isResizing()) {
+      const widthChange = e.clientX - (initialX() ?? 0);
+      setInitialX(e.clientX);
+      const newWidth = width() + widthChange;
+      if (newWidth >= minWidth) {
+        setWidth(width() + widthChange);
+      }
+    }
+  };
+  const onMouseUp = () => {
+    if (isResizing()) {
+      setIsResizing(false);
+    }
+  };
+
+  onMount(() => {
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  });
+  onCleanup(() => {
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+  });
+
+  const enableResize = (e: MouseEvent) => {
+    e.preventDefault();
+    if (!isResizing()) {
+      const initialX = e.clientX;
+      batch(() => {
+        setIsResizing(true);
+        setInitialX(initialX);
+      });
+    }
+  };
+
+  return { width, enableResize };
+};
