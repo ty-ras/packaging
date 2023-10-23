@@ -1,5 +1,6 @@
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import type * as types from "./types";
+import * as errors from "./errors";
 
 export const getTopLevelElementsFromMultipleDocumentations = (
   groupNames: ReadonlyArray<string>,
@@ -32,7 +33,7 @@ export const getTopLevelElements = (
               documentation.children?.find(
                 ({ id: childId }) => childId === id,
               ) ??
-              doThrow(
+              errors.doThrow(
                 `Could not find element with ID ${id} in ${documentation.packageName}`,
               );
             return {
@@ -108,7 +109,3 @@ export interface TopLevelElementGroup {
   groupName: string;
   items: Array<TopLevelElement>;
 }
-
-export const doThrow = (msg: string) => {
-  throw new Error(msg);
-};
