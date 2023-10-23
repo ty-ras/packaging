@@ -186,8 +186,11 @@ const getSignatureText = (signature: typedoc.SignatureReflection): string => {
       : ""
   }(${signature.parameters?.map(
     (p) =>
-      `${p.name}: ${getSomeTypeText(
+      `${getParametersFlagsText(p.flags)}${p.name}: ${getSomeTypeText(
         p.type ?? functionality.doThrow("Parameter without type"),
+      )}${getOptionalValueText(
+        p.defaultValue,
+        (defaultValue) => ` = ${defaultValue}`,
       )}`,
   )}) => ${getSomeTypeText(
     signature.type ??
@@ -200,6 +203,14 @@ const getFlagsText = (flags: typedoc.ReflectionFlags): string =>
     .filter(([key, val]) => val && key !== "isExternal")
     .map(([key]) => key.substring(key.search(/[A-Z]/)).toLowerCase())
     .join(" ");
+
+const getParametersFlagsText = (flags: typedoc.ReflectionFlags): string => {
+  let retVal = "";
+  if (flags.isRest) {
+    retVal = `${retVal}...`;
+  }
+  return retVal;
+};
 
 const ensureOneSignature = (
   signatures: ReadonlyArray<typedoc.SignatureReflection> | undefined,
