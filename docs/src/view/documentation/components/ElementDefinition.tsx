@@ -25,11 +25,11 @@ export default function ElementDefinition(props: ElementDefinitionProps) {
                       <>
                         {typeParam.name}
                         {typeParam.type &&
-                          ` extends ${functionality.getSomeTypeText(
+                          ` extends ${props.codeGenerator.getTypeText(
                             typeParam.type,
                           )}`}
                         {typeParam.default &&
-                          ` = ${functionality.getSomeTypeText(
+                          ` = ${props.codeGenerator.getTypeText(
                             typeParam.default,
                           )}`}
                         {index() === typeParams().length - 1 ? "" : ", "}
@@ -47,7 +47,7 @@ export default function ElementDefinition(props: ElementDefinitionProps) {
                   <For each={parentTypes()}>
                     {(parentType, index) => (
                       <>
-                        {functionality.getSomeTypeText(parentType)}
+                        {props.codeGenerator.getTypeText(parentType)}
                         {index() === parentTypes().length - 1 ? "" : ", "}
                       </>
                     )}
@@ -62,7 +62,7 @@ export default function ElementDefinition(props: ElementDefinitionProps) {
                   <For each={implementedTypes()}>
                     {(implementedType, index) => (
                       <>
-                        {functionality.getSomeTypeText(implementedType)}
+                        {props.codeGenerator.getTypeText(implementedType)}
                         {index() === implementedTypes().length - 1 ? "" : ", "}
                       </>
                     )}
@@ -78,5 +78,5 @@ export default function ElementDefinition(props: ElementDefinitionProps) {
 }
 
 export interface ElementDefinitionProps extends types.ReflectionElementProps {
-  // Currently no extra properties
+  codeGenerator: functionality.CodeGenerator;
 }

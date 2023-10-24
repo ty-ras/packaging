@@ -1,4 +1,3 @@
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import type * as types from "./types";
 import * as errors from "./errors";
 
@@ -24,24 +23,22 @@ export const getTopLevelElements = (
   groupName: string,
   groupStates: Record<string, boolean>,
 ): Array<TopLevelElement> =>
-  documentation.groups
+  documentation.project.groups
     ?.filter(({ title }) => title === groupName)
     .flatMap(({ title, children }) =>
       groupStates[title] === true
         ? children?.map((id) => {
             const element =
-              documentation.children?.find(
-                ({ id: childId }) => childId === id,
-              ) ??
+              documentation.modelIndex[id] ??
               errors.doThrow(
-                `Could not find element with ID ${id} in ${documentation.packageName}`,
+                `Could not find element with ID ${id} in ${documentation.project.packageName}@${documentation.project.packageVersion}`,
               );
             return {
               docKind,
               id,
               text: element.name,
               element,
-              project: documentation,
+              index: documentation.modelIndex,
               showKind: false, // Will be set to true by deduplication if needed
             };
           }) ?? []
@@ -101,8 +98,8 @@ export interface TopLevelElement {
   id: number;
   text: string;
   showKind: boolean;
-  element: typedoc.DeclarationReflection;
-  project: types.Documentation;
+  element: types.IndexableModel;
+  index: types.ModelIndex;
 }
 
 export interface TopLevelElementGroup {

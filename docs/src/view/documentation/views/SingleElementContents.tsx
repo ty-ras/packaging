@@ -1,5 +1,5 @@
 import { For, Show } from "solid-js";
-import type * as types from "../functionality";
+import * as types from "../functionality";
 import Title from "../components/Title";
 import Comment from "../components/Comment";
 import ElementDefinition from "../components/ElementDefinition";
@@ -29,7 +29,12 @@ export default function SingleElementView(props: SingleElementViewProps) {
         <For
           each={props.currentElement.element.signatures}
           fallback={
-            <ElementDefinition element={props.currentElement.element} />
+            <ElementDefinition
+              element={props.currentElement.element}
+              codeGenerator={
+                new types.CodeGenerator(props.currentElement.index)
+              }
+            />
           }
         >
           {(signature) => (

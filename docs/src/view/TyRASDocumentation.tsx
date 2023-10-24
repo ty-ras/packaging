@@ -86,11 +86,7 @@ export default function TyRASDocumentation() {
     return documentation.getTopLevelElementsFromMultipleDocumentations(
       groupNames(),
       groupStates,
-      Object.fromEntries(
-        Object.entries(docs() ?? {}).map(
-          ([key, doc]) => [key, doc.project] as const,
-        ),
-      ),
+      docs() ?? {},
     );
   });
 

@@ -6,3 +6,4 @@ export * from "./errors";
 export * from "./some-type";
 export * from "./signature";
 export * from "./text";
+export * from "./code-generator";

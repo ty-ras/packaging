@@ -1,6 +1,5 @@
-import type * as model from "typedoc/dist/lib/serialization/schema";
+import type * as solidTypedoc from "../view/documentation/functionality";
 
-export interface Documentation {
+export interface Documentation extends solidTypedoc.Documentation {
   version: 1;
-  project: model.ProjectReflection;
 }

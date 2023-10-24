@@ -301,7 +301,7 @@ const generateDocsForVersion = async (
 
   const docs: docs.Documentation = {
     version: 1,
-    project: app.serializer.projectToObject(project, sourceDir),
+    ...indexProject(app.serializer.projectToObject(project, sourceDir)),
   };
 
   // TODO: merge project groups: interfaces, (classes), type aliases into one
@@ -462,4 +462,32 @@ type PackageJson = Record<string, unknown> & {
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
   resolutions?: Record<string, string>;
+};
+
+const indexProject = ({
+  children,
+  ...project
+}: td.JSONOutput.ProjectReflection) => {
+  const modelIndex: docs.Documentation["modelIndex"] = {};
+  const indexReflection = (
+    reflection: td.JSONOutput.DeclarationReflection,
+  ): number => {
+    const id = reflection.id;
+    if (id in modelIndex) {
+      throw new Error(`Duplicate ID ${id}`);
+    }
+    const { children, ...rest } = reflection;
+    modelIndex[id] = {
+      ...rest,
+      ...((children?.length ?? 0) > 0
+        ? { children: children?.map(indexReflection) }
+        : {}),
+    } as docs.Documentation["modelIndex"][number];
+    return id;
+  };
+
+  return {
+    modelIndex,
+    project: { ...project, children: children?.map(indexReflection) },
+  };
 };
