@@ -1,6 +1,8 @@
 import Typography, { type TypographyProps } from "@suid/material/Typography";
 
-export default function SingleLineCode(props: TypographyProps) {
+export default function SingleLineCode(
+  props: Omit<TypographyProps<"code">, "component" | "sx">,
+) {
   return (
     <Typography
       component="code"

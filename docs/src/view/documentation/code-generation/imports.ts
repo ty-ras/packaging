@@ -1,5 +1,5 @@
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
-import * as errors from "./errors";
+import * as functionality from "../functionality";
 
 export const createRegisterImport = (
   importContext: ImportContext,
@@ -10,7 +10,7 @@ export const createRegisterImport = (
   ): string {
     const packageName =
       typePackage ??
-      errors.doThrow(`Reference type did not specify package name.`);
+      functionality.doThrow(`Reference type did not specify package name.`);
     if (!importContext.globals.has(packageName)) {
       const kind = target.qualifiedName === name ? "individual" : "named";
       const currentImport = importContext.imports[packageName];

@@ -1,4 +1,5 @@
 import type * as functionality from "../functionality";
+import type * as codeGen from "../code-generation";
 
 export interface ReflectionElementProps {
   element: Element;
@@ -7,5 +8,5 @@ export interface ReflectionElementProps {
 export type Element = functionality.IndexableModel;
 
 export interface CodeGenerationProps {
-  codeGenerator: functionality.CodeGenerator;
+  codeGenerator: codeGen.CodeGenerator;
 }

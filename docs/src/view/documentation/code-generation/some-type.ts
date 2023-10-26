@@ -1,7 +1,5 @@
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
-import * as kind from "./reflection-kind";
-import * as errors from "./errors";
-import * as text from "./text";
+import * as functionality from "../functionality";
 import type * as types from "./types";
 
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
@@ -25,7 +23,7 @@ export const createGetSomeTypeText = (
           type.indexType,
         )}]`;
       case "inferred":
-        return `infer ${type.name}${text.getOptionalValueText(
+        return `infer ${type.name}${functionality.getOptionalValueText(
           type.constraint,
           (constraint) => ` extends ${getSomeTypeText(constraint)}`,
         )}`;
@@ -36,15 +34,15 @@ export const createGetSomeTypeText = (
       case "literal":
         return `"${type.value}"`;
       case "mapped":
-        return `{${text.getOptionalValueText(
+        return `{${functionality.getOptionalValueText(
           type.readonlyModifier,
           (roMod) => ` ${onlyMinus(roMod)}readonly `,
         )}[${type.parameter} in ${getSomeTypeText(
           type.parameterType,
-        )}${text.getOptionalValueText(
+        )}${functionality.getOptionalValueText(
           type.nameType,
           (nameType) => ` as ${getSomeTypeText(nameType)}`,
-        )}]${text.getOptionalValueText(
+        )}]${functionality.getOptionalValueText(
           type.optionalModifier,
           (optMod) => `${onlyMinus(optMod)}?`,
         )}: ${getSomeTypeText(type.templateType)}}`;
@@ -65,7 +63,7 @@ export const createGetSomeTypeText = (
       case "reference":
         return `${
           type.refersToTypeParameter ? type.name : refToStr(type)
-        }${text.getOptionalValueText(
+        }${functionality.getOptionalValueText(
           type.typeArguments,
           (typeArgs) => `<${typeArgs.map(getSomeTypeText)}>`,
         )}`;
@@ -102,13 +100,13 @@ const getDeclarationReferenceText = (
   getSignatureText: types.GetSignatureText,
 ): string => {
   switch (declaration.kind) {
-    case kind.ReflectionKind.Enum:
-    case kind.ReflectionKind.EnumMember:
-    case kind.ReflectionKind.Class:
-    case kind.ReflectionKind.Interface:
+    case functionality.ReflectionKind.Enum:
+    case functionality.ReflectionKind.EnumMember:
+    case functionality.ReflectionKind.Class:
+    case functionality.ReflectionKind.Interface:
       return declaration.name;
-    case kind.ReflectionKind.Function:
-    case kind.ReflectionKind.Constructor:
+    case functionality.ReflectionKind.Function:
+    case functionality.ReflectionKind.Constructor:
       return getSignatureText(ensureOneSignature(declaration.signatures), "=>");
     default:
       throw new Error(`No implementation for declaration ${declaration.kind}`);
@@ -119,7 +117,9 @@ const ensureOneSignature = (
   signatures: ReadonlyArray<typedoc.SignatureReflection> | undefined,
 ): typedoc.SignatureReflection =>
   (signatures?.length === 1 ? signatures[0] : undefined) ??
-  errors.doThrow(`Expected one signature but had ${signatures?.length}.`);
+  functionality.doThrow(
+    `Expected one signature but had ${signatures?.length}.`,
+  );
 
 function onlyMinus(str: "+" | "-") {
   return str === "-" ? str : "";

@@ -1,55 +1,49 @@
 import type * as types from "./types";
-import * as kind from "./reflection-kind";
-import * as text from "./text";
-import * as errors from "./errors";
+import * as functionality from "../functionality";
 
 export const createGetDeclarationText = (
   getTypeText: types.GetSomeTypeText,
   getSignatureText: types.GetSignatureText,
 ): types.GetDeclarationText => {
-  function getDeclarationText(declaration: types.IndexableModel) {
+  function getDeclarationText(declaration: functionality.IndexableModel) {
     return `${getReflectionKindTypeScriptName(declaration.kind)} ${
       declaration.name
-    }${text.getOptionalValueText(
+    }${functionality.getOptionalValueText(
       declaration.typeParameters,
       (typeParams) =>
         `<${typeParams
           .map(
             (typeParam) =>
-              `${typeParam.name}${text.getOptionalValueText(
+              `${typeParam.name}${functionality.getOptionalValueText(
                 typeParam.type,
                 (parentType) => ` extends ${getTypeText(parentType)}`,
-              )}${text.getOptionalValueText(
+              )}${functionality.getOptionalValueText(
                 typeParam.default,
                 (defaultValue) => ` = ${getTypeText(defaultValue)}`,
               )}`,
           )
-          .join(", ")}>${getDeclarationBodyText(
-          getTypeText,
-          getSignatureText,
-          declaration,
-        )}`,
-    )}`;
+          .join(", ")}>`,
+    )}${getDeclarationBodyText(getTypeText, getSignatureText, declaration)}`;
   }
 
   return getDeclarationText;
 };
 
 export const getReflectionKindTypeScriptName = (
-  reflectionKind: kind.ReflectionKind,
+  reflectionKind: functionality.ReflectionKind,
 ): string => {
   switch (reflectionKind) {
-    case kind.ReflectionKind.Enum:
+    case functionality.ReflectionKind.Enum:
       return "enum";
-    case kind.ReflectionKind.Variable:
+    case functionality.ReflectionKind.Variable:
       return "const";
-    case kind.ReflectionKind.Function:
+    case functionality.ReflectionKind.Function:
       return "function";
-    case kind.ReflectionKind.Class:
+    case functionality.ReflectionKind.Class:
       return "class";
-    case kind.ReflectionKind.Interface:
+    case functionality.ReflectionKind.Interface:
       return "interface";
-    case kind.ReflectionKind.Constructor:
+    case functionality.ReflectionKind.Constructor:
       return "constructor";
     default:
       throw new Error(`Implement title name for ${reflectionKind}.`);
@@ -59,14 +53,15 @@ export const getReflectionKindTypeScriptName = (
 const getDeclarationBodyText = (
   getTypeText: types.GetSomeTypeText,
   getSignatureText: types.GetSignatureText,
-  declaration: types.IndexableModel,
+  declaration: functionality.IndexableModel,
 ) => {
   switch (declaration.kind) {
-    case kind.ReflectionKind.Class:
+    case functionality.ReflectionKind.Class:
       return getClassBodyText(declaration, getTypeText);
-    case kind.ReflectionKind.Function:
+    case functionality.ReflectionKind.Function:
       return (
-        declaration.signatures ?? errors.doThrow("Function without signatures?")
+        declaration.signatures ??
+        functionality.doThrow("Function without signatures?")
       )
         .map(
           (sig) =>
@@ -81,13 +76,13 @@ const getDeclarationBodyText = (
 };
 
 const getClassBodyText = (
-  declaration: types.IndexableModel,
+  declaration: functionality.IndexableModel,
   getTypeText: types.GetSomeTypeText,
 ) => {
-  return `${text.getOptionalValueText(
+  return `${functionality.getOptionalValueText(
     declaration.extendedTypes,
     (parentTypes) => ` extends ${parentTypes.map(getTypeText).join(", ")}`,
-  )}${text.getOptionalValueText(
+  )}${functionality.getOptionalValueText(
     declaration.implementedTypes,
     (implementedTypes) =>
       ` implements ${implementedTypes.map(getTypeText).join(", ")}`,

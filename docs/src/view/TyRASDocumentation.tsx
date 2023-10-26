@@ -86,13 +86,6 @@ export default function TyRASDocumentation() {
     return documentation.getTopLevelElementsFromMultipleDocumentations(
       groupNames(),
       groupStates,
-      {
-        printWidth: 80,
-        trailingComma: "all",
-        tabWidth: 2,
-        useTabs: false,
-        endOfLine: "lf",
-      },
       docs() ?? {},
     );
   });
@@ -226,6 +219,13 @@ export default function TyRASDocumentation() {
                     <SingleElementContents
                       currentElement={elem()}
                       headerLevel={3}
+                      prettierOptions={{
+                        printWidth: 80,
+                        trailingComma: "all",
+                        tabWidth: 2,
+                        useTabs: false,
+                        endOfLine: "lf",
+                      }}
                     />
                   )}
                 </Show>

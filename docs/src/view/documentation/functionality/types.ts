@@ -15,13 +15,3 @@ export type IndexableModel =
 export type MakeChildrenIntegers<
   T extends { children?: Array<typedoc.DeclarationReflection> | undefined },
 > = Omit<T, "children"> & { children?: Array<number> | undefined };
-
-// Callbacks
-export type GetSomeTypeText = (type: typedoc.SomeType) => string;
-
-export type GetSignatureText = (
-  signature: typedoc.SignatureReflection,
-  returnTypeSeparator: ":" | "=>",
-) => string;
-
-export type GetDeclarationText = (declaration: IndexableModel) => string;

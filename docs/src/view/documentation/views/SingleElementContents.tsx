@@ -1,9 +1,10 @@
 import { For, Show } from "solid-js";
-import * as types from "../functionality";
+import { Typography } from "@suid/material";
+import * as functionality from "../functionality";
+import * as codeGen from "../code-generation";
 import Title from "../components/Title";
 import Comment from "../components/Comment";
 import ElementDefinition from "../components/ElementDefinition";
-import { Typography } from "@suid/material";
 
 export default function SingleElementView(props: SingleElementViewProps) {
   return (
@@ -24,7 +25,10 @@ export default function SingleElementView(props: SingleElementViewProps) {
           fallback={
             <ElementDefinition
               element={props.currentElement.element}
-              codeGenerator={props.currentElement.globalContext.codeGenerator}
+              codeGenerator={codeGen.createCodeGenerator(
+                props.currentElement.globalContext.index,
+                props.prettierOptions,
+              )}
             />
           }
         >
@@ -43,6 +47,7 @@ export default function SingleElementView(props: SingleElementViewProps) {
 }
 
 export interface SingleElementViewProps {
-  currentElement: types.TopLevelElement;
+  currentElement: functionality.TopLevelElement;
+  prettierOptions: codeGen.PrettierOptions;
   headerLevel: 1 | 2 | 3 | 4 | 5 | 6;
 }

@@ -1,11 +1,9 @@
 import type * as types from "./types";
 import * as errors from "./errors";
-import * as codegen from "./code-generator";
 
 export const getTopLevelElementsFromMultipleDocumentations = (
   groupNames: ReadonlyArray<string>,
   groupStates: Record<string, boolean>,
-  prettierOptions: codegen.PrettierOptions,
   docs: Record<string, types.Documentation>,
 ) =>
   groupNames
@@ -14,20 +12,13 @@ export const getTopLevelElementsFromMultipleDocumentations = (
       groupName,
       items: deduplicateTopLevelElements(
         Object.entries(docs).flatMap(([docKind, doc]) =>
-          getTopLevelElements(
-            groupStates,
-            prettierOptions,
-            docKind,
-            doc,
-            groupName,
-          ),
+          getTopLevelElements(groupStates, docKind, doc, groupName),
         ),
       ),
     }));
 
 export const getTopLevelElements = (
   groupStates: Record<string, boolean>,
-  prettierOptions: codegen.PrettierOptions,
   docKind: string,
   documentation: types.Documentation,
   groupName: string,
@@ -35,10 +26,7 @@ export const getTopLevelElements = (
   const globalContext: GlobalElementContext = {
     project: documentation.project,
     index: documentation.modelIndex,
-    codeGenerator: codegen.createCodeGenerator(
-      documentation.modelIndex,
-      prettierOptions,
-    ),
+    id: docKind,
   };
   return (
     documentation.project.groups
@@ -125,7 +113,7 @@ export interface TopLevelElement {
 export interface GlobalElementContext {
   project: types.Project;
   index: types.ModelIndex;
-  codeGenerator: codegen.CodeGenerator;
+  id: string;
 }
 
 export interface TopLevelElementGroup {
