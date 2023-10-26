@@ -1,9 +1,11 @@
 import type * as types from "./types";
 import * as errors from "./errors";
+import * as codegen from "./code-generator";
 
 export const getTopLevelElementsFromMultipleDocumentations = (
   groupNames: ReadonlyArray<string>,
   groupStates: Record<string, boolean>,
+  prettierOptions: codegen.PrettierOptions,
   docs: Record<string, types.Documentation>,
 ) =>
   groupNames
@@ -12,38 +14,56 @@ export const getTopLevelElementsFromMultipleDocumentations = (
       groupName,
       items: deduplicateTopLevelElements(
         Object.entries(docs).flatMap(([docKind, doc]) =>
-          getTopLevelElements(docKind, doc, groupName, groupStates),
+          getTopLevelElements(
+            groupStates,
+            prettierOptions,
+            docKind,
+            doc,
+            groupName,
+          ),
         ),
       ),
     }));
 
 export const getTopLevelElements = (
+  groupStates: Record<string, boolean>,
+  prettierOptions: codegen.PrettierOptions,
   docKind: string,
   documentation: types.Documentation,
   groupName: string,
-  groupStates: Record<string, boolean>,
-): Array<TopLevelElement> =>
-  documentation.project.groups
-    ?.filter(({ title }) => title === groupName)
-    .flatMap(({ title, children }) =>
-      groupStates[title] === true
-        ? children?.map((id) => {
-            const element =
-              documentation.modelIndex[id] ??
-              errors.doThrow(
-                `Could not find element with ID ${id} in ${documentation.project.packageName}@${documentation.project.packageVersion}`,
-              );
-            return {
-              docKind,
-              id,
-              text: element.name,
-              element,
-              index: documentation.modelIndex,
-              showKind: false, // Will be set to true by deduplication if needed
-            };
-          }) ?? []
-        : [],
-    ) ?? [];
+): Array<TopLevelElement> => {
+  const globalContext: GlobalElementContext = {
+    project: documentation.project,
+    index: documentation.modelIndex,
+    codeGenerator: codegen.createCodeGenerator(
+      documentation.modelIndex,
+      prettierOptions,
+    ),
+  };
+  return (
+    documentation.project.groups
+      ?.filter(({ title }) => title === groupName)
+      .flatMap(({ title, children }) =>
+        groupStates[title] === true
+          ? children?.map((id) => {
+              const element =
+                documentation.modelIndex[id] ??
+                errors.doThrow(
+                  `Could not find element with ID ${id} in ${documentation.project.packageName}@${documentation.project.packageVersion}`,
+                );
+              return {
+                docKind,
+                id,
+                text: element.name,
+                element,
+                globalContext,
+                showKind: false, // Will be set to true by deduplication if needed
+              };
+            }) ?? []
+          : [],
+      ) ?? []
+  );
+};
 
 export const deduplicateTopLevelElements = (
   elements: ReturnType<typeof getTopLevelElements>,
@@ -99,7 +119,13 @@ export interface TopLevelElement {
   text: string;
   showKind: boolean;
   element: types.IndexableModel;
+  globalContext: GlobalElementContext;
+}
+
+export interface GlobalElementContext {
+  project: types.Project;
   index: types.ModelIndex;
+  codeGenerator: codegen.CodeGenerator;
 }
 
 export interface TopLevelElementGroup {

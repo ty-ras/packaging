@@ -7,3 +7,5 @@ export * from "./some-type";
 export * from "./signature";
 export * from "./text";
 export * from "./code-generator";
+export * from "./imports";
+export * from "./declaration";

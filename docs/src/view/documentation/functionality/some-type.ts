@@ -2,13 +2,14 @@ import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import * as kind from "./reflection-kind";
 import * as errors from "./errors";
 import * as text from "./text";
+import type * as types from "./types";
 
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 
 export const createGetSomeTypeText = (
   refToStr: (ref: typedoc.ReferenceType) => string,
-  getSignatureText: (signature: typedoc.SignatureReflection) => string,
-) => {
+  getSignatureText: types.GetSignatureText,
+): types.GetSomeTypeText => {
   function getSomeTypeText(type: typedoc.SomeType): string {
     switch (type.type) {
       case "array":
@@ -62,7 +63,12 @@ export const createGetSomeTypeText = (
       case "query":
         return `typeof ${getSomeTypeText(type.queryType)}`;
       case "reference":
-        return type.refersToTypeParameter ? type.name : refToStr(type);
+        return `${
+          type.refersToTypeParameter ? type.name : refToStr(type)
+        }${text.getOptionalValueText(
+          type.typeArguments,
+          (typeArgs) => `<${typeArgs.map(getSomeTypeText)}>`,
+        )}`;
       case "reflection":
         return getDeclarationReferenceText(type.declaration, getSignatureText);
       case "rest":
@@ -93,7 +99,7 @@ export const createGetSomeTypeText = (
 
 const getDeclarationReferenceText = (
   declaration: typedoc.DeclarationReflection,
-  getSignatureText: (signature: typedoc.SignatureReflection) => string,
+  getSignatureText: types.GetSignatureText,
 ): string => {
   switch (declaration.kind) {
     case kind.ReflectionKind.Enum:
@@ -103,7 +109,7 @@ const getDeclarationReferenceText = (
       return declaration.name;
     case kind.ReflectionKind.Function:
     case kind.ReflectionKind.Constructor:
-      return getSignatureText(ensureOneSignature(declaration.signatures));
+      return getSignatureText(ensureOneSignature(declaration.signatures), "=>");
     default:
       throw new Error(`No implementation for declaration ${declaration.kind}`);
   }

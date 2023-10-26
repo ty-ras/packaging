@@ -1,22 +1,3 @@
-export const getReflectionKindTitle = (kind: ReflectionKind): string => {
-  switch (kind) {
-    case ReflectionKind.Enum:
-      return "enum";
-    case ReflectionKind.Variable:
-      return "const";
-    case ReflectionKind.Function:
-      return "function";
-    case ReflectionKind.Class:
-      return "class";
-    case ReflectionKind.Interface:
-      return "interface";
-    case ReflectionKind.Constructor:
-      return "constructor";
-    default:
-      throw new Error(`Implement title name for ${kind}.`);
-  }
-};
-
 // declaration: DeclarationReflection;
 // param: ParameterReflection;
 // project: ProjectReflection;

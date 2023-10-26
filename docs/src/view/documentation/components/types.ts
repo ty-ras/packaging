@@ -5,3 +5,7 @@ export interface ReflectionElementProps {
 }
 
 export type Element = functionality.IndexableModel;
+
+export interface CodeGenerationProps {
+  codeGenerator: functionality.CodeGenerator;
+}

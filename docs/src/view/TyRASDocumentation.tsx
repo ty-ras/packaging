@@ -86,6 +86,13 @@ export default function TyRASDocumentation() {
     return documentation.getTopLevelElementsFromMultipleDocumentations(
       groupNames(),
       groupStates,
+      {
+        printWidth: 80,
+        trailingComma: "all",
+        tabWidth: 2,
+        useTabs: false,
+        endOfLine: "lf",
+      },
       docs() ?? {},
     );
   });
@@ -215,7 +222,12 @@ export default function TyRASDocumentation() {
                     <Typography>Please select element from the list</Typography>
                   }
                 >
-                  {(elem) => <SingleElementContents currentElement={elem()} />}
+                  {(elem) => (
+                    <SingleElementContents
+                      currentElement={elem()}
+                      headerLevel={3}
+                    />
+                  )}
                 </Show>
               </Box>
             </Box>
@@ -226,7 +238,7 @@ export default function TyRASDocumentation() {
   );
 }
 
-export const parseParamsAndMaybeNewURL = (pathname: string) => {
+const parseParamsAndMaybeNewURL = (pathname: string) => {
   let paramsOrFullURL = parseParamsFromPathname(pathname);
   let maybeURL: string | undefined;
   if (isNavigate(paramsOrFullURL)) {
@@ -234,7 +246,7 @@ export const parseParamsAndMaybeNewURL = (pathname: string) => {
     // The given URL was really partial
     paramsOrFullURL = parseParamsFromPathname(paramsOrFullURL);
     if (isNavigate(paramsOrFullURL)) {
-      // If we get partial URL again even after rsult of parseParamsFromPathname, we have encountered internal error
+      // If we get partial URL again even after result of parseParamsFromPathname, we have encountered internal error
       throw new Error(
         `The given partial navigation URL "${pathname}" was resolved to be partial even on 2nd attempt, this signals error in URL parsing logic.`,
       );
@@ -353,9 +365,9 @@ const useResize = (minWidth: number, initialWidth?: number) => {
   const onMouseMove = (e: MouseEvent) => {
     if (isResizing()) {
       const widthChange = e.clientX - (initialX() ?? 0);
-      setInitialX(e.clientX);
       const newWidth = width() + widthChange;
       if (newWidth >= minWidth) {
+        setInitialX(e.clientX);
         setWidth(width() + widthChange);
       }
     }

@@ -6,7 +6,7 @@ export default function Title(props: TitleProps) {
   return (
     // <Box sx={{ overflow: "hidden", textOverflow: "ellipsis", width: "auto" }}>
     <Typography variant={props.variant}>
-      {functionality.getReflectionKindTitle(props.element.kind)}{" "}
+      {functionality.getReflectionKindTypeScriptName(props.element.kind)}{" "}
       {props.element.name}
     </Typography>
     // </Box>

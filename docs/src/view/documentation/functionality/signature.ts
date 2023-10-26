@@ -2,13 +2,17 @@ import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import * as kind from "./reflection-kind";
 import * as errors from "./errors";
 import * as text from "./text";
+import type * as types from "./types";
 
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 
 export const createGetSignatureText = (
-  getSomeTypeText: (type: typedoc.SomeType) => string,
-) => {
-  function getSignatureText(signature: typedoc.SignatureReflection): string {
+  getSomeTypeText: types.GetSomeTypeText,
+): types.GetSignatureText => {
+  function getSignatureText(
+    signature: typedoc.SignatureReflection,
+    returnTypeSeparator: ":" | "=>",
+  ): string {
     const str = getFlagsText(signature.flags);
     return `${str}${
       signature.kind === kind.ReflectionKind.ConstructorSignature ? " new " : ""
@@ -20,7 +24,7 @@ export const createGetSignatureText = (
           p.defaultValue,
           (defaultValue) => ` = ${defaultValue}`,
         )}`,
-    )}) => ${getSomeTypeText(
+    )}) ${returnTypeSeparator} ${getSomeTypeText(
       signature.type ??
         errors.doThrow("Function signature without return type"),
     )}`;
