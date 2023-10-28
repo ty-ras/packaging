@@ -267,7 +267,6 @@ const generateDocsForVersion = async (
 
   const json = path.join(versionDir, `${version}.json`);
   const app = await td.Application.bootstrap({
-    json,
     tsconfig: path.join(sourceDir, "tsconfig.json"),
     entryPoints: [path.join(sourceDir, "src", "index.ts")],
     entryPointStrategy: "expand",
@@ -279,6 +278,11 @@ const generateDocsForVersion = async (
     // Include 'packageVersion' property
     includeVersion: true,
     basePath: sourceDir,
+    externalPattern: [
+      `!${path.join(sourceDir, "node_modules", "@ty-ras", "**")}`,
+    ],
+    // No need to e.g. include parent class fields and methods when extending external class
+    excludeExternals: true,
   });
 
   const project = await app.convert();

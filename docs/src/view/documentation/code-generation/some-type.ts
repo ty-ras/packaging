@@ -1,6 +1,6 @@
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import * as functionality from "../functionality";
-import type * as types from "./types";
+import * as types from "./types";
 
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 
@@ -107,19 +107,14 @@ const getDeclarationReferenceText = (
       return declaration.name;
     case functionality.ReflectionKind.Function:
     case functionality.ReflectionKind.Constructor:
-      return getSignatureText(ensureOneSignature(declaration.signatures), "=>");
+      return getSignatureText(
+        functionality.ensureOneItem(declaration.signatures),
+        types.SIG_CONTEXT_TYPE,
+      );
     default:
       throw new Error(`No implementation for declaration ${declaration.kind}`);
   }
 };
-
-const ensureOneSignature = (
-  signatures: ReadonlyArray<typedoc.SignatureReflection> | undefined,
-): typedoc.SignatureReflection =>
-  (signatures?.length === 1 ? signatures[0] : undefined) ??
-  functionality.doThrow(
-    `Expected one signature but had ${signatures?.length}.`,
-  );
 
 function onlyMinus(str: "+" | "-") {
   return str === "-" ? str : "";

@@ -18,11 +18,8 @@ export const createCodeGenerator = (
   const getDeclarationTextImpl = (
     reflection: functionality.IndexableModel,
   ): string => {
-    const { importContext, declarationToText } = createCallbacks();
-    return textWithImports(
-      importContext,
-      `export declare ${declarationToText(reflection)}`,
-    );
+    const { importContext, declarationToText } = createCallbacks(index);
+    return textWithImports(importContext, declarationToText(reflection));
   };
 
   const getDeclarationText: types.CodeGenerator["getDeclarationText"] = (
@@ -40,11 +37,11 @@ export const createCodeGenerator = (
 
   return {
     getTypeText: (type) => {
-      const { importContext, typeToText } = createCallbacks();
+      const { importContext, typeToText } = createCallbacks(index);
       return textWithImports(importContext, `export ${typeToText(type)}`);
     },
     getSignatureText: (sig) => {
-      const { importContext, sigToText } = createCallbacks();
+      const { importContext, sigToText } = createCallbacks(index);
       const sigText = sigToText(sig, ":");
       return textWithImports(
         importContext,
@@ -82,7 +79,7 @@ const isReference = (
 ): reflection is functionality.MakeChildrenIntegers<typedoc.ReferenceReflection> =>
   reflection.variant === "reference";
 
-const createCallbacks = () => {
+const createCallbacks = (index: functionality.ModelIndex) => {
   const importContext: imports.ImportContext = {
     imports: {},
     globals: new Set(["typescript"]),
@@ -93,6 +90,7 @@ const createCallbacks = () => {
       typeof target === "number"
         ? `${
             type.qualifiedName ??
+            type.name ??
             functionality.doThrow(
               `Internal reference ${target} had no qualified name`,
             )
@@ -102,6 +100,7 @@ const createCallbacks = () => {
   );
   const sigToText = sig.createGetSignatureText((type) => typeToText(type));
   const declarationToText = declaration.createGetDeclarationText(
+    index,
     typeToText,
     sigToText,
   );

@@ -17,8 +17,13 @@ export type GetSomeTypeText = (type: typedoc.SomeType) => string;
 
 export type GetSignatureText = (
   signature: typedoc.SignatureReflection,
-  returnTypeSeparator: ":" | "=>",
+  returnTypeSeparator?: SignatureContext,
 ) => string;
+
+export const SIG_CONTEXT_DEF = ":";
+export const SIG_CONTEXT_TYPE = "=>";
+
+export type SignatureContext = typeof SIG_CONTEXT_DEF | typeof SIG_CONTEXT_TYPE;
 
 export type GetDeclarationText = (
   declaration: functionality.IndexableModel,

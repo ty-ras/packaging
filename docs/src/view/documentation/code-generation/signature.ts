@@ -1,6 +1,7 @@
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import * as functionality from "../functionality";
-import type * as types from "./types";
+import * as types from "./types";
+import * as flags from "./flags";
 
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 
@@ -9,16 +10,16 @@ export const createGetSignatureText = (
 ): types.GetSignatureText => {
   function getSignatureText(
     signature: typedoc.SignatureReflection,
-    returnTypeSeparator: ":" | "=>",
+    returnTypeSeparator: types.SignatureContext = types.SIG_CONTEXT_DEF,
   ): string {
-    const str = getFlagsText(signature.flags);
-    return `${str}${
+    return `${flags.getFlagsText(signature.flags)}${
+      returnTypeSeparator === types.SIG_CONTEXT_TYPE &&
       signature.kind === functionality.ReflectionKind.ConstructorSignature
         ? " new "
         : ""
     }(${signature.parameters?.map(
       (p) =>
-        `${getParametersFlagsText(p.flags)}${p.name}: ${getSomeTypeText(
+        `${flags.getParametersFlagsText(p.flags)}${p.name}: ${getSomeTypeText(
           p.type ?? functionality.doThrow("Parameter without type"),
         )}${functionality.getOptionalValueText(
           p.defaultValue,
@@ -30,18 +31,4 @@ export const createGetSignatureText = (
     )}`;
   }
   return getSignatureText;
-};
-
-const getFlagsText = (flags: typedoc.ReflectionFlags): string =>
-  Object.entries(flags)
-    .filter(([key, val]) => val && key !== "isExternal")
-    .map(([key]) => key.substring(key.search(/[A-Z]/)).toLowerCase())
-    .join(" ");
-
-const getParametersFlagsText = (flags: typedoc.ReflectionFlags): string => {
-  let retVal = "";
-  if (flags.isRest) {
-    retVal = `${retVal}...`;
-  }
-  return retVal;
 };
