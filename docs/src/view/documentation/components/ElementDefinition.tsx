@@ -6,12 +6,15 @@ import type * as types from "./types";
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 
 export default function ElementDefinition(props: ElementDefinitionProps) {
-  const [formattedCode] = createResource(async () => {
-    const code = await props.codeGenerator.formatCode(
-      props.codeGenerator.getDeclarationText(props.element),
-    );
-    return props.codeGenerator.getTokenInfos(code);
-  });
+  const [formattedCode] = createResource(
+    () => props.element,
+    async (element) => {
+      const code = await props.codeGenerator.formatCode(
+        props.codeGenerator.getDeclarationText(element),
+      );
+      return props.codeGenerator.getTokenInfos(code);
+    },
+  );
   return (
     <Box>
       <MultiLineCode>

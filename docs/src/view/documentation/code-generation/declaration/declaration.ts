@@ -4,6 +4,7 @@ import classes from "./classes";
 import constructors from "./constructors";
 import properties from "./properties";
 import methods from "./methods";
+import functions from "./functions";
 import type * as toTextTypes from "./types";
 
 export const createGetDeclarationText = (
@@ -12,30 +13,39 @@ export const createGetDeclarationText = (
   getSignatureText: types.GetSignatureText,
 ): types.GetDeclarationText => {
   function getDeclarationText(declaration: functionality.IndexableModel) {
-    return `${useFunctionality(declaration, "getPrefixText", {
-      declaration,
-    })} ${declaration.name}${functionality.getOptionalValueText(
-      declaration.typeParameters,
-      (typeParams) =>
-        `<${typeParams
-          .map(
-            (typeParam) =>
-              `${typeParam.name}${functionality.getOptionalValueText(
-                typeParam.type,
-                (parentType) => ` extends ${getTypeText(parentType)}`,
-              )}${functionality.getOptionalValueText(
-                typeParam.default,
-                (defaultValue) => ` = ${getTypeText(defaultValue)}`,
-              )}`,
-          )
-          .join(", ")}>`,
-    )}${useFunctionality(declaration, "getBodyText", {
-      index,
-      getTypeText,
-      getSignatureText,
-      getDeclarationText,
-      declaration,
-    })}`;
+    const textFunctionality = useFunctionality(declaration, "text");
+    return typeof textFunctionality === "function"
+      ? textFunctionality({
+          index,
+          getTypeText,
+          getSignatureText,
+          getDeclarationText,
+          declaration,
+        })
+      : `${textFunctionality.getPrefixText({
+          declaration,
+        })} ${declaration.name}${functionality.getOptionalValueText(
+          declaration.typeParameters,
+          (typeParams) =>
+            `<${typeParams
+              .map(
+                (typeParam) =>
+                  `${typeParam.name}${functionality.getOptionalValueText(
+                    typeParam.type,
+                    (parentType) => ` extends ${getTypeText(parentType)}`,
+                  )}${functionality.getOptionalValueText(
+                    typeParam.default,
+                    (defaultValue) => ` = ${getTypeText(defaultValue)}`,
+                  )}`,
+              )
+              .join(", ")}>`,
+        )}${textFunctionality.getBodyText({
+          index,
+          getTypeText,
+          getSignatureText,
+          getDeclarationText,
+          declaration,
+        })}`;
   }
 
   return getDeclarationText;
@@ -50,6 +60,7 @@ const functionalities: Record<
   [functionality.ReflectionKind.Constructor]: constructors,
   [functionality.ReflectionKind.Property]: properties,
   [functionality.ReflectionKind.Method]: methods,
+  [functionality.ReflectionKind.Function]: functions,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
@@ -58,12 +69,8 @@ const useFunctionality = <
 >(
   declaration: functionality.IndexableModel,
   name: TKey,
-  ...args: Parameters<toTextTypes.ReflectionKindFunctionality[TKey]>
-): ReturnType<toTextTypes.ReflectionKindFunctionality[TKey]> =>
+): toTextTypes.ReflectionKindFunctionality[TKey] =>
   (functionalities[declaration.kind] ??
     functionality.doThrow(
       `Implement to-text functionality for ${declaration.kind}`,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-    ))[name](...(args as [any])) as ReturnType<
-    toTextTypes.ReflectionKindFunctionality[TKey]
-  >;
+    ))[name];

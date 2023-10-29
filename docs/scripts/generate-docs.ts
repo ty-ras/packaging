@@ -260,15 +260,15 @@ const generateDocsForVersion = async (
   { versionDir, packageSource }: VersionInfoDirs,
   version: string,
 ) => {
-  const sourceDir =
+  const packageDir =
     packageSource.source === "local"
       ? path.dirname(packageSource.path)
       : await preparePackageFromNpm(packageSource.tarballs[version]);
 
   const json = path.join(versionDir, `${version}.json`);
   const app = await td.Application.bootstrap({
-    tsconfig: path.join(sourceDir, "tsconfig.json"),
-    entryPoints: [path.join(sourceDir, "src", "index.ts")],
+    tsconfig: path.join(packageDir, "tsconfig.json"),
+    entryPoints: [path.join(packageDir, "src", "index.ts")],
     entryPointStrategy: "expand",
     logLevel: "Verbose",
     // For some reason the TSC ran by TD fails - this doesn't matter, as we validate TS code elsewhere
@@ -277,9 +277,12 @@ const generateDocsForVersion = async (
     emit: "none",
     // Include 'packageVersion' property
     includeVersion: true,
-    basePath: sourceDir,
+    basePath: packageDir,
     externalPattern: [
-      `!${path.join(sourceDir, "node_modules", "@ty-ras", "**")}`,
+      `!${path.join(
+        packageDir,
+        `{${path.join("node_modules", "@ty-ras")},src}`,
+      )}/**`,
     ],
     // No need to e.g. include parent class fields and methods when extending external class
     excludeExternals: true,
@@ -303,9 +306,13 @@ const generateDocsForVersion = async (
   //   throw new Error("Typedoc validation found warnings");
   // }
 
+  const tdProject = app.serializer.projectToObject(project, packageDir);
+  redefineProjectGroups(
+    tdProject.groups ?? errors.doThrow("Project without groups"),
+  );
   const docs: docs.Documentation = {
     version: 1,
-    ...indexProject(app.serializer.projectToObject(project, sourceDir)),
+    ...indexProject(tdProject),
   };
 
   // TODO: merge project groups: interfaces, (classes), type aliases into one
@@ -494,4 +501,50 @@ const indexProject = ({
     modelIndex,
     project: { ...project, children: children?.map(indexReflection) },
   };
+};
+
+const redefineProjectGroups = (
+  groups: Array<td.JSONOutput.ReflectionGroup>,
+) => {
+  for (const [newGroupName, composedGroups] of Object.entries(
+    projectGroupRedefinition,
+  )) {
+    groups.push(
+      newProjectGroup(
+        newGroupName,
+        removeMatching(groups, ({ title }) => composedGroups.has(title)),
+      ),
+    );
+  }
+};
+
+const projectGroupRedefinition: Record<string, Set<string>> = {
+  Types: new Set(
+    [td.ReflectionKind.Interface, td.ReflectionKind.TypeAlias].map(
+      td.ReflectionKind.pluralString,
+    ),
+  ),
+};
+
+const newProjectGroup = (
+  title: string,
+  removed: ReadonlyArray<td.JSONOutput.ReflectionGroup>,
+): td.JSONOutput.ReflectionGroup => ({
+  title,
+  children: removed.flatMap(({ children }) => children ?? []),
+});
+
+const removeMatching = <T>(
+  array: Array<T>,
+  condition: (item: T) => boolean,
+) => {
+  const removed: Array<T> = [];
+  for (let x = 0; x < array.length; ) {
+    if (condition(array[x])) {
+      removed.push(...array.splice(x, 1));
+    } else {
+      ++x;
+    }
+  }
+  return removed;
 };

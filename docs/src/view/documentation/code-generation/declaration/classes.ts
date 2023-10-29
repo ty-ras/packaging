@@ -20,27 +20,29 @@ const getChildren: types.GetChildren = ({ declaration, index }) =>
     ) ?? [];
 
 export default {
-  getPrefixText: ({ declaration }) =>
-    `export declare ${flags.getFlagsText(declaration.flags)} class`,
-  getBodyText: ({
-    index,
-    getTypeText,
-    getDeclarationText,
-    declaration,
-  }) => `${functionality.getOptionalValueText(
-    declaration.extendedTypes,
-    (parentTypes) => ` extends ${parentTypes.map(getTypeText).join(", ")}`,
-  )}${functionality.getOptionalValueText(
-    declaration.implementedTypes,
-    (implementedTypes) =>
-      ` implements ${implementedTypes.map(getTypeText).join(", ")}`,
-  )} {
+  text: {
+    getPrefixText: ({ declaration }) =>
+      `export declare ${flags.getFlagsText(declaration.flags)} class`,
+    getBodyText: ({
+      index,
+      getTypeText,
+      getDeclarationText,
+      declaration,
+    }) => `${functionality.getOptionalValueText(
+      declaration.extendedTypes,
+      (parentTypes) => ` extends ${parentTypes.map(getTypeText).join(", ")}`,
+    )}${functionality.getOptionalValueText(
+      declaration.implementedTypes,
+      (implementedTypes) =>
+        ` implements ${implementedTypes.map(getTypeText).join(", ")}`,
+    )} {
 ${
   getChildren({ declaration, index })
     .map((childId) => getDeclarationText(get.getIndexedModel(childId, index)))
     .join("\n") ?? ""
 }
   }`,
+  },
   getChildren,
 } as const satisfies types.ReflectionKindFunctionality;
 

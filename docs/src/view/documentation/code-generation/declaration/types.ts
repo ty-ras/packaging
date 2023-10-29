@@ -2,10 +2,16 @@ import * as functionality from "../../functionality";
 import * as types from "../types";
 
 export interface ReflectionKindFunctionality {
-  getPrefixText: (args: GetPrefixTextArgs) => string;
-  getBodyText: (args: GetBodyTextArgs) => string;
+  text: ReflectionKindFunctionalityToText;
   getChildren: GetChildren;
 }
+
+export type ReflectionKindFunctionalityToText =
+  | {
+      getPrefixText: (args: GetPrefixTextArgs) => string;
+      getBodyText: (args: GetBodyTextArgs) => string;
+    }
+  | ((args: GetBodyTextArgs) => string);
 
 export type GetChildren = (args: GetChildrenArgs) => Array<number>;
 

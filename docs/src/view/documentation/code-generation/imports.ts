@@ -70,7 +70,7 @@ export type RegisterImport = (
 ) => string;
 
 const getImportAlias = (name: string, qualifiedName: string) =>
-  name.substring(0, name.indexOf(qualifiedName));
+  qualifiedName.substring(0, qualifiedName.indexOf(`.${name}`));
 
 const createImportInfo = (
   kind: ImportInfo["import"],

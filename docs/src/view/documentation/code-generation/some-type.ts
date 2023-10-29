@@ -68,7 +68,11 @@ export const createGetSomeTypeText = (
           (typeArgs) => `<${typeArgs.map(getSomeTypeText)}>`,
         )}`;
       case "reflection":
-        return getDeclarationReferenceText(type.declaration, getSignatureText);
+        return getDeclarationReferenceText(
+          type.declaration,
+          getSignatureText,
+          getSomeTypeText,
+        );
       case "rest":
         return `...${getSomeTypeText(type.elementType)}`;
       case "templateLiteral":
@@ -98,6 +102,7 @@ export const createGetSomeTypeText = (
 const getDeclarationReferenceText = (
   declaration: typedoc.DeclarationReflection,
   getSignatureText: types.GetSignatureText,
+  getSomeTypeText: types.GetSomeTypeText,
 ): string => {
   switch (declaration.kind) {
     case functionality.ReflectionKind.Enum:
@@ -111,6 +116,10 @@ const getDeclarationReferenceText = (
         functionality.ensureOneItem(declaration.signatures),
         types.SIG_CONTEXT_TYPE,
       );
+    case functionality.ReflectionKind.TypeLiteral:
+      return declaration.type
+        ? getSomeTypeText(declaration.type)
+        : getSignatureText(functionality.ensureOneItem(declaration.signatures));
     default:
       throw new Error(`No implementation for declaration ${declaration.kind}`);
   }

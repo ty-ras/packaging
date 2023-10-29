@@ -1,14 +1,11 @@
 import * as functionality from "../../functionality";
 import * as types from "./types";
 
-// TODO actually we probably want to NOT have functionality related to functions here?
-
 // TODO are there parameters as children of function?
 const getChildren: types.GetChildren = () => [];
 
 export default {
-  getPrefixText: () => "", // No single prefix text, instead we iterate the signatures in getBodyText
-  getBodyText: ({ declaration, getSignatureText }) =>
+  text: ({ declaration, getSignatureText }) =>
     (
       declaration.signatures ??
       functionality.doThrow("Function without signatures?")
@@ -16,6 +13,6 @@ export default {
       .map(
         (sig) => `export declare function ${sig.name}${getSignatureText(sig)}`,
       )
-      .join(";\n"),
+      .join(";\n\n"),
   getChildren,
 } as const satisfies types.ReflectionKindFunctionality;

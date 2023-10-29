@@ -112,7 +112,7 @@ const textWithImports = (
       ([, importInfo]) =>
         `import ${
           importInfo.import === "named"
-            ? "* as"
+            ? `* as ${importInfo.alias}`
             : `{ ${importInfo.importedElements.join(", ")} }`
         } from "${importInfo.packageName}";`,
     )
