@@ -23,7 +23,10 @@ export type GetSignatureText = (
 export const SIG_CONTEXT_DEF = ":";
 export const SIG_CONTEXT_TYPE = "=>";
 
-export type SignatureContext = typeof SIG_CONTEXT_DEF | typeof SIG_CONTEXT_TYPE;
+export type SignatureContext =
+  | typeof SIG_CONTEXT_DEF
+  | typeof SIG_CONTEXT_TYPE
+  | null;
 
 export type GetDeclarationText = (
   declaration: functionality.IndexableModel,

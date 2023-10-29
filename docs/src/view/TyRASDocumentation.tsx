@@ -126,114 +126,121 @@ export default function TyRASDocumentation() {
           setLastSelectedGroup={setLastSelectedGroup}
         />
       </AppBar>
-      <Box>
-        <Box
-          sx={{
-            maxWidth: "100%",
-            marginLeft: "auto",
-            marginRight: "auto",
-            display: "flex",
-            flexWrap: "wrap",
-          }}
-        >
-          <Box
-            sx={{
-              maxWidth: "100%",
-              display: "flex",
-              flexGrow: 1,
-              flexShrink: 1,
-              flexBasis: "100%",
-              flexWrap: "wrap",
-            }}
-          >
-            <Box sx={{ width: "auto" }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  width: "auto",
-                  height: `calc(100vh - ${observedAppBarHeight()}px)`,
-                  maxHeight: `calc(100vh - ${observedAppBarHeight()}px) !important`,
-                  position: "sticky",
-                  top: "0px",
-                  flexDirection: "row-reverse",
-                  minWidth: "0px",
-                }}
-              >
-                <Box
-                  sx={{
-                    height: "100%",
-                    position: "relative",
-                    width: "1px",
-                    backgroundColor: "black",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      inset: "0px -2px",
-                      cursor: "col-resize",
-                      backgroundColor: "transparent",
-                      transitionDelay: "0.1s",
-                    }}
-                    onMouseDown={enableResize}
-                  />
-                </Box>
-                <Box
-                  sx={{
-                    overflow: "auto",
-                    width: width(),
-                  }}
-                >
-                  <TopLevelElementsList
-                    elements={topLevelElements()}
-                    lastSelectedGroup={lastSelectedGroup()}
-                    setCurrentElement={setCurrentElement}
-                  />
-                </Box>
-              </Box>
-            </Box>
+      <Show when={docs()}>
+        {(docs) => (
+          <Box>
             <Box
-              component="main"
               sx={{
+                maxWidth: "100%",
+                marginLeft: "auto",
+                marginRight: "auto",
                 display: "flex",
-                flexGrow: 1,
-                flexShrink: 1,
-                flexBasis: "0px",
-                minWidth: "1px",
+                flexWrap: "wrap",
               }}
             >
               <Box
                 sx={{
-                  width: "100%",
                   maxWidth: "100%",
+                  display: "flex",
                   flexGrow: 1,
+                  flexShrink: 1,
+                  flexBasis: "100%",
+                  flexWrap: "wrap",
                 }}
               >
-                <Show
-                  when={currentElement()}
-                  fallback={
-                    <Typography>Please select element from the list</Typography>
-                  }
-                >
-                  {(elem) => (
-                    <SingleElementContents
-                      currentElement={elem()}
-                      headerLevel={3}
-                      prettierOptions={{
-                        printWidth: 80,
-                        trailingComma: "all",
-                        tabWidth: 2,
-                        useTabs: false,
-                        endOfLine: "lf",
+                <Box sx={{ width: "auto" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      width: "auto",
+                      height: `calc(100vh - ${observedAppBarHeight()}px)`,
+                      maxHeight: `calc(100vh - ${observedAppBarHeight()}px) !important`,
+                      position: "sticky",
+                      top: "0px",
+                      flexDirection: "row-reverse",
+                      minWidth: "0px",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        height: "100%",
+                        position: "relative",
+                        width: "1px",
+                        backgroundColor: "black",
                       }}
-                    />
-                  )}
-                </Show>
+                    >
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          inset: "0px -2px",
+                          cursor: "col-resize",
+                          backgroundColor: "transparent",
+                          transitionDelay: "0.1s",
+                        }}
+                        onMouseDown={enableResize}
+                      />
+                    </Box>
+                    <Box
+                      sx={{
+                        overflow: "auto",
+                        width: width(),
+                      }}
+                    >
+                      <TopLevelElementsList
+                        elements={topLevelElements()}
+                        lastSelectedGroup={lastSelectedGroup()}
+                        setCurrentElement={setCurrentElement}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+                <Box
+                  component="main"
+                  sx={{
+                    display: "flex",
+                    flexGrow: 1,
+                    flexShrink: 1,
+                    flexBasis: "0px",
+                    minWidth: "1px",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "100%",
+                      maxWidth: "100%",
+                      flexGrow: 1,
+                    }}
+                  >
+                    <Show
+                      when={currentElement()}
+                      fallback={
+                        <Typography>
+                          Please select element from the list
+                        </Typography>
+                      }
+                    >
+                      {(elem) => (
+                        <SingleElementContents
+                          currentElement={elem()}
+                          headerLevel={3}
+                          prettierOptions={{
+                            printWidth: 80,
+                            trailingComma: "all",
+                            tabWidth: 2,
+                            useTabs: false,
+                            endOfLine: "lf",
+                          }}
+                          showDocKinds={Object.keys(docs()).length > 1}
+                        />
+                      )}
+                    </Show>
+                  </Box>
+                </Box>
               </Box>
             </Box>
           </Box>
-        </Box>
-      </Box>
+        )}
+      </Show>
     </>
   );
 }

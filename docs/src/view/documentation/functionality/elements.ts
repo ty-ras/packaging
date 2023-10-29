@@ -22,11 +22,11 @@ export const getTopLevelElements = (
   docKind: string,
   documentation: types.Documentation,
   groupName: string,
-): Array<TopLevelElement> => {
+): Array<TopLevelElement<Set<string>>> => {
   const globalContext: GlobalElementContext = {
     project: documentation.project,
     index: documentation.modelIndex,
-    id: docKind,
+    docKind,
   };
   return (
     documentation.project.groups
@@ -40,7 +40,7 @@ export const getTopLevelElements = (
                   `Could not find element with ID ${id} in ${documentation.project.packageName}@${documentation.project.packageVersion}`,
                 );
               return {
-                docKind,
+                allDocKinds: new Set([docKind]),
                 id,
                 text: element.name,
                 element,
@@ -55,54 +55,59 @@ export const getTopLevelElements = (
 
 export const deduplicateTopLevelElements = (
   elements: ReturnType<typeof getTopLevelElements>,
-) => {
+): Array<TopLevelElement> => {
   const retVal = Object.values(
-    elements.reduce<Record<string, Record<string, TopLevelElement>>>(
-      (state, item) => {
-        const key = item.text;
-        if (key in state) {
-          const sameByDocKind = state[key];
-          if (item.docKind in sameByDocKind) {
-            throw new Error(
-              `Duplicate exported member ${item.text} in kind ${item.docKind}.`,
-            );
-          } else {
-            if (
-              Object.values(sameByDocKind).some(
-                (otherElement) =>
-                  otherElement.element.sources?.length !==
-                    item.element.sources?.length ||
-                  otherElement.element.sources?.some(
-                    (other, idx) =>
-                      other.fileName !== item.element.sources?.[idx].fileName,
-                  ),
-              )
-            ) {
-              // This is not a shared top-level element (= not in "protocol" packages)
-              sameByDocKind[item.docKind] = item;
-            }
-          }
+    elements.reduce<
+      Record<string, Record<string, TopLevelElement<Set<string>>>>
+    >((state, item) => {
+      const key = item.text;
+      const docKind = item.globalContext.docKind;
+      if (key in state) {
+        const sameByDocKind = state[key];
+        if (docKind in sameByDocKind) {
+          throw new Error(
+            `Duplicate exported member ${item.text} in kind ${docKind}.`,
+          );
+        } else if (
+          Object.values(sameByDocKind).some(
+            (otherElement) =>
+              otherElement.element.sources?.length !==
+                item.element.sources?.length ||
+              otherElement.element.sources?.some(
+                (other, idx) =>
+                  other.fileName !== item.element.sources?.[idx].fileName,
+              ),
+          )
+        ) {
+          // This is not a shared top-level element (= not in "protocol" packages)
+          sameByDocKind[docKind] = item;
         } else {
-          state[key] = { [item.docKind]: item };
+          Object.values(sameByDocKind).forEach((el) =>
+            el.allDocKinds.add(docKind),
+          );
         }
-        return state;
-      },
-      {},
-    ),
-  ).flatMap((byDocKind) => {
+      } else {
+        state[key] = { [docKind]: item };
+      }
+      return state;
+    }, {}),
+  ).flatMap((byDocKind): Array<TopLevelElement> => {
     const retVal = Object.values(byDocKind);
     if (retVal.length > 1) {
       retVal.forEach((otherItem) => (otherItem.showKind = true));
     }
-    return retVal;
+    return retVal.map(({ allDocKinds, ...element }) => ({
+      ...element,
+      allDocKinds: Array.from(allDocKinds),
+    }));
   });
 
   retVal.sort(({ text: xText }, { text: yText }) => xText.localeCompare(yText));
   return retVal;
 };
 
-export interface TopLevelElement {
-  docKind: string;
+export interface TopLevelElement<TAllDocKinds = ReadonlyArray<string>> {
+  allDocKinds: TAllDocKinds;
   id: number;
   text: string;
   showKind: boolean;
@@ -113,7 +118,7 @@ export interface TopLevelElement {
 export interface GlobalElementContext {
   project: types.Project;
   index: types.ModelIndex;
-  id: string;
+  docKind: string;
 }
 
 export interface TopLevelElementGroup {

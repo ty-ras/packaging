@@ -10,6 +10,7 @@ import * as declaration from "./declaration";
 import * as someType from "./some-type";
 import * as sig from "./signature";
 import * as imports from "./imports";
+import * as get from "./get-with-check";
 
 export const createCodeGenerator = (
   index: functionality.ModelIndex,
@@ -26,12 +27,7 @@ export const createCodeGenerator = (
     reflection,
   ) => {
     return isReference(reflection)
-      ? getDeclarationText(
-          (reflection.target < 0 ? undefined : index[reflection.target]) ??
-            functionality.doThrow(
-              `Failed to find reference ${reflection.target}`,
-            ),
-        )
+      ? getDeclarationText(get.getIndexedModel(reflection.target, index))
       : getDeclarationTextImpl(reflection);
   };
 

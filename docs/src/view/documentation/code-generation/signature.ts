@@ -25,9 +25,13 @@ export const createGetSignatureText = (
           p.defaultValue,
           (defaultValue) => ` = ${defaultValue}`,
         )}`,
-    )}) ${returnTypeSeparator} ${getSomeTypeText(
-      signature.type ??
-        functionality.doThrow("Function signature without return type"),
+    )})${functionality.getOptionalValueText(
+      returnTypeSeparator,
+      (separator) =>
+        ` ${separator} ${getSomeTypeText(
+          signature.type ??
+            functionality.doThrow("Function signature without return type"),
+        )}`,
     )}`;
   }
   return getSignatureText;

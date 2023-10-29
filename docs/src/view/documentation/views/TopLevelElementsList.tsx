@@ -28,7 +28,9 @@ export default function TopLevelElementsList(props: TopLevelElementsListProps) {
                       <ListItemText
                         primary={element.text}
                         secondary={
-                          element.showKind ? element.docKind : undefined
+                          element.showKind
+                            ? element.globalContext.docKind
+                            : undefined
                         }
                       />
                     </ListItemButton>
