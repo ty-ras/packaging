@@ -6,7 +6,7 @@ import type * as types from "./types";
 
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 
-export default function SigfnatureDefinition(props: SignatureDefinitionProps) {
+export default function SignatureDefinition(props: SignatureDefinitionProps) {
   const [formattedCode] = createResource(async () => {
     const code = await props.codeGenerator.formatCode(
       props.codeGenerator.getSignatureText(props.signature),

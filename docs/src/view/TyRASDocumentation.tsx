@@ -113,7 +113,7 @@ export default function TyRASDocumentation() {
     }
   });
 
-  const { width, enableResize } = useResize(50, 400);
+  const { width, enableResize } = useResize(50, 250);
 
   return (
     <>
@@ -202,6 +202,8 @@ export default function TyRASDocumentation() {
                     flexShrink: 1,
                     flexBasis: "0px",
                     minWidth: "1px",
+                    height: `calc(100vh - ${observedAppBarHeight()}px)`,
+                    maxHeight: `calc(100vh - ${observedAppBarHeight()}px) !important`,
                   }}
                 >
                   <Box
@@ -209,6 +211,7 @@ export default function TyRASDocumentation() {
                       width: "100%",
                       maxWidth: "100%",
                       flexGrow: 1,
+                      overflow: "auto",
                     }}
                   >
                     <Show

@@ -13,7 +13,7 @@ export default function SingleElementView(props: SingleElementViewProps) {
       <section>
         <Title
           element={props.currentElement.element}
-          variant={`h${props.headerLevel}`}
+          variant={`h${ensureHeaderLevel(props.headerLevel)}`}
         />
         <Show when={props.showDocKinds}>
           <Stack direction="row" spacing={1}>
@@ -24,7 +24,9 @@ export default function SingleElementView(props: SingleElementViewProps) {
         </Show>
       </section>
       <section>
-        <Typography variant={`h${props.headerLevel}`}>Definition</Typography>
+        <Typography variant={`h${ensureHeaderLevel(props.headerLevel)}`}>
+          Definition
+        </Typography>
         <ElementDefinition
           element={props.currentElement.element}
           codeGenerator={codeGen.createCodeGenerator(
@@ -42,10 +44,10 @@ export default function SingleElementView(props: SingleElementViewProps) {
             </Show>
           )}
         </For>
-        {
-          // Traverse children and invoke itself recursively?
-        }
       </section>
+      {
+        // Traverse children and invoke itself recursively?
+      }
     </>
   );
 }
@@ -53,6 +55,15 @@ export default function SingleElementView(props: SingleElementViewProps) {
 export interface SingleElementViewProps {
   currentElement: functionality.TopLevelElement;
   prettierOptions: codeGen.PrettierOptions;
-  headerLevel: 1 | 2 | 3 | 4 | 5 | 6;
+  headerLevel: number;
   showDocKinds: boolean;
 }
+
+const ensureHeaderLevel = (headerLevel: number) =>
+  (headerLevel < 1 ? 1 : headerLevel > 6 ? 6 : headerLevel) as
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 6;
