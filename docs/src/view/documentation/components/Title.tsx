@@ -1,20 +1,20 @@
-import { Typography } from "@suid/material";
 import type * as types from "./types";
 import * as functionality from "../functionality";
+import SmallHeader, { type SmallHeaderProps } from "./SmallHeader";
 
 export default function Title(props: TitleProps) {
   return (
     // <Box sx={{ overflow: "hidden", textOverflow: "ellipsis", width: "auto" }}>
-    <Typography variant={props.variant}>
+    <SmallHeader headerLevel={props.headerLevel}>
       {getReflectionKindTypeScriptName(props.element.kind)} {props.element.name}
-    </Typography>
+    </SmallHeader>
     // </Box>
   );
 }
 
-export interface TitleProps extends types.ReflectionElementProps {
-  variant: Parameters<typeof Typography>[0]["variant"];
-}
+export interface TitleProps
+  extends types.ReflectionElementProps,
+    SmallHeaderProps {}
 
 const getReflectionKindTypeScriptName = (
   reflectionKind: functionality.ReflectionKind,
