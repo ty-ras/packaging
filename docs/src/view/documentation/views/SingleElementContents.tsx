@@ -1,14 +1,20 @@
-import { For, Match, Show, Switch } from "solid-js";
+import { For, Match, Show, Switch, createMemo } from "solid-js";
 import { Chip, Stack } from "@suid/material";
 import * as functionality from "../functionality";
 import * as codeGen from "../code-generation";
 import Title from "../components/Title";
 import Comment from "../components/Comment";
-import ElementDefinition from "../components/ElementDefinition";
+import FormattedCode from "../components/FormattedCode";
 import SmallHeader from "../components/SmallHeader";
 import SingleSignatureView from "./SingleSignatureContents";
 
 export default function SingleElementView(props: SingleElementViewProps) {
+  const codeGenerator = createMemo(() =>
+    codeGen.createCodeGenerator(
+      props.currentElement.globalContext.index,
+      props.prettierOptions,
+    ),
+  );
   // Functions, Constructors, and Accessors never have comments directly on them.
   return (
     <>
@@ -27,12 +33,10 @@ export default function SingleElementView(props: SingleElementViewProps) {
       </section>
       <section>
         <SmallHeader headerLevel={props.headerLevel}>Definition</SmallHeader>
-        <ElementDefinition
-          element={props.currentElement.element}
-          codeGenerator={codeGen.createCodeGenerator(
-            props.currentElement.globalContext.index,
-            props.prettierOptions,
-          )}
+        <FormattedCode
+          reflection={props.currentElement.element}
+          kind="getDeclarationText"
+          codeGenerator={codeGenerator()}
         />
         <Switch>
           <Match when={props.currentElement.element.comment}>
@@ -50,6 +54,7 @@ export default function SingleElementView(props: SingleElementViewProps) {
               <SingleSignatureView
                 signature={signature()}
                 headerLevel={props.headerLevel}
+                codeGenerator={codeGenerator()}
               />
             )}
           </Match>
@@ -61,13 +66,8 @@ export default function SingleElementView(props: SingleElementViewProps) {
                     <SingleSignatureView
                       signature={signature}
                       headerLevel={props.headerLevel}
-                      overload={{
-                        orderNumber: index(),
-                        codeGenerator: codeGen.createCodeGenerator(
-                          props.currentElement.globalContext.index,
-                          props.prettierOptions,
-                        ),
-                      }}
+                      codeGenerator={codeGenerator()}
+                      overloadOrder={index()}
                     />
                   </section>
                 )}

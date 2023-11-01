@@ -23,49 +23,54 @@ export const createCodeGenerator = (
     return textWithImports(importContext, declarationToText(reflection));
   };
 
-  const getDeclarationText: types.CodeGenerator["getDeclarationText"] = (
-    reflection,
-  ) => {
-    return isReference(reflection)
-      ? getDeclarationText(get.getIndexedModel(reflection.target, index))
-      : getDeclarationTextImpl(reflection);
-  };
+  const getDeclarationText: types.CodeGeneratorGeneration["getDeclarationText"] =
+    (reflection) => {
+      return isReference(reflection)
+        ? getDeclarationText(get.getIndexedModel(reflection.target, index))
+        : getDeclarationTextImpl(reflection);
+    };
 
   return {
-    getTypeText: (type) => {
-      const { importContext, typeToText } = createCallbacks(index);
-      return textWithImports(importContext, `export ${typeToText(type)}`);
+    generation: {
+      getTypeText: (type) => {
+        const { importContext, typeToText } = createCallbacks(index);
+        return textWithImports(importContext, `type X = ${typeToText(type)}`);
+      },
+      getSignatureText: (sig) => {
+        const { importContext, sigToText } = createCallbacks(index);
+        const sigText = sigToText(sig, ":");
+        return textWithImports(
+          importContext,
+          `export declare function ${sig.name}${sigText}`,
+        );
+      },
+      getDeclarationText,
     },
-    getSignatureText: (sig) => {
-      const { importContext, sigToText } = createCallbacks(index);
-      const sigText = sigToText(sig, ":");
-      return textWithImports(
-        importContext,
-        `export declare function ${sig.name}${sigText}`,
-      );
-    },
-    getDeclarationText,
-    formatCode: async (code) =>
-      await prettier.format(code, {
-        ...prettierOptions,
-        parser: "typescript",
-        plugins: [estree, typescript],
-      }),
-    getTokenInfos: (code) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const { tokens }: TSESTree.Program = typescript.parsers.typescript.parse(
-        code,
-        // Options are not used for anything useful for us
-        // See https://github.com/prettier/prettier/blob/main/src/language-js/parse/typescript.js
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-        undefined as any,
-      );
-      return Array.from(
-        constructTokenInfoArray(
-          code,
-          tokens ?? functionality.doThrow("Parsed TS program without tokens?"),
-        ),
-      );
+    formatting: {
+      formatCode: async (code) =>
+        await prettier.format(code, {
+          ...prettierOptions,
+          parser: "typescript",
+          plugins: [estree, typescript],
+        }),
+      getTokenInfos: (code) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const { tokens }: TSESTree.Program =
+          typescript.parsers.typescript.parse(
+            code,
+            // Options are not used for anything useful for us
+            // See https://github.com/prettier/prettier/blob/main/src/language-js/parse/typescript.js
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
+            undefined as any,
+          );
+        return Array.from(
+          constructTokenInfoArray(
+            code,
+            tokens ??
+              functionality.doThrow("Parsed TS program without tokens?"),
+          ),
+        );
+      },
     },
   };
 };

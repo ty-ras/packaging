@@ -209,7 +209,6 @@ export default function TyRASDocumentation() {
                   <Box
                     sx={{
                       width: "100%",
-                      maxWidth: "100%",
                       flexGrow: 1,
                       overflow: "auto",
                     }}

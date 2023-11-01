@@ -1,51 +1,98 @@
 import { For, Show } from "solid-js";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@suid/material";
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import * as codeGen from "../code-generation";
+import * as functionality from "../functionality";
 import Comment from "../components/Comment";
-import SignatureDefinition from "../components/SignatureDefinition";
+import SingleLineCode from "../components/SingleLineCode";
+import FormattedCode from "../components/FormattedCode";
 import SmallHeader from "../components/SmallHeader";
 
 export default function SingleSignatureView(props: SingleSignatureViewProps) {
-  // TODO: parameters and return value probably would look a lot better if not used with header + content
-  // Instead some kind of data grid would be much more compact
   return (
     <>
-      <Show when={props.overload}>
-        {(overload) => (
-          <>
-            <SmallHeader headerLevel={props.headerLevel}>
-              Overload #{overload().orderNumber}
-            </SmallHeader>
-            <SignatureDefinition
-              signature={props.signature}
-              codeGenerator={overload().codeGenerator}
-            />
-          </>
-        )}
+      <Show when={props.overloadOrder !== undefined}>
+        <SmallHeader headerLevel={props.headerLevel}>
+          Overload #{props.overloadOrder}
+        </SmallHeader>
+        <FormattedCode
+          reflection={props.signature}
+          kind="getSignatureText"
+          codeGenerator={props.codeGenerator}
+        />
       </Show>
       <SmallHeader headerLevel={props.headerLevel}>Summary</SmallHeader>
       <Comment comment={props.signature.comment} />
       <SmallHeader headerLevel={props.headerLevel}>
         Inputs and Outputs
       </SmallHeader>
-      <For each={props.signature.parameters}>
-        {(parameter) => (
-          <>
-            <SmallHeader headerLevel={props.headerLevel}>
-              Parameter <code>{parameter.name}</code>
-            </SmallHeader>
-            <Comment comment={parameter.comment ?? NOT_DOCUMENTED} />
-          </>
-        )}
-      </For>
-      <SmallHeader headerLevel={props.headerLevel}>Return value</SmallHeader>
-      <Comment
-        comment={
-          props.signature.comment?.blockTags?.find(
-            (cTag) => cTag.tag === "@returns",
-          )?.content ?? NOT_DOCUMENTED
-        }
-      />
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Type</TableCell>
+              <TableCell>Summary</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <For each={props.signature.parameters}>
+              {(parameter) => (
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                    <SingleLineCode>{parameter.name}</SingleLineCode>
+                  </TableCell>
+                  <TableCell>
+                    <FormattedCode
+                      reflection={
+                        parameter.type ??
+                        functionality.doThrow("Parameter without type")
+                      }
+                      kind="getTypeText"
+                      codeGenerator={props.codeGenerator}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Comment comment={parameter.comment ?? NOT_DOCUMENTED} />
+                  </TableCell>
+                </TableRow>
+              )}
+            </For>
+            <TableRow>
+              <TableCell component="th" scope="row">
+                Return value
+              </TableCell>
+              <TableCell>
+                <FormattedCode
+                  reflection={
+                    props.signature.type ??
+                    functionality.doThrow("Signature without return type")
+                  }
+                  kind="getTypeText"
+                  codeGenerator={props.codeGenerator}
+                />
+              </TableCell>
+              <TableCell>
+                <Comment
+                  comment={
+                    props.signature.comment?.blockTags?.find(
+                      (cTag) => cTag.tag === "@returns",
+                    )?.content ?? NOT_DOCUMENTED
+                  }
+                />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
     </>
   );
 }
@@ -53,12 +100,8 @@ export default function SingleSignatureView(props: SingleSignatureViewProps) {
 export interface SingleSignatureViewProps {
   signature: typedoc.SignatureReflection;
   headerLevel: number;
-  overload?: SignatureOverloadShowInfo;
-}
-
-export interface SignatureOverloadShowInfo {
-  orderNumber: number;
   codeGenerator: codeGen.CodeGenerator;
+  overloadOrder?: number;
 }
 
 const NOT_DOCUMENTED: Array<typedoc.CommentDisplayPart> = [

@@ -4,9 +4,23 @@ import { type TSESTree } from "@typescript-eslint/types/dist/index";
 import type * as functionality from "../functionality";
 
 export interface CodeGenerator {
-  getTypeText: (type: typedoc.SomeType) => string;
-  getSignatureText: (sig: typedoc.SignatureReflection) => string;
-  getDeclarationText: (reflection: functionality.IndexableModel) => string;
+  generation: CodeGeneratorGeneration;
+  formatting: CodeGeneratorFormatting;
+}
+
+export interface CodeGeneratorGenerationFunctionMap {
+  getTypeText: typedoc.SomeType;
+  getSignatureText: typedoc.SignatureReflection;
+  getDeclarationText: functionality.IndexableModel;
+}
+
+export type CodeGeneratorGeneration = {
+  [P in keyof CodeGeneratorGenerationFunctionMap]: (
+    reflection: CodeGeneratorGenerationFunctionMap[P],
+  ) => string;
+};
+
+export interface CodeGeneratorFormatting {
   formatCode: (code: string) => Promise<string>;
   getTokenInfos: (code: string) => Array<TSESTree.Token | string>;
 }
