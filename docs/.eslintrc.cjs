@@ -29,6 +29,7 @@ module.exports = {
     "@typescript-eslint/restrict-template-expressions": "off", // We are OK with whatever type within template expressions
     "@typescript-eslint/unbound-method": "off", // We never use 'this' within functions anyways.
     "@typescript-eslint/no-empty-function": "off", // Empty functions are ok sometimes.
+    "@typescript-eslint/no-unsafe-enum-comparison": "off", // We can't include typedoc or @typescript-eslint libraries into bundle as they are heavily Node-oriented, so we must disable this rule to avoid putting it in almost every file.
     "no-useless-return": "error",
     "no-console": "error",
     "sonarjs/no-nested-template-literals": "off", // Nested template literals are OK really

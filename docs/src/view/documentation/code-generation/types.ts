@@ -11,26 +11,42 @@ export interface CodeGenerator {
 export interface CodeGeneratorGenerationFunctionMap {
   getTypeText: typedoc.SomeType;
   getSignatureText: typedoc.SignatureReflection;
-  getDeclarationText: functionality.IndexableModel;
+  getDeclarationText:
+    | functionality.IndexableModel
+    | typedoc.DeclarationReflection;
 }
 
 export type CodeGeneratorGeneration = {
   [P in keyof CodeGeneratorGenerationFunctionMap]: (
     reflection: CodeGeneratorGenerationFunctionMap[P],
-  ) => string;
+  ) => CodeGenerationResult;
 };
+
+export type CodeGenerationResult =
+  | string
+  | {
+      code: string;
+      processTokenInfos: TokenInfoProcessor;
+    };
+
+export type TokenInfoProcessor = (result: TokenInfos) => TokenInfos;
 
 export interface CodeGeneratorFormatting {
   formatCode: (code: string) => Promise<string>;
-  getTokenInfos: (code: string) => Array<TSESTree.Token | string>;
+  getTokenInfos: (code: string) => TokenInfos;
 }
+
+export type TokenInfos = Array<TokenInfo>;
+export type TokenInfo = TSESTree.Token | string;
 
 export type PrettierOptions = Omit<prettier.Options, "parser" | "plugins">;
 
-export type GetSomeTypeText = (type: typedoc.SomeType) => string;
+export type GetSomeTypeText = (
+  type: CodeGeneratorGenerationFunctionMap["getTypeText"],
+) => string;
 
 export type GetSignatureText = (
-  signature: typedoc.SignatureReflection,
+  signature: CodeGeneratorGenerationFunctionMap["getSignatureText"],
   returnTypeSeparator?: SignatureContext,
 ) => string;
 
@@ -43,5 +59,5 @@ export type SignatureContext =
   | null;
 
 export type GetDeclarationText = (
-  declaration: functionality.IndexableModel,
+  declaration: CodeGeneratorGenerationFunctionMap["getDeclarationText"],
 ) => string;

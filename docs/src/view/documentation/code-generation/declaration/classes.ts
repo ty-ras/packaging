@@ -14,8 +14,10 @@ const getChildren: types.GetChildren = ({ declaration, index }) =>
       ({ children }) =>
         children?.toSorted((childIdX, childIdY) =>
           get
-            .getIndexedModel(childIdX, index)
-            .name.localeCompare(get.getIndexedModel(childIdY, index).name),
+            .getIndexedModel(childIdX, declaration, index)
+            .name.localeCompare(
+              get.getIndexedModel(childIdY, declaration, index).name,
+            ),
         ) ?? [],
     ) ?? [];
 
@@ -38,7 +40,9 @@ export default {
     )} {
 ${
   getChildren({ declaration, index })
-    .map((childId) => getDeclarationText(get.getIndexedModel(childId, index)))
+    .map((childId) =>
+      getDeclarationText(get.getIndexedModel(childId, declaration, index)),
+    )
     .join("\n") ?? ""
 }
   }`,

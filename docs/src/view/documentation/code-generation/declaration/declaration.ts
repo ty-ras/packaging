@@ -12,7 +12,9 @@ export const createGetDeclarationText = (
   getTypeText: types.GetSomeTypeText,
   getSignatureText: types.GetSignatureText,
 ): types.GetDeclarationText => {
-  function getDeclarationText(declaration: functionality.IndexableModel) {
+  function getDeclarationText(
+    declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
+  ) {
     const textFunctionality = useFunctionality(declaration, "text");
     return typeof textFunctionality === "function"
       ? textFunctionality({
@@ -67,7 +69,7 @@ const functionalities: Record<
 const useFunctionality = <
   TKey extends keyof toTextTypes.ReflectionKindFunctionality,
 >(
-  declaration: functionality.IndexableModel,
+  declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
   name: TKey,
 ): toTextTypes.ReflectionKindFunctionality[TKey] =>
   (functionalities[declaration.kind] ??

@@ -2,11 +2,10 @@ import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import * as functionality from "../functionality";
 import * as types from "./types";
 
-/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
-
 export const createGetSomeTypeText = (
   refToStr: (ref: typedoc.ReferenceType) => string,
   getSignatureText: types.GetSignatureText,
+  getDeclarationText: types.GetDeclarationText,
 ): types.GetSomeTypeText => {
   function getSomeTypeText(type: typedoc.SomeType): string {
     switch (type.type) {
@@ -71,6 +70,7 @@ export const createGetSomeTypeText = (
         return getDeclarationReferenceText(
           type.declaration,
           getSignatureText,
+          getDeclarationText,
           getSomeTypeText,
         );
       case "rest":
@@ -102,6 +102,7 @@ export const createGetSomeTypeText = (
 const getDeclarationReferenceText = (
   declaration: typedoc.DeclarationReflection,
   getSignatureText: types.GetSignatureText,
+  getDeclarationText: types.GetDeclarationText,
   getSomeTypeText: types.GetSomeTypeText,
 ): string => {
   switch (declaration.kind) {
@@ -118,8 +119,13 @@ const getDeclarationReferenceText = (
       );
     case functionality.ReflectionKind.TypeLiteral:
       return declaration.type
-        ? getSomeTypeText(declaration.type)
-        : getSignatureText(functionality.ensureOneItem(declaration.signatures));
+        ? // This is just reference to another type
+          getSomeTypeText(declaration.type)
+        : declaration.signatures?.length === 1
+        ? // This is function type
+          getSignatureText(functionality.ensureOneItem(declaration.signatures))
+        : // Inline type spec
+          getDeclarationText(declaration);
     default:
       throw new Error(`No implementation for declaration ${declaration.kind}`);
   }

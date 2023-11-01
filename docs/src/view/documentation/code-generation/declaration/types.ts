@@ -16,7 +16,7 @@ export type ReflectionKindFunctionalityToText =
 export type GetChildren = (args: GetChildrenArgs) => Array<number>;
 
 export interface GetPrefixTextArgs {
-  declaration: functionality.IndexableModel;
+  declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"];
 }
 
 export interface GetBodyTextArgs {
@@ -24,10 +24,10 @@ export interface GetBodyTextArgs {
   getTypeText: types.GetSomeTypeText;
   getDeclarationText: types.GetDeclarationText;
   getSignatureText: types.GetSignatureText;
-  declaration: functionality.IndexableModel;
+  declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"];
 }
 
 export interface GetChildrenArgs {
-  declaration: functionality.IndexableModel;
+  declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"];
   index: functionality.ModelIndex;
 }

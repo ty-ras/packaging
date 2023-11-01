@@ -58,6 +58,7 @@ export default function SingleSignatureView(props: SingleSignatureViewProps) {
                       }
                       kind="getTypeText"
                       codeGenerator={props.codeGenerator}
+                      tokenInfoProcessor={typeTokensProcessor}
                     />
                   </TableCell>
                   <TableCell>
@@ -78,6 +79,7 @@ export default function SingleSignatureView(props: SingleSignatureViewProps) {
                   }
                   kind="getTypeText"
                   codeGenerator={props.codeGenerator}
+                  tokenInfoProcessor={typeTokensProcessor}
                 />
               </TableCell>
               <TableCell>
@@ -107,3 +109,15 @@ export interface SingleSignatureViewProps {
 const NOT_DOCUMENTED: Array<typedoc.CommentDisplayPart> = [
   { kind: "text", text: "<Not documented>" },
 ];
+
+const typeTokensProcessor: codeGen.TokenInfoProcessor = (tokenInfos) => {
+  let idx = tokenInfos.length - 1;
+  while (idx >= 0 && shouldBeDroppedFromEndOfTypeTokens(tokenInfos[idx])) {
+    --idx;
+  }
+  return tokenInfos.slice(0, idx + 1);
+};
+
+const shouldBeDroppedFromEndOfTypeTokens = (tokenInfo: codeGen.TokenInfo) =>
+  typeof tokenInfo === "string" ||
+  (tokenInfo.type === "Punctuator" && tokenInfo.value === ";");

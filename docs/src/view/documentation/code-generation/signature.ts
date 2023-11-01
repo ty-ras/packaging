@@ -3,8 +3,6 @@ import * as functionality from "../functionality";
 import * as types from "./types";
 import * as flags from "./flags";
 
-/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
-
 export const createGetSignatureText = (
   getSomeTypeText: types.GetSomeTypeText,
 ): types.GetSignatureText => {

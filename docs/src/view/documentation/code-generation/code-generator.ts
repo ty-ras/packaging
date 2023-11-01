@@ -17,7 +17,7 @@ export const createCodeGenerator = (
   prettierOptions: types.PrettierOptions,
 ): types.CodeGenerator => {
   const getDeclarationTextImpl = (
-    reflection: functionality.IndexableModel,
+    reflection: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
   ): string => {
     const { importContext, declarationToText } = createCallbacks(index);
     return textWithImports(importContext, declarationToText(reflection));
@@ -26,7 +26,9 @@ export const createCodeGenerator = (
   const getDeclarationText: types.CodeGeneratorGeneration["getDeclarationText"] =
     (reflection) => {
       return isReference(reflection)
-        ? getDeclarationText(get.getIndexedModel(reflection.target, index))
+        ? getDeclarationText(
+            get.getIndexedModel(reflection.target, reflection, index),
+          )
         : getDeclarationTextImpl(reflection);
     };
 
@@ -34,7 +36,18 @@ export const createCodeGenerator = (
     generation: {
       getTypeText: (type) => {
         const { importContext, typeToText } = createCallbacks(index);
-        return textWithImports(importContext, `type X = ${typeToText(type)}`);
+        return {
+          code: textWithImports(
+            importContext,
+            // We must prefix with `type ___X___ = <actual type> in order to make it valid TypeScript program
+            `${TYPE} ${TYPE_NAME} ${EQUALS} ${typeToText(type)}`,
+          ),
+          processTokenInfos: (tokenInfos) =>
+            remainingTokensAfter(
+              tokenInfos,
+              TYPE_STRING_TOKEN_PROCESSOR_MATCHERS,
+            ),
+        };
       },
       getSignatureText: (sig) => {
         const { importContext, sigToText } = createCallbacks(index);
@@ -76,7 +89,7 @@ export const createCodeGenerator = (
 };
 
 const isReference = (
-  reflection: functionality.IndexableModel,
+  reflection: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
 ): reflection is functionality.MakeChildrenIntegers<typedoc.ReferenceReflection> =>
   reflection.variant === "reference";
 
@@ -98,6 +111,7 @@ const createCallbacks = (index: functionality.ModelIndex) => {
           }`
         : registerImport(type, target),
     (sig) => sigToText(sig, "=>"),
+    (dec) => declarationToText(dec),
   );
   const sigToText = sig.createGetSignatureText((type) => typeToText(type));
   const declarationToText = declaration.createGetDeclarationText(
@@ -145,3 +159,42 @@ function* constructTokenInfoArray(
     yield source.substring(prevIndex);
   }
 }
+
+const TYPE = "type";
+const TYPE_NAME = "___X___";
+const EQUALS = "=";
+
+const remainingTokensAfter = (
+  tokenInfos: types.TokenInfos,
+  matchers: TokenProcessorMatchers,
+) => {
+  let tokenIndex = 0;
+  let matcherIndex = 0;
+
+  for (
+    ;
+    tokenIndex < tokenInfos.length && matcherIndex < matchers.length;
+    ++tokenIndex
+  ) {
+    const tokenInfo = tokenInfos[tokenIndex];
+    if (typeof tokenInfo !== "string") {
+      if (matchers[matcherIndex](tokenInfo)) {
+        ++matcherIndex;
+      } else {
+        matcherIndex = 0;
+      }
+    }
+  }
+  while (tokenIndex < tokenInfos.length && typeof tokenInfos === "string") {
+    ++tokenIndex;
+  }
+  return tokenInfos.slice(tokenIndex);
+};
+
+type TokenProcessorMatchers = ReadonlyArray<(token: TSESTree.Token) => boolean>;
+
+const TYPE_STRING_TOKEN_PROCESSOR_MATCHERS: TokenProcessorMatchers = [
+  (token1) => token1.type === "Identifier" && token1.value === TYPE,
+  (token2) => token2.type === "Identifier" && token2.value === TYPE_NAME,
+  (token3) => token3.type === "Punctuator" && token3.value === EQUALS,
+];
