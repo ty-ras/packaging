@@ -31,11 +31,9 @@ export default function SingleSignatureView(props: SingleSignatureViewProps) {
       </Show>
       <SmallHeader headerLevel={props.headerLevel}>Summary</SmallHeader>
       <Comment comment={props.signature.comment} />
-      <SmallHeader headerLevel={props.headerLevel}>
-        Inputs and Outputs
-      </SmallHeader>
+      <SmallHeader headerLevel={props.headerLevel}>Details</SmallHeader>
       <TableContainer component={Paper}>
-        <Table>
+        <Table size="small">
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
