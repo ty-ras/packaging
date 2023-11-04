@@ -14,10 +14,18 @@ import { AppBar, Box, Typography } from "@suid/material";
 import * as structure from "../structure";
 import TyRASDocumentationToolbar from "./TyRASDocumentationToolbar";
 import * as documentation from "./documentation/functionality";
+import type * as codeGen from "./documentation/code-generation";
+import type * as navigation from "./documentation/navigation";
 import TopLevelElementsToolbar from "./documentation/views/TopLevelElementsToolbar";
 import TopLevelElementsList from "./documentation/views/TopLevelElementsList";
-const SingleElementContents = lazy(
-  async () => await import("./documentation/views/SingleElementContents"),
+import SingleElementContents from "./documentation/views/SingleElementContents";
+
+// Put the context provider behind `lazy` as it loads Prettier libs, which are pretty  big
+const SingleElementContentsContextProvider = lazy(
+  async () =>
+    await import(
+      "./documentation/components/SingleElementContentsContextProvider"
+    ),
 );
 
 export default function TyRASDocumentation() {
@@ -29,6 +37,9 @@ export default function TyRASDocumentation() {
     const paramsValue = params();
     const fromParams = structure.buildNavigationURL(paramsValue);
     // TODO use history API here.
+    if (window.location.pathname !== "/") {
+      window.location.pathname = "/";
+    }
     if (window.location.hash !== fromParams) {
       window.location.hash = fromParams;
     }
@@ -98,12 +109,17 @@ export default function TyRASDocumentation() {
     );
   });
 
+  createEffect(() => {
+    examine params.selectedReflection and call setCurrentElement as needed
+  })
+
   const [lastSelectedGroup, setLastSelectedGroup] = createSignal<
     string | undefined
   >();
   const [currentElement, setCurrentElement] = createSignal<
     documentation.TopLevelElement | undefined
   >();
+
   const [observedAppBarHeight, setObservedAppBarHeight] =
     createSignal<number>(0);
   let appBarElement: HTMLDivElement | undefined;
@@ -114,6 +130,25 @@ export default function TyRASDocumentation() {
   });
 
   const { width, enableResize } = useResize(50, 250);
+
+  const [prettierOptions] = createSignal<codeGen.PrettierOptions>({
+    printWidth: 80,
+    trailingComma: "all",
+    tabWidth: 2,
+    useTabs: false,
+    endOfLine: "lf",
+  });
+
+  const linkHrefFunctionality = createMemo<navigation.LinkHrefFunctionality>(
+    () => ({
+      fromReflection: (id) => `internal-${id}`,
+      fromExternalSymbol: (symbol) => `external-${symbol.sourceFileName}`,
+      onClick: ({ target }) => {
+        // eslint-disable-next-line no-console
+        console.log("DEBUG", target);
+      },
+    }),
+  );
 
   return (
     <>
@@ -222,18 +257,17 @@ export default function TyRASDocumentation() {
                       }
                     >
                       {(elem) => (
-                        <SingleElementContents
-                          currentElement={elem()}
-                          headerLevel={3}
-                          prettierOptions={{
-                            printWidth: 80,
-                            trailingComma: "all",
-                            tabWidth: 2,
-                            useTabs: false,
-                            endOfLine: "lf",
-                          }}
-                          showDocKinds={Object.keys(docs()).length > 1}
-                        />
+                        <SingleElementContentsContextProvider
+                          index={elem().globalContext.index}
+                          prettierOptions={prettierOptions()}
+                          linkFunctionality={linkHrefFunctionality()}
+                        >
+                          <SingleElementContents
+                            currentElement={elem()}
+                            headerLevel={3}
+                            showDocKinds={Object.keys(docs()).length > 1}
+                          />
+                        </SingleElementContentsContextProvider>
                       )}
                     </Show>
                   </Box>
@@ -278,6 +312,7 @@ const parseParamsFromPathname = (
     serverVersionFragment,
     clientFragment,
     clientVersionFragment,
+    selectedReflectionFragment,
   ] = fragments;
   const dataValidation = inArrayOrFirst(
     dataValidationFragment,
@@ -352,7 +387,41 @@ const parseParamsFromPathname = (
     }
   }
 
+  handleSelectedPortionOfParams(selectedReflectionFragment, params, urlValid);
+
   return urlValid ? params : structure.buildNavigationURL(params);
+};
+
+const handleSelectedPortionOfParams = (
+  selectedReflectionFragment: string | undefined,
+  params: structure.DocumentationParams,
+  urlValid: boolean,
+) => {
+  if (selectedReflectionFragment) {
+    if (params.kind === "server-and-client") {
+      const kindSeparator = selectedReflectionFragment.indexOf("-");
+      if (
+        kindSeparator >= 0 &&
+        kindSeparator < selectedReflectionFragment.length - 1
+      ) {
+        const selectedKind = selectedReflectionFragment.substring(
+          0,
+          kindSeparator,
+        );
+        if (selectedKind === "server" || selectedKind === "client") {
+          params.selectedReflection = {
+            docKind: selectedKind,
+            name: selectedReflectionFragment.substring(kindSeparator + 1),
+          };
+          urlValid = true;
+        }
+      }
+    } else {
+      params.selectedReflection = selectedReflectionFragment;
+      urlValid = true;
+    }
+  }
+  return urlValid;
 };
 
 type DocumentationParamsOrNavigate = structure.DocumentationParams | string;

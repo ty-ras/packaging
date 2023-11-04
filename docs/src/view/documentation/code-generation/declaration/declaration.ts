@@ -53,20 +53,17 @@ export const createGetDeclarationText = (
   return getDeclarationText;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const functionalities: Record<
-  functionality.ReflectionKind,
-  toTextTypes.ReflectionKindFunctionality
+const functionalities: Partial<
+  Record<functionality.ReflectionKind, toTextTypes.ReflectionKindFunctionality>
 > = {
   [functionality.ReflectionKind.Class]: classes,
   [functionality.ReflectionKind.Constructor]: constructors,
   [functionality.ReflectionKind.Property]: properties,
   [functionality.ReflectionKind.Method]: methods,
   [functionality.ReflectionKind.Function]: functions,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-} as any;
+};
 
-const useFunctionality = <
+export const useFunctionality = <
   TKey extends keyof toTextTypes.ReflectionKindFunctionality,
 >(
   declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],

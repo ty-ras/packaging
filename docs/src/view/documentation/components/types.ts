@@ -1,5 +1,5 @@
+import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import type * as functionality from "../functionality";
-import type * as codeGen from "../code-generation";
 
 export interface ReflectionElementProps {
   element: Element;
@@ -7,6 +7,12 @@ export interface ReflectionElementProps {
 
 export type Element = functionality.IndexableModel;
 
-export interface CodeGenerationProps {
-  codeGenerator: codeGen.CodeGenerator;
+export interface InlineLink {
+  text: string;
+  target: InlineLinkTarget;
 }
+
+export type InlineLinkTarget = Exclude<
+  typedoc.InlineTagDisplayPart["target"],
+  undefined
+>;

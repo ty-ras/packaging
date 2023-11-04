@@ -12,6 +12,10 @@ export type TyrasVersionsSpecific<TVersions = Versions> = Record<
   Record<VersionKind, Record<string, TVersions>>
 >;
 
-export type VersionKind = "server" | "client";
+export type VersionKind = VersionKindServer | VersionKindClient;
+
+// TODO extract these and some others to consts.ts
+export type VersionKindServer = "server";
+export type VersionKindClient = "client";
 
 export type Versions = ReadonlyArray<string>;

@@ -1,11 +1,17 @@
+import type * as versions from "./tyras-versions.types";
+
 export type DocumentationParams =
   | DocumentationParamsServer
   | DocumentationParamsClient
   | DocumentationParamsServerAndClient
   | DocumentationParamsProtocol;
 
-export interface DocumentationParamsBase {
+export interface DocumentationParamsBaseNoSelected {
   dataValidation: string;
+}
+export interface DocumentationParamsBase
+  extends DocumentationParamsBaseNoSelected {
+  selectedReflection?: string;
 }
 
 export interface DocumentationParamsServerBase {
@@ -15,7 +21,7 @@ export interface DocumentationParamsServerBase {
 export interface DocumentationParamsServer
   extends DocumentationParamsBase,
     DocumentationParamsServerBase {
-  kind: "server";
+  kind: versions.VersionKindServer;
 }
 
 export interface DocumentationParamsClientBase {
@@ -25,14 +31,18 @@ export interface DocumentationParamsClientBase {
 export interface DocumentationParamsClient
   extends DocumentationParamsBase,
     DocumentationParamsClientBase {
-  kind: "client";
+  kind: versions.VersionKindClient;
 }
 
 export interface DocumentationParamsServerAndClient
-  extends DocumentationParamsBase,
+  extends DocumentationParamsBaseNoSelected,
     DocumentationParamsClientBase,
     DocumentationParamsServerBase {
-  kind: "server-and-client";
+  kind: `${versions.VersionKindServer}-and-${versions.VersionKindClient}`;
+  selectedReflection?: {
+    name: string;
+    docKind: versions.VersionKind;
+  };
 }
 
 export interface DocumentationParamsProtocolBase {

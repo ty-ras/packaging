@@ -23,11 +23,7 @@ export default function SingleSignatureView(props: SingleSignatureViewProps) {
         <SmallHeader headerLevel={props.headerLevel}>
           Overload #{props.overloadOrder}
         </SmallHeader>
-        <FormattedCode
-          reflection={props.signature}
-          kind="getSignatureText"
-          codeGenerator={props.codeGenerator}
-        />
+        <FormattedCode reflection={props.signature} kind="getSignatureText" />
       </Show>
       <SmallHeader headerLevel={props.headerLevel}>Summary</SmallHeader>
       <Comment comment={props.signature.comment} />
@@ -55,7 +51,6 @@ export default function SingleSignatureView(props: SingleSignatureViewProps) {
                         functionality.doThrow("Parameter without type")
                       }
                       kind="getTypeText"
-                      codeGenerator={props.codeGenerator}
                       tokenInfoProcessor={typeTokensProcessor}
                     />
                   </TableCell>
@@ -76,7 +71,6 @@ export default function SingleSignatureView(props: SingleSignatureViewProps) {
                     functionality.doThrow("Signature without return type")
                   }
                   kind="getTypeText"
-                  codeGenerator={props.codeGenerator}
                   tokenInfoProcessor={typeTokensProcessor}
                 />
               </TableCell>
@@ -100,7 +94,6 @@ export default function SingleSignatureView(props: SingleSignatureViewProps) {
 export interface SingleSignatureViewProps {
   signature: typedoc.SignatureReflection;
   headerLevel: number;
-  codeGenerator: codeGen.CodeGenerator;
   overloadOrder?: number;
 }
 

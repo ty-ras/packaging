@@ -1,20 +1,15 @@
-import { For, Match, Show, Switch, createMemo } from "solid-js";
+import { For, Match, Show, Switch, type JSX } from "solid-js";
 import { Chip, Stack } from "@suid/material";
 import * as functionality from "../functionality";
-import * as codeGen from "../code-generation";
 import Title from "../components/Title";
 import Comment from "../components/Comment";
 import FormattedCode from "../components/FormattedCode";
 import SmallHeader from "../components/SmallHeader";
 import SingleSignatureView from "./SingleSignatureContents";
 
-export default function SingleElementView(props: SingleElementViewProps) {
-  const codeGenerator = createMemo(() =>
-    codeGen.createCodeGenerator(
-      props.currentElement.globalContext.index,
-      props.prettierOptions,
-    ),
-  );
+export default function SingleElementView(
+  props: SingleElementViewProps,
+): JSX.Element {
   // Functions, Constructors, and Accessors never have comments directly on them.
   return (
     <>
@@ -36,7 +31,6 @@ export default function SingleElementView(props: SingleElementViewProps) {
         <FormattedCode
           reflection={props.currentElement.element}
           kind="getDeclarationText"
-          codeGenerator={codeGenerator()}
         />
         <Switch>
           <Match when={props.currentElement.element.comment}>
@@ -54,7 +48,6 @@ export default function SingleElementView(props: SingleElementViewProps) {
               <SingleSignatureView
                 signature={signature()}
                 headerLevel={props.headerLevel}
-                codeGenerator={codeGenerator()}
               />
             )}
           </Match>
@@ -66,7 +59,6 @@ export default function SingleElementView(props: SingleElementViewProps) {
                     <SingleSignatureView
                       signature={signature}
                       headerLevel={props.headerLevel}
-                      codeGenerator={codeGenerator()}
                       overloadOrder={index()}
                     />
                   </section>
@@ -85,7 +77,6 @@ export default function SingleElementView(props: SingleElementViewProps) {
 
 export interface SingleElementViewProps {
   currentElement: functionality.TopLevelElement;
-  prettierOptions: codeGen.PrettierOptions;
   headerLevel: number;
   showDocKinds: boolean;
 }

@@ -1,7 +1,9 @@
 import { Typography } from "@suid/material";
 import { For, Match, Show, Switch } from "solid-js";
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import type * as types from "./types";
 import SingleLineCode from "./SingleLineCode";
+import Link from "./Link";
 
 export default function Comment(props: CommentProps) {
   // TODO multi-line code blocks might need breaking props.comment.summary into multiple arrays, each being its own <p>aragraph.
@@ -37,9 +39,9 @@ export default function Comment(props: CommentProps) {
                 </Match>
                 <Match when={tryGetLink(summary)}>
                   {(summaryLink) => (
-                    <Typography component="span">{`{@link ${
-                      summaryLink().target
-                    }}`}</Typography>
+                    <Typography component="span">
+                      <Link target={summaryLink()} />
+                    </Typography>
                   )}
                 </Match>
               </Switch>
@@ -61,8 +63,19 @@ const tryGetText = (summary: typedoc.CommentDisplayPart) =>
 const tryGetCode = (summary: typedoc.CommentDisplayPart) =>
   summary.kind === "code" ? summary : undefined;
 
-const tryGetLink = (summary: typedoc.CommentDisplayPart) =>
-  summary.kind === "inline-tag" ? summary : undefined;
+const tryGetLink = ({
+  text,
+  ...summary
+}: typedoc.CommentDisplayPart): types.InlineLink | undefined =>
+  summary.kind === "inline-tag" && !!summary.target
+    ? {
+        text:
+          (typeof summary.target === "object"
+            ? summary.target.qualifiedName
+            : undefined) ?? text,
+        target: summary.target,
+      }
+    : undefined;
 
 // From https://www.measurethat.net/Benchmarks/Show/12738/0/trimming-leadingtrailing-characters
 // Sad that JS standard library still does not have this, instead .trim methods are all only whitespace-oriented

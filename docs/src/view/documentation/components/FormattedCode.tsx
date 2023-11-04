@@ -1,21 +1,22 @@
 import { Box } from "@suid/material";
-import { For, createResource } from "solid-js";
+import { For, createResource, useContext } from "solid-js";
+import singleElementContext from "../context/single-element-contents";
 import MultiLineCode from "./MultiLineCode";
-import type * as types from "./types";
 import type * as codeGen from "../code-generation";
 
 export default function FormattedCode<
   TKind extends keyof codeGen.CodeGeneratorGeneration,
 >(props: ElementDefinitionProps<TKind>) {
+  const context = useContext(singleElementContext);
   const [formattedCode] = createResource(
     () => props.reflection,
     async (reflection) => {
-      const rawCode = props.codeGenerator.generation[props.kind](reflection);
-      const formattedCode = await props.codeGenerator.formatting.formatCode(
+      const rawCode = context.codeGenerator.generation[props.kind](reflection);
+      const formattedCode = await context.codeGenerator.formatting.formatCode(
         typeof rawCode === "string" ? rawCode : rawCode.code,
       );
       let tokenInfos =
-        props.codeGenerator.formatting.getTokenInfos(formattedCode);
+        context.codeGenerator.formatting.getTokenInfos(formattedCode);
       if (typeof rawCode !== "string") {
         tokenInfos = rawCode.processTokenInfos(tokenInfos);
       }
@@ -44,7 +45,7 @@ export default function FormattedCode<
 
 export interface ElementDefinitionProps<
   TKind extends keyof codeGen.CodeGeneratorGenerationFunctionMap,
-> extends types.CodeGenerationProps {
+> {
   kind: TKind;
   reflection: codeGen.CodeGeneratorGenerationFunctionMap[TKind];
   tokenInfoProcessor?: codeGen.TokenInfoProcessor;

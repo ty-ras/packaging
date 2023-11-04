@@ -44,7 +44,10 @@ export const buildDataURL = (
   }.json`;
 };
 
-export const buildNavigationURL = (params: types.DocumentationParams) => {
+export const buildNavigationURL = ({
+  selectedReflection,
+  ...params
+}: types.DocumentationParams) => {
   let urlSuffix: string;
   switch (params.kind) {
     case "server-and-client":
@@ -64,11 +67,19 @@ export const buildNavigationURL = (params: types.DocumentationParams) => {
         version: ASPECT_NONE,
       })}/${getURLSuffix(params.client)}`;
       break;
-
     default:
       throw new Error("New params kind not supported");
   }
-  return `/${params.dataValidation}/${urlSuffix}`;
+
+  return `/${params.dataValidation}/${urlSuffix}${
+    selectedReflection
+      ? `/${
+          typeof selectedReflection === "string"
+            ? selectedReflection
+            : `${selectedReflection.docKind}-${selectedReflection.name}`
+        }`
+      : ""
+  }`;
 };
 
 /**
