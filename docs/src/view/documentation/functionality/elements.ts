@@ -1,7 +1,7 @@
 import type * as types from "./types";
 import * as errors from "./errors";
 
-export const getTopLevelElementsFromMultipleDocumentations = (
+export const getGroupedTopLevelElements = (
   groupNames: ReadonlyArray<string>,
   groupStates: Record<string, boolean>,
   docs: Record<string, types.Documentation>,
@@ -10,18 +10,30 @@ export const getTopLevelElementsFromMultipleDocumentations = (
     .filter((groupName) => groupStates[groupName] === true)
     .map((groupName) => ({
       groupName,
-      items: deduplicateTopLevelElements(
-        Object.entries(docs).flatMap(([docKind, doc]) =>
-          getTopLevelElements(groupStates, docKind, doc, groupName),
-        ),
+      items: getTopLevelElements(
+        docs,
+        (seenGroupName) => seenGroupName === groupName,
       ),
     }));
 
 export const getTopLevelElements = (
-  groupStates: Record<string, boolean>,
+  docs: Record<string, types.Documentation>,
+  includeGroup?: (groupName: string) => boolean,
+) =>
+  deduplicateTopLevelElements(
+    Object.entries(docs).flatMap(([docKind, doc]) =>
+      getTopLevelElementsWithMutableDocKinds(
+        docKind,
+        doc,
+        includeGroup ?? (() => true),
+      ),
+    ),
+  );
+
+const getTopLevelElementsWithMutableDocKinds = (
   docKind: string,
   documentation: types.Documentation,
-  groupName: string,
+  includeGroup: (groupName: string) => boolean,
 ): Array<TopLevelElement<Set<string>>> => {
   const globalContext: GlobalElementContext = {
     project: documentation.project,
@@ -30,31 +42,30 @@ export const getTopLevelElements = (
   };
   return (
     documentation.project.groups
-      ?.filter(({ title }) => title === groupName)
-      .flatMap(({ title, children }) =>
-        groupStates[title] === true
-          ? children?.map((id) => {
-              const element =
-                documentation.modelIndex[id] ??
-                errors.doThrow(
-                  `Could not find element with ID ${id} in ${documentation.project.packageName}@${documentation.project.packageVersion}`,
-                );
-              return {
-                allDocKinds: new Set([docKind]),
-                id,
-                text: element.name,
-                element,
-                globalContext,
-                showKind: false, // Will be set to true by deduplication if needed
-              };
-            }) ?? []
-          : [],
+      ?.filter(({ title }) => includeGroup(title))
+      .flatMap(
+        ({ children }) =>
+          children?.map((id) => {
+            const element =
+              documentation.modelIndex[id] ??
+              errors.doThrow(
+                `Could not find element with ID ${id} in ${documentation.project.packageName}@${documentation.project.packageVersion}`,
+              );
+            return {
+              allDocKinds: new Set([docKind]),
+              id,
+              text: element.name,
+              element,
+              globalContext,
+              showKind: false, // Will be set to true by deduplication if needed
+            };
+          }) ?? [],
       ) ?? []
   );
 };
 
-export const deduplicateTopLevelElements = (
-  elements: ReturnType<typeof getTopLevelElements>,
+const deduplicateTopLevelElements = (
+  elements: ReturnType<typeof getTopLevelElementsWithMutableDocKinds>,
 ): Array<TopLevelElement> => {
   const retVal = Object.values(
     elements.reduce<

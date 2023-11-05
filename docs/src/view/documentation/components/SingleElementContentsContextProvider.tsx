@@ -10,11 +10,9 @@ export default function SingleElementContentsContextProvider(
   props: SingleElementContentsContextProviderProps,
 ) {
   const context = createMemo<SingleElementContext>(() => ({
-    linkFunctionality: props.linkFunctionality,
-    codeGenerator: codeGen.createCodeGenerator(
-      props.index,
-      props.prettierOptions,
-    ),
+    linkFunctionality: () => props.linkFunctionality,
+    codeGenerator: () =>
+      codeGen.createCodeGenerator(props.index, props.prettierOptions),
   }));
   return (
     <SingleElementContentsContext.Provider value={context()}>

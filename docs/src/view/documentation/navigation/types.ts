@@ -13,8 +13,6 @@ export type HandleNavigation = (info: NavigationInfo) => void;
 
 export interface NavigationInfo {
   // When undefined, the link was to SOME target within same site
-  target: TSNavigationInfo | undefined;
+  target: number | undefined;
   href: string;
 }
-
-export type TSNavigationInfo = number | typedoc.ReflectionSymbolId;

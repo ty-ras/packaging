@@ -1,4 +1,5 @@
 import type * as versions from "./tyras-versions.types";
+import type * as consts from "./consts";
 
 export type DocumentationParams =
   | DocumentationParamsServer
@@ -38,7 +39,7 @@ export interface DocumentationParamsServerAndClient
   extends DocumentationParamsBaseNoSelected,
     DocumentationParamsClientBase,
     DocumentationParamsServerBase {
-  kind: `${versions.VersionKindServer}-and-${versions.VersionKindClient}`;
+  kind: typeof consts.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT;
   selectedReflection?: {
     name: string;
     docKind: versions.VersionKind;
@@ -52,10 +53,12 @@ export interface DocumentationParamsProtocolBase {
 export interface DocumentationParamsProtocol
   extends DocumentationParamsBase,
     DocumentationParamsProtocolBase {
-  kind: "protocol";
+  kind: typeof consts.NAVIGATION_PARAM_KIND_PROTOCOL;
 }
 
 export interface ComponentAndVersion {
   name: string;
   version: string;
 }
+
+export type SelectedReflection = DocumentationParams["selectedReflection"];

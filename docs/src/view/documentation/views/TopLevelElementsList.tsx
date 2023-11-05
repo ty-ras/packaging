@@ -1,4 +1,4 @@
-import { For, Setter } from "solid-js";
+import { For } from "solid-js";
 import {
   List,
   ListItem,
@@ -47,6 +47,6 @@ export default function TopLevelElementsList(props: TopLevelElementsListProps) {
 
 export interface TopLevelElementsListProps {
   elements: Array<functionality.TopLevelElementGroup>;
-  setCurrentElement: Setter<functionality.TopLevelElement | undefined>;
+  setCurrentElement: (element: functionality.TopLevelElement) => void;
   lastSelectedGroup: string | undefined;
 }

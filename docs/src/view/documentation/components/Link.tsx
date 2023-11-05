@@ -7,6 +7,7 @@ import {
   type JSX,
 } from "solid-js";
 import { OpenInNew } from "@suid/icons-material";
+import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import singleElementContext from "../context/single-element-contents";
 import type * as navigation from "../navigation";
 import type * as types from "./types";
@@ -15,7 +16,7 @@ import SingleLineCode from "./SingleLineCode";
 export default function Link(props: LinkProps) {
   const context = useContext(singleElementContext);
   const hrefInfo = createMemo(() =>
-    getLinkHrefInfo(props.target.target, context.linkFunctionality),
+    getLinkHrefInfo(props.target.target, context.linkFunctionality()),
   );
   return (
     <Switch fallback={<SingleLineCode>{props.target.text}</SingleLineCode>}>
@@ -25,7 +26,7 @@ export default function Link(props: LinkProps) {
             href={href()}
             text={props.target.text}
             navigation={hrefInfo().navigation}
-            onClick={context.linkFunctionality.onClick}
+            onClick={context.linkFunctionality().onClick}
           />
         )}
       </Match>
@@ -63,8 +64,7 @@ interface LinkHrefInfo {
   href: string | undefined;
   navigation: NavigationInfo | undefined;
 }
-
-type NavigationInfo = navigation.TSNavigationInfo | true;
+type NavigationInfo = number | typedoc.ReflectionSymbolId | true;
 
 // <SwitchDiscriminating object={obj} discriminator="type" fallback={(objFallback) => <></>}>
 //   <Match when="kind1">{(objKind1) => <></>}</Match>
@@ -83,7 +83,7 @@ function Anchor(props: AnchorProps) {
     <a
       href={props.href}
       onclick={
-        props.navigation === undefined
+        props.navigation === undefined || typeof props.navigation === "object"
           ? undefined
           : getEventHandler(props.href, props.navigation, props.onClick)
       }
@@ -100,7 +100,7 @@ function Anchor(props: AnchorProps) {
 const getEventHandler =
   (
     href: string,
-    target: NavigationInfo,
+    target: Exclude<NavigationInfo, typedoc.ReflectionSymbolId>,
     onClick: AnchorProps["onClick"],
   ): JSX.EventHandlerUnion<HTMLAnchorElement, MouseEvent> =>
   (evt) => {

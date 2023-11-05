@@ -11,12 +11,12 @@ export default function FormattedCode<
   const [formattedCode] = createResource(
     () => props.reflection,
     async (reflection) => {
-      const rawCode = context.codeGenerator.generation[props.kind](reflection);
-      const formattedCode = await context.codeGenerator.formatting.formatCode(
+      const codeGenerator = context.codeGenerator();
+      const rawCode = codeGenerator.generation[props.kind](reflection);
+      const formattedCode = await codeGenerator.formatting.formatCode(
         typeof rawCode === "string" ? rawCode : rawCode.code,
       );
-      let tokenInfos =
-        context.codeGenerator.formatting.getTokenInfos(formattedCode);
+      let tokenInfos = codeGenerator.formatting.getTokenInfos(formattedCode);
       if (typeof rawCode !== "string") {
         tokenInfos = rawCode.processTokenInfos(tokenInfos);
       }

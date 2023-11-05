@@ -14,26 +14,25 @@ export default function SingleElementView(
   return (
     <>
       <section>
-        <Title
-          element={props.currentElement.element}
-          headerLevel={props.headerLevel}
-        />
-        <Show when={props.showDocKinds}>
-          <Stack direction="row" spacing={1}>
-            <For each={props.currentElement.allDocKinds}>
-              {(docKind) => <Chip label={docKind} />}
-            </For>
-          </Stack>
+        <Title element={props.currentElement} headerLevel={props.headerLevel} />
+        <Show when={props.docKinds}>
+          {(docKinds) => (
+            <Stack direction="row" spacing={1}>
+              <For each={docKinds()}>
+                {(docKind) => <Chip label={docKind} />}
+              </For>
+            </Stack>
+          )}
         </Show>
       </section>
       <section>
         <SmallHeader headerLevel={props.headerLevel}>Definition</SmallHeader>
         <FormattedCode
-          reflection={props.currentElement.element}
+          reflection={props.currentElement}
           kind="getDeclarationText"
         />
         <Switch>
-          <Match when={props.currentElement.element.comment}>
+          <Match when={props.currentElement.comment}>
             {(summary) => (
               <>
                 <SmallHeader headerLevel={props.headerLevel}>
@@ -43,7 +42,7 @@ export default function SingleElementView(
               </>
             )}
           </Match>
-          <Match when={tryGetSingleSignature(props.currentElement.element)}>
+          <Match when={tryGetSingleSignature(props.currentElement)}>
             {(signature) => (
               <SingleSignatureView
                 signature={signature()}
@@ -51,7 +50,7 @@ export default function SingleElementView(
               />
             )}
           </Match>
-          <Match when={tryGetManySignatures(props.currentElement.element)}>
+          <Match when={tryGetManySignatures(props.currentElement)}>
             {(signatures) => (
               <For each={signatures()}>
                 {(signature, index) => (
@@ -76,9 +75,9 @@ export default function SingleElementView(
 }
 
 export interface SingleElementViewProps {
-  currentElement: functionality.TopLevelElement;
+  currentElement: functionality.IndexableModel;
   headerLevel: number;
-  showDocKinds: boolean;
+  docKinds: ReadonlyArray<string> | undefined;
 }
 
 const tryGetSingleSignature = (element: functionality.IndexableModel) =>

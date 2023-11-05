@@ -24,7 +24,9 @@ import * as routing from "../structure";
 // TODO Cypress tests to verify that all combinations work
 
 // Notice: we can't destructure props in Solid: https://github.com/solidjs/solid/discussions/287
-export default function TyRASDocumentation(props: DocumentationHeaderProps) {
+export default function TyRASDocumentationToolbar(
+  props: TyRASDocumentationToolbarProps,
+) {
   const currentServer = createMemo(() => {
     const params = props.params;
     return params.kind === "protocol" || params.kind === "client"
@@ -156,7 +158,7 @@ export default function TyRASDocumentation(props: DocumentationHeaderProps) {
   );
 }
 
-export interface DocumentationHeaderProps {
+export interface TyRASDocumentationToolbarProps {
   params: routing.DocumentationParams;
   setParams: Setter<routing.DocumentationParams>;
 }

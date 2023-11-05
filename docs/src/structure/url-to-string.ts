@@ -1,5 +1,6 @@
 import type * as types from "./params.types";
 import type * as version from "./tyras-versions.types";
+import * as consts from "./consts";
 import * as errors from "./errors";
 
 export const ROUTE_PATH =
@@ -11,27 +12,31 @@ export const buildDataURL = (
 ): string => {
   let urlSuffix: string | undefined;
   switch (params.kind) {
-    case "server-and-client":
+    case consts.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT:
       urlSuffix =
-        versionKind === "server"
+        versionKind === consts.VERSION_KIND_SERVER
           ? getServerDataURLSuffix(params)
-          : versionKind === "client"
+          : versionKind === consts.VERSION_KIND_CLIENT
           ? getClientDataURLSuffix(params)
           : undefined;
       break;
-    case "protocol":
+    case consts.NAVIGATION_PARAM_KIND_PROTOCOL:
       urlSuffix =
         versionKind === undefined
           ? `protocol/${params.protocolVersion}`
           : undefined;
       break;
-    case "server":
+    case consts.NAVIGATION_PARAM_KIND_SERVER:
       urlSuffix =
-        versionKind === "server" ? getServerDataURLSuffix(params) : undefined;
+        versionKind === consts.VERSION_KIND_SERVER
+          ? getServerDataURLSuffix(params)
+          : undefined;
       break;
-    case "client":
+    case consts.NAVIGATION_PARAM_KIND_CLIENT:
       urlSuffix =
-        versionKind === "client" ? getClientDataURLSuffix(params) : undefined;
+        versionKind === consts.VERSION_KIND_CLIENT
+          ? getClientDataURLSuffix(params)
+          : undefined;
       break;
   }
   return `docs/${params.dataValidation}/${
@@ -50,21 +55,21 @@ export const buildNavigationURL = ({
 }: types.DocumentationParams) => {
   let urlSuffix: string;
   switch (params.kind) {
-    case "server-and-client":
+    case consts.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT:
       urlSuffix = `${getURLSuffix(params.server)}/${getURLSuffix(
         params.client,
       )}`;
       break;
-    case "protocol":
+    case consts.NAVIGATION_PARAM_KIND_PROTOCOL:
       urlSuffix = params.protocolVersion;
       break;
-    case "server":
+    case consts.NAVIGATION_PARAM_KIND_SERVER:
       urlSuffix = getURLSuffix(params.server);
       break;
-    case "client":
+    case consts.NAVIGATION_PARAM_KIND_CLIENT:
       urlSuffix = `${getURLSuffix({
-        name: ASPECT_NONE,
-        version: ASPECT_NONE,
+        name: consts.ASPECT_NONE,
+        version: consts.ASPECT_NONE,
       })}/${getURLSuffix(params.client)}`;
       break;
     default:
@@ -81,11 +86,6 @@ export const buildNavigationURL = ({
       : ""
   }`;
 };
-
-/**
- * Only applicable for server or client, not data validation
- */
-export const ASPECT_NONE = "none";
 
 const getURLSuffix = ({ name, version }: types.ComponentAndVersion) =>
   `${name}/${version}`;
