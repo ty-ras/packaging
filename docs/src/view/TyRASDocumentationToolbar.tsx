@@ -159,8 +159,8 @@ export default function TyRASDocumentationToolbar(
 }
 
 export interface TyRASDocumentationToolbarProps {
-  params: routing.DocumentationParams;
-  setParams: types.SimpleSetter<routing.DocumentationParams>;
+  params: types.ToolbarNavigationParams;
+  setParams: types.SimpleSetter<types.ToolbarNavigationParams>;
 }
 
 function MenuDropDown(props: MenuDropDownProps) {
@@ -215,8 +215,8 @@ interface MenuDropDownProps {
   kindText: string;
   items: ReadonlyArray<string> | undefined;
   currentlySelected: Accessor<string>;
-  getParamsForItem: (item: string) => routing.DocumentationParams;
-  setParams: types.SimpleSetter<routing.DocumentationParams>;
+  getParamsForItem: (item: string) => types.ToolbarNavigationParams;
+  setParams: types.SimpleSetter<types.ToolbarNavigationParams>;
 }
 
 const NONE = "none";
@@ -225,9 +225,9 @@ const SERVERS = [...routing.tyrasStructure.server, NONE];
 const CLIENTS = [...routing.tyrasStructure.client, NONE];
 
 const changeDataValidation = (
-  params: routing.DocumentationParams,
+  params: types.ToolbarNavigationParams,
   dataValidation: string,
-): routing.DocumentationParams => {
+): types.ToolbarNavigationParams => {
   switch (params.kind) {
     case "server-and-client":
       return {
@@ -288,10 +288,10 @@ const changeDataValidation = (
 };
 
 const changeServer = (
-  params: routing.DocumentationParams,
+  params: types.ToolbarNavigationParams,
   server: string | undefined,
-): routing.DocumentationParams => {
-  let retVal: routing.DocumentationParams;
+): types.ToolbarNavigationParams => {
+  let retVal: types.ToolbarNavigationParams;
   if (server) {
     const servers = routing.tyrasStructure.server;
     if (servers.indexOf(server) < 0) {
@@ -375,10 +375,10 @@ const deduceServerVersion = (
   deduceServerOrClientVersion("server", dataValidation, server, serverVersion);
 
 const changeClient = (
-  params: routing.DocumentationParams,
+  params: types.ToolbarNavigationParams,
   client: string | undefined,
-): routing.DocumentationParams => {
-  let retVal: routing.DocumentationParams;
+): types.ToolbarNavigationParams => {
+  let retVal: types.ToolbarNavigationParams;
   if (client) {
     const clients = routing.tyrasStructure.client;
     if (clients.indexOf(client) < 0) {
@@ -440,7 +440,7 @@ const changeClientVersion = <
 >(
   params: TParams,
   clientVersion: string,
-): routing.DocumentationParams => {
+): types.ToolbarNavigationParams => {
   return {
     ...params,
     client: {

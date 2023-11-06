@@ -1,4 +1,12 @@
-import { createSignal, Show, onMount, onCleanup, batch, lazy } from "solid-js";
+import {
+  createSignal,
+  Show,
+  onMount,
+  onCleanup,
+  batch,
+  lazy,
+  createMemo,
+} from "solid-js";
 import { Box, Typography } from "@suid/material";
 import * as documentation from "./documentation/functionality";
 import type * as codeGen from "./documentation/code-generation";
@@ -7,6 +15,7 @@ import TopLevelElementsList from "./documentation/views/TopLevelElementsList";
 import SingleElementContents from "./documentation/views/SingleElementContents";
 import * as structure from "../structure";
 import type * as types from "./tyras-view.types";
+import * as routing from "./routing";
 
 // Put the context provider behind `lazy` as it loads Prettier libs, which are pretty  big
 const SingleElementContentsContextProvider = lazy(
@@ -19,9 +28,9 @@ const SingleElementContentsContextProvider = lazy(
 export default function TyRASDocumentationContents(
   props: TyRASDocumentationContentsProps,
 ) {
-  const [currentElement, setCurrentElement] = createSignal(
+  const currentElement = createMemo(() =>
     getCurrentElementFromNavigationParams(
-      props.navigationParams.selectedReflection,
+      props.contentNavigationParams.selectedReflection,
       props.docs,
     ),
   );
@@ -107,8 +116,17 @@ export default function TyRASDocumentationContents(
                   )}
                   lastSelectedGroup={props.lastSelectedGroup}
                   setCurrentElement={(topLevel) =>
-                    setCurrentElement(
-                      topLevelElementToSelectedElement(topLevel),
+                    props.setContentNavigationParams(
+                      props.toolbarNavigationParams.kind ===
+                        structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
+                        ? {
+                            selectedReflection: {
+                              docKind: topLevel
+                                .allDocKinds[0] as structure.VersionKind,
+                              name: topLevel.element.name,
+                            },
+                          }
+                        : { selectedReflection: topLevel.element.name },
                     )
                   }
                 />
@@ -137,7 +155,11 @@ export default function TyRASDocumentationContents(
               <Show
                 when={currentElement()}
                 fallback={
-                  <Typography>Please select element from the list</Typography>
+                  <Typography>
+                    {props.contentNavigationParams.selectedReflection
+                      ? "Loading..."
+                      : "Please select element from the list"}
+                  </Typography>
                 }
               >
                 {(elem) => (
@@ -145,11 +167,13 @@ export default function TyRASDocumentationContents(
                     index={elem().index}
                     prettierOptions={prettierOptions()}
                     linkFunctionality={createLinkHrefFunctionality(
-                      props.navigationParams,
+                      props.contentNavigationParams,
+                      props.setContentNavigationParams,
+                      props.toolbarNavigationParams,
+                      props.setFullNavigationParams,
                       elem().index,
-                      "server",
-                      setCurrentElement,
-                      props.setNavigationParams,
+                      // If we have more than one version kind, for now - just pick first one.
+                      elem().allDocKinds[0] as structure.VersionKind,
                     )}
                   >
                     <SingleElementContents
@@ -178,8 +202,10 @@ export interface TyRASDocumentationContentsProps {
   appBarElement: HTMLDivElement | undefined;
   groupNames: Array<string>;
   groupStates: Record<string, boolean>;
-  navigationParams: types.ContentNavigationParams;
-  setNavigationParams: types.SimpleSetter<types.ContentNavigationParams>;
+  contentNavigationParams: types.ContentNavigationParams;
+  setContentNavigationParams: types.SimpleSetter<types.ContentNavigationParams>;
+  toolbarNavigationParams: types.ToolbarNavigationParams;
+  setFullNavigationParams: types.SimpleSetter<types.FullNavigationParams>;
 }
 
 const useResize = (minWidth: number, initialWidth?: number) => {
@@ -237,7 +263,12 @@ const getCurrentElementFromNavigationParams = (
         ? selectedReflection
         : selectedReflection.name;
     const topLevel = documentation
-      .getTopLevelElements(docs)
+      .getTopLevelElements(
+        typeof selectedReflection === "string" ||
+          !(selectedReflection.docKind in docs)
+          ? docs
+          : { [selectedReflection.docKind]: docs[selectedReflection.docKind] },
+      )
       .find(({ element: { name: topLevelName } }) => topLevelName === name);
     return topLevel ? topLevelElementToSelectedElement(topLevel) : undefined;
   }
@@ -252,35 +283,44 @@ const topLevelElementToSelectedElement = (
 });
 
 const createLinkHrefFunctionality = (
-  params: types.ContentNavigationParams,
+  contentNavigationParams: types.ContentNavigationParams,
+  setContentNavigationParams: types.SimpleSetter<types.ContentNavigationParams>,
+  toolbarNavigationParams: types.ToolbarNavigationParams,
+  setFullNavigationParams: types.SimpleSetter<types.FullNavigationParams>,
   index: documentation.ModelIndex,
   docKind: structure.VersionKind,
-  setCurrentElement: types.SimpleSetter<types.SelectedElement>,
-  setNavigationParams: types.SimpleSetter<types.ContentNavigationParams>,
 ): navigation.LinkHrefFunctionality => ({
   fromReflection: (id) => {
     const reflection = index[id];
     return reflection === undefined
       ? undefined
-      : structure.buildNavigationURL(
-          params.kind === structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
-            ? {
-                ...params,
-                selectedReflection: { name: reflection.name, docKind },
-              }
-            : { ...params, selectedReflection: reflection.name },
+      : routing.logicalURL2ActualURL(
+          structure.buildNavigationURL(
+            toolbarNavigationParams.kind ===
+              structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
+              ? {
+                  ...toolbarNavigationParams,
+                  ...contentNavigationParams,
+                  selectedReflection: { name: reflection.name, docKind },
+                }
+              : {
+                  ...toolbarNavigationParams,
+                  ...contentNavigationParams,
+                  selectedReflection: reflection.name,
+                },
+          ),
         );
   },
   fromExternalSymbol: () => `/external-todo`,
   onClick: ({ target, href }) => {
-    const pathname = href;
+    href = routing.actualURL2LogicalURL(href);
     let navigate = true;
     let reflection: documentation.IndexableModel | undefined;
     if (target === undefined) {
       // Some link to something on this same site
       const maybeParams = structure.parseParamsAndMaybeNewURL(href)?.params;
       if (maybeParams) {
-        setNavigationParams(maybeParams);
+        setFullNavigationParams(maybeParams);
       } else {
         // There was some internal error related to parsing params from string
         navigate = false;
@@ -290,19 +330,26 @@ const createLinkHrefFunctionality = (
       reflection = index[target];
 
       if (reflection) {
-        setCurrentElement({
-          element: reflection,
-          index,
-          // TODO
-          allDocKinds: [],
-        });
+        setContentNavigationParams(
+          toolbarNavigationParams.kind ===
+            structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
+            ? {
+                selectedReflection: {
+                  docKind,
+                  name: reflection.name,
+                },
+              }
+            : {
+                selectedReflection: reflection.name,
+              },
+        );
       } else {
         // Link to non-existing reflection?
         navigate = false;
       }
     }
     if (navigate) {
-      window.location.hash = pathname;
+      routing.afterNavigatingToURL(href);
     } else {
       // eslint-disable-next-line no-console
       console.error(`Could not navigate to ${target} via link "${href}"`);

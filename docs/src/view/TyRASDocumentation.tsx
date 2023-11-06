@@ -3,48 +3,60 @@ import {
   createResource,
   createEffect,
   createMemo,
+  batch,
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { AppBar } from "@suid/material";
+import equals from "fast-deep-equal";
 import * as structure from "../structure";
+import type * as types from "./tyras-view.types";
 import TyRASDocumentationToolbar from "./TyRASDocumentationToolbar";
 import * as documentation from "./documentation/functionality";
 import TopLevelElementsToolbar from "./documentation/views/TopLevelElementsToolbar";
 import TyRASDocumentationContents from "./TyRASDocumentationContents";
-import equals from "fast-deep-equal";
+import * as routing from "./routing";
 
 export default function TyRASDocumentation() {
-  // TODO we probably want _two_ params:
-  // One for toolbar, which does NOT have selectedReflection
-  // selectedReflection for contents
-  // This way, we avoid re-updating anything related to toolbar, when we select something/click link to reflection.
-  // The "setParams" passed to contents needs then to set non-selectedReflection params only when it changes
-  const initialParams =
-    structure.parseParamsAndMaybeNewURL(window.location.hash)?.params ??
+  const fullParams =
+    structure.parseParamsAndMaybeNewURL(routing.getCurrentRoutingURL())
+      ?.params ??
     documentation.doThrow(
       // If we get partial URL again even after result of parseParamsFromPathname, we have encountered internal error
-      `The given partial navigation URL "${window.location.hash}" was resolved to be partial even on 2nd attempt, this signals error in URL parsing logic.`,
+      `The given partial navigation URL "${routing.getCurrentRoutingURL()}" was resolved to be partial even on 2nd attempt, this signals error in URL parsing logic.`,
     );
-  const [params, setParams] = createSignal(initialParams, {
-    equals,
-  });
+  // We don't want to create signal from full navigation params object, as then both toolbar and contents would update whenever just contents would change.
+  // We could use createStore... But with the discrminating type unions, I am not sure if that is the best approach either.
+  // Let's try with 2 signals for now.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { selectedReflection: _, ...toolbarParamsObj } = fullParams;
+  const [toolbarParams, setToolbarParams] =
+    createSignal<types.ToolbarNavigationParams>(toolbarParamsObj, {
+      equals,
+    });
+  const [contentParams, setContentParams] =
+    createSignal<types.ContentNavigationParams>(
+      // eslint-disable-next-line sonarjs/no-all-duplicated-branches
+      fullParams.kind === structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
+        ? {
+            selectedReflection: fullParams.selectedReflection,
+          }
+        : {
+            selectedReflection: fullParams.selectedReflection,
+          },
+      { equals },
+    );
 
   createEffect(() => {
-    const paramsValue = params();
+    const paramsValue = mergeParams(toolbarParams(), contentParams());
     const fromParams = structure.buildNavigationURL(paramsValue);
-    // TODO use history API here.
-    if (window.location.pathname !== "/") {
-      window.location.pathname = "/";
-    }
-    if (window.location.hash !== fromParams) {
-      window.location.hash = fromParams;
-    }
+
+    routing.afterNavigatingToURL(fromParams);
   });
 
   const [docs] = createResource<
     Record<string, structure.Documentation>,
     structure.DocumentationParams
-  >(params, async (paramsValue) => {
+  >(toolbarParams, async (paramsValue) => {
     const docsInfo: Array<[string, structure.VersionKind | undefined]> = [];
     if (paramsValue.kind === "protocol") {
       docsInfo.push(["protocol", undefined]);
@@ -107,7 +119,15 @@ export default function TyRASDocumentation() {
   return (
     <>
       <AppBar ref={setAppBarElement} position="sticky">
-        <TyRASDocumentationToolbar params={params()} setParams={setParams} />
+        <TyRASDocumentationToolbar
+          params={toolbarParams()}
+          setParams={(params) =>
+            batch(() => {
+              setToolbarParams(params);
+              setContentParams({ selectedReflection: undefined });
+            })
+          }
+        />
         <TopLevelElementsToolbar
           groupStates={groupStates}
           setGroupStates={setGroupStates}
@@ -121,9 +141,32 @@ export default function TyRASDocumentation() {
         appBarElement={appBarElement()}
         groupNames={groupNames()}
         groupStates={groupStates}
-        navigationParams={params()}
-        setNavigationParams={setParams}
+        toolbarNavigationParams={toolbarParams()}
+        setFullNavigationParams={({ selectedReflection, ...params }) =>
+          batch(() => {
+            setToolbarParams(params);
+            setContentParams(
+              // eslint-disable-next-line sonarjs/no-all-duplicated-branches
+              typeof selectedReflection === "string"
+                ? { selectedReflection }
+                : { selectedReflection },
+            );
+          })
+        }
+        contentNavigationParams={contentParams()}
+        setContentNavigationParams={setContentParams}
       />
     </>
   );
 }
+
+const mergeParams = (
+  toolbarParams: types.ToolbarNavigationParams,
+  contentParams: types.ContentNavigationParams,
+): types.FullNavigationParams =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  ({
+    ...toolbarParams,
+    ...contentParams,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  }) as any;
