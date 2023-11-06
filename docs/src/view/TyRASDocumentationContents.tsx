@@ -1,12 +1,4 @@
-import {
-  createSignal,
-  Show,
-  onMount,
-  onCleanup,
-  batch,
-  lazy,
-  Setter,
-} from "solid-js";
+import { createSignal, Show, onMount, onCleanup, batch, lazy } from "solid-js";
 import { Box, Typography } from "@suid/material";
 import * as documentation from "./documentation/functionality";
 import type * as codeGen from "./documentation/code-generation";
@@ -157,6 +149,7 @@ export default function TyRASDocumentationContents(
                       elem().index,
                       "server",
                       setCurrentElement,
+                      props.setNavigationParams,
                     )}
                   >
                     <SingleElementContents
@@ -185,8 +178,8 @@ export interface TyRASDocumentationContentsProps {
   appBarElement: HTMLDivElement | undefined;
   groupNames: Array<string>;
   groupStates: Record<string, boolean>;
-  navigationParams: structure.DocumentationParams;
-  setNavigationParams: Setter<structure.DocumentationParams>;
+  navigationParams: types.ContentNavigationParams;
+  setNavigationParams: types.SimpleSetter<types.ContentNavigationParams>;
 }
 
 const useResize = (minWidth: number, initialWidth?: number) => {
@@ -259,10 +252,11 @@ const topLevelElementToSelectedElement = (
 });
 
 const createLinkHrefFunctionality = (
-  params: structure.DocumentationParams,
+  params: types.ContentNavigationParams,
   index: documentation.ModelIndex,
   docKind: structure.VersionKind,
-  setCurrentElement: (element: types.SelectedElement) => void,
+  setCurrentElement: types.SimpleSetter<types.SelectedElement>,
+  setNavigationParams: types.SimpleSetter<types.ContentNavigationParams>,
 ): navigation.LinkHrefFunctionality => ({
   fromReflection: (id) => {
     const reflection = index[id];
@@ -279,16 +273,22 @@ const createLinkHrefFunctionality = (
   },
   fromExternalSymbol: () => `/external-todo`,
   onClick: ({ target, href }) => {
-    let pathname = href;
+    const pathname = href;
     let navigate = true;
+    let reflection: documentation.IndexableModel | undefined;
     if (target === undefined) {
       // Some link to something on this same site
-      const paramsOrNavigate = structure.parseParamsFromURL(href);
-      if (typeof paramsOrNavigate === "string") {
-        pathname = paramsOrNavigate;
+      const maybeParams = structure.parseParamsAndMaybeNewURL(href)?.params;
+      if (maybeParams) {
+        setNavigationParams(maybeParams);
+      } else {
+        // There was some internal error related to parsing params from string
+        navigate = false;
       }
     } else {
-      const reflection = index[target];
+      // Link to reflection
+      reflection = index[target];
+
       if (reflection) {
         setCurrentElement({
           element: reflection,
@@ -297,13 +297,15 @@ const createLinkHrefFunctionality = (
           allDocKinds: [],
         });
       } else {
-        // eslint-disable-next-line no-console
-        console.error(`Could not navigate to ${target} via link "${href}"`);
+        // Link to non-existing reflection?
         navigate = false;
       }
     }
     if (navigate) {
       window.location.hash = pathname;
+    } else {
+      // eslint-disable-next-line no-console
+      console.error(`Could not navigate to ${target} via link "${href}"`);
     }
   },
 });

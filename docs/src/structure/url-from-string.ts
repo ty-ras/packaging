@@ -7,19 +7,19 @@ import * as url2string from "./url-to-string";
 export const parseParamsAndMaybeNewURL = (pathname: string) => {
   let paramsOrFullURL = parseParamsFromURL(pathname);
   let maybeURL: string | undefined;
+  let params: types.DocumentationParams | undefined;
   if (isNavigate(paramsOrFullURL)) {
     maybeURL = paramsOrFullURL;
-    // The given URL was really partial
+    // The given URL was really partial, or targeting something else
     paramsOrFullURL = parseParamsFromURL(paramsOrFullURL);
-    if (isNavigate(paramsOrFullURL)) {
-      // If we get partial URL again even after result of parseParamsFromPathname, we have encountered internal error
-      throw new Error(
-        `The given partial navigation URL "${pathname}" was resolved to be partial even on 2nd attempt, this signals error in URL parsing logic.`,
-      );
+    if (!isNavigate(paramsOrFullURL)) {
+      params = paramsOrFullURL;
     }
+  } else {
+    params = paramsOrFullURL;
   }
 
-  return { params: paramsOrFullURL, maybeURL };
+  return params ? { params, maybeURL } : undefined;
 };
 
 export const getURLSuffixForSelectedReflection = (

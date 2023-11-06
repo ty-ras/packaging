@@ -11,11 +11,23 @@ import TyRASDocumentationToolbar from "./TyRASDocumentationToolbar";
 import * as documentation from "./documentation/functionality";
 import TopLevelElementsToolbar from "./documentation/views/TopLevelElementsToolbar";
 import TyRASDocumentationContents from "./TyRASDocumentationContents";
+import equals from "fast-deep-equal";
 
 export default function TyRASDocumentation() {
-  const [params, setParams] = createSignal(
-    structure.parseParamsAndMaybeNewURL(window.location.hash).params,
-  );
+  // TODO we probably want _two_ params:
+  // One for toolbar, which does NOT have selectedReflection
+  // selectedReflection for contents
+  // This way, we avoid re-updating anything related to toolbar, when we select something/click link to reflection.
+  // The "setParams" passed to contents needs then to set non-selectedReflection params only when it changes
+  const initialParams =
+    structure.parseParamsAndMaybeNewURL(window.location.hash)?.params ??
+    documentation.doThrow(
+      // If we get partial URL again even after result of parseParamsFromPathname, we have encountered internal error
+      `The given partial navigation URL "${window.location.hash}" was resolved to be partial even on 2nd attempt, this signals error in URL parsing logic.`,
+    );
+  const [params, setParams] = createSignal(initialParams, {
+    equals,
+  });
 
   createEffect(() => {
     const paramsValue = params();

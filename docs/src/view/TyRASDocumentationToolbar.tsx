@@ -3,7 +3,6 @@ import {
   createMemo,
   batch,
   type Accessor,
-  type Setter,
   For,
   Show,
 } from "solid-js";
@@ -18,6 +17,7 @@ import {
 } from "@suid/material";
 import { KeyboardArrowDown } from "@suid/icons-material";
 import * as routing from "../structure";
+import type * as types from "./tyras-view.types";
 
 /* eslint-disable sonarjs/no-duplicate-string */
 
@@ -160,7 +160,7 @@ export default function TyRASDocumentationToolbar(
 
 export interface TyRASDocumentationToolbarProps {
   params: routing.DocumentationParams;
-  setParams: Setter<routing.DocumentationParams>;
+  setParams: types.SimpleSetter<routing.DocumentationParams>;
 }
 
 function MenuDropDown(props: MenuDropDownProps) {
@@ -216,7 +216,7 @@ interface MenuDropDownProps {
   items: ReadonlyArray<string> | undefined;
   currentlySelected: Accessor<string>;
   getParamsForItem: (item: string) => routing.DocumentationParams;
-  setParams: Setter<routing.DocumentationParams>;
+  setParams: types.SimpleSetter<routing.DocumentationParams>;
 }
 
 const NONE = "none";

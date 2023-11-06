@@ -10,6 +10,7 @@ export type DocumentationParams =
 export interface DocumentationParamsBaseNoSelected {
   dataValidation: string;
 }
+
 export interface DocumentationParamsBase
   extends DocumentationParamsBaseNoSelected {
   selectedReflection?: string;
