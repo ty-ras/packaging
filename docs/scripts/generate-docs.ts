@@ -266,6 +266,8 @@ const generateDocsForVersion = async (
       : await preparePackageFromNpm(packageSource.tarballs[version]);
 
   const json = path.join(versionDir, `${version}.json`);
+  // Call this always for each run, as otherwise the IDs will keep increasing between different typedoc Applications.
+  td.resetReflectionID();
   const app = await td.Application.bootstrap({
     tsconfig: path.join(packageDir, "tsconfig.json"),
     entryPoints: [path.join(packageDir, "src", "index.ts")],

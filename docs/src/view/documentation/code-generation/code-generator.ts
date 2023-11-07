@@ -15,7 +15,7 @@ import * as get from "./get-with-check";
 export const createCodeGenerator = (
   index: functionality.ModelIndex,
   prettierOptions: types.PrettierOptions,
-): types.CodeGenerator => {
+): CodeGenerator => {
   const getDeclarationTextImpl = (
     reflection: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
   ): string => {
@@ -23,14 +23,15 @@ export const createCodeGenerator = (
     return textWithImports(importContext, declarationToText(reflection));
   };
 
-  const getDeclarationText: types.CodeGeneratorGeneration["getDeclarationText"] =
-    (reflection) => {
-      return isReference(reflection)
-        ? getDeclarationText(
-            get.getIndexedModel(reflection.target, reflection, index),
-          )
-        : getDeclarationTextImpl(reflection);
-    };
+  const getDeclarationText: CodeGeneratorGeneration["getDeclarationText"] = (
+    reflection,
+  ) => {
+    return isReference(reflection)
+      ? getDeclarationText(
+          get.getIndexedModel(reflection.target, reflection, index),
+        )
+      : getDeclarationTextImpl(reflection);
+  };
 
   return {
     generation: {
@@ -87,6 +88,36 @@ export const createCodeGenerator = (
     },
   };
 };
+
+export interface CodeGenerator {
+  generation: CodeGeneratorGeneration;
+  formatting: CodeGeneratorFormatting;
+}
+
+export type CodeGeneratorGeneration = {
+  [P in keyof types.CodeGeneratorGenerationFunctionMap]: (
+    reflection: types.CodeGeneratorGenerationFunctionMap[P],
+  ) => CodeGenerationResult;
+};
+
+export type CodeGenerationResult =
+  | Code
+  | {
+      code: Code;
+      processTokenInfos: TokenInfoProcessor;
+    };
+
+export type Code = string;
+
+export type TokenInfoProcessor = (result: TokenInfos) => TokenInfos;
+
+export type TokenInfos = Array<TokenInfo>;
+export type TokenInfo = TSESTree.Token | Code;
+
+export interface CodeGeneratorFormatting {
+  formatCode: (code: Code) => Promise<Code>;
+  getTokenInfos: (code: Code) => TokenInfos;
+}
 
 const isReference = (
   reflection: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
@@ -165,7 +196,7 @@ const TYPE_NAME = "___X___";
 const EQUALS = "=";
 
 const remainingTokensAfter = (
-  tokenInfos: types.TokenInfos,
+  tokenInfos: TokenInfos,
   matchers: TokenProcessorMatchers,
 ) => {
   let tokenIndex = 0;

@@ -1,12 +1,6 @@
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import type * as prettier from "prettier";
-import { type TSESTree } from "@typescript-eslint/types/dist/index";
 import type * as functionality from "../functionality";
-
-export interface CodeGenerator {
-  generation: CodeGeneratorGeneration;
-  formatting: CodeGeneratorFormatting;
-}
 
 export interface CodeGeneratorGenerationFunctionMap {
   getTypeText: typedoc.SomeType;
@@ -15,29 +9,6 @@ export interface CodeGeneratorGenerationFunctionMap {
     | functionality.IndexableModel
     | typedoc.DeclarationReflection;
 }
-
-export type CodeGeneratorGeneration = {
-  [P in keyof CodeGeneratorGenerationFunctionMap]: (
-    reflection: CodeGeneratorGenerationFunctionMap[P],
-  ) => CodeGenerationResult;
-};
-
-export type CodeGenerationResult =
-  | string
-  | {
-      code: string;
-      processTokenInfos: TokenInfoProcessor;
-    };
-
-export type TokenInfoProcessor = (result: TokenInfos) => TokenInfos;
-
-export interface CodeGeneratorFormatting {
-  formatCode: (code: string) => Promise<string>;
-  getTokenInfos: (code: string) => TokenInfos;
-}
-
-export type TokenInfos = Array<TokenInfo>;
-export type TokenInfo = TSESTree.Token | string;
 
 export type PrettierOptions = Omit<prettier.Options, "parser" | "plugins">;
 

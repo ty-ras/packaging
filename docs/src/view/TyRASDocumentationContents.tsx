@@ -8,6 +8,7 @@ import {
   createMemo,
 } from "solid-js";
 import { Box, Typography } from "@suid/material";
+import equals from "fast-deep-equal";
 import * as documentation from "./documentation/functionality";
 import type * as codeGen from "./documentation/code-generation";
 import type * as navigation from "./documentation/navigation";
@@ -39,13 +40,16 @@ export default function TyRASDocumentationContents(
 
   const { width, enableResize } = useResize(50, 250);
 
-  const [prettierOptions] = createSignal<codeGen.PrettierOptions>({
-    printWidth: 80,
-    trailingComma: "all",
-    tabWidth: 2,
-    useTabs: false,
-    endOfLine: "lf",
-  });
+  const [prettierOptions] = createSignal<codeGen.PrettierOptions>(
+    {
+      printWidth: 80,
+      trailingComma: "all",
+      tabWidth: 2,
+      useTabs: false,
+      endOfLine: "lf",
+    },
+    { equals },
+  );
 
   // TODO Not sure if all of these Boxes are strictly necessary.
   // I used the same structure as GitHub webpage, but I'm sure it could be done with lesser amount of Boxes.
@@ -167,22 +171,19 @@ export default function TyRASDocumentationContents(
                     index={elem().index}
                     prettierOptions={prettierOptions()}
                     linkFunctionality={createLinkHrefFunctionality(
-                      props.contentNavigationParams,
-                      props.setContentNavigationParams,
                       props.toolbarNavigationParams,
+                      props.setContentNavigationParams,
                       props.setFullNavigationParams,
                       elem().index,
                       // If we have more than one version kind, for now - just pick first one.
-                      elem().allDocKinds[0] as structure.VersionKind,
+                      getAllDocKinds(props.docs, elem())?.[0] as
+                        | structure.VersionKind
+                        | undefined,
                     )}
                   >
                     <SingleElementContents
                       currentElement={elem().element}
-                      docKinds={
-                        Object.keys(props.docs).length > 1
-                          ? elem().allDocKinds
-                          : undefined
-                      }
+                      docKinds={getAllDocKinds(props.docs, elem())}
                       headerLevel={3}
                     />
                   </SingleElementContentsContextProvider>
@@ -199,7 +200,7 @@ export default function TyRASDocumentationContents(
 export interface TyRASDocumentationContentsProps {
   docs: Record<string, structure.Documentation>;
   lastSelectedGroup: string | undefined;
-  appBarElement: HTMLDivElement | undefined;
+  appBarElement: HTMLElement | undefined;
   groupNames: Array<string>;
   groupStates: Record<string, boolean>;
   contentNavigationParams: types.ContentNavigationParams;
@@ -283,12 +284,11 @@ const topLevelElementToSelectedElement = (
 });
 
 const createLinkHrefFunctionality = (
-  contentNavigationParams: types.ContentNavigationParams,
-  setContentNavigationParams: types.SimpleSetter<types.ContentNavigationParams>,
   toolbarNavigationParams: types.ToolbarNavigationParams,
+  setContentNavigationParams: types.SimpleSetter<types.ContentNavigationParams>,
   setFullNavigationParams: types.SimpleSetter<types.FullNavigationParams>,
   index: documentation.ModelIndex,
-  docKind: structure.VersionKind,
+  docKind: structure.VersionKind | undefined,
 ): navigation.LinkHrefFunctionality => ({
   fromReflection: (id) => {
     const reflection = index[id];
@@ -300,12 +300,13 @@ const createLinkHrefFunctionality = (
               structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
               ? {
                   ...toolbarNavigationParams,
-                  ...contentNavigationParams,
-                  selectedReflection: { name: reflection.name, docKind },
+                  selectedReflection: {
+                    name: reflection.name,
+                    docKind: ensureDocKind(docKind),
+                  },
                 }
               : {
                   ...toolbarNavigationParams,
-                  ...contentNavigationParams,
                   selectedReflection: reflection.name,
                 },
           ),
@@ -335,7 +336,7 @@ const createLinkHrefFunctionality = (
             structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
             ? {
                 selectedReflection: {
-                  docKind,
+                  docKind: ensureDocKind(docKind),
                   name: reflection.name,
                 },
               }
@@ -356,3 +357,14 @@ const createLinkHrefFunctionality = (
     }
   },
 });
+
+const getAllDocKinds = (
+  docs: Record<string, structure.Documentation>,
+  selectedElement: types.SelectedElement,
+) => (Object.keys(docs).length > 1 ? selectedElement.allDocKinds : undefined);
+
+const ensureDocKind = (docKind: string | undefined) =>
+  (docKind as structure.VersionKind) ??
+  structure.doThrow(
+    `Doc kind must be defined when toolbar navigation kind is "${structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT}".`,
+  );

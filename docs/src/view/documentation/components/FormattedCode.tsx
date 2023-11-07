@@ -1,5 +1,5 @@
-import { Box } from "@suid/material";
-import { For, createResource, useContext } from "solid-js";
+import { Box, Typography } from "@suid/material";
+import { ErrorBoundary, For, createResource, useContext } from "solid-js";
 import singleElementContext from "../context/single-element-contents";
 import MultiLineCode from "./MultiLineCode";
 import type * as codeGen from "../code-generation";
@@ -25,21 +25,25 @@ export default function FormattedCode<
     },
   );
   return (
-    <Box>
-      <MultiLineCode>
-        <For each={formattedCode()}>
-          {(token) =>
-            typeof token === "string" ? (
-              token
-            ) : token.type !== "Keyword" ? (
-              token.value
-            ) : (
-              <b>{token.value}</b>
-            )
-          }
-        </For>
-      </MultiLineCode>
-    </Box>
+    <ErrorBoundary
+      fallback={<Typography>Error while rendering TS code.</Typography>}
+    >
+      <Box>
+        <MultiLineCode>
+          <For each={formattedCode()}>
+            {(token) =>
+              typeof token === "string" ? (
+                token
+              ) : token.type !== "Keyword" ? (
+                token.value
+              ) : (
+                <b>{token.value}</b>
+              )
+            }
+          </For>
+        </MultiLineCode>
+      </Box>
+    </ErrorBoundary>
   );
 }
 

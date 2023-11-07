@@ -13,6 +13,10 @@ export interface DocumentationParamsBaseNoSelected {
 
 export interface DocumentationParamsBase
   extends DocumentationParamsBaseNoSelected {
+  // Notice that this is name, not ID
+  // We want to have human-readable, stable URLs, so we use name instead of ID as selected reflection reference.
+  // This is not generally robust way, as there might be types and consts exported with same name in the packages.
+  // For TyRAS, however, this is not true, and thus we can use the name instead of numeric ID here.
   selectedReflection?: string;
 }
 
@@ -42,6 +46,10 @@ export interface DocumentationParamsServerAndClient
     DocumentationParamsServerBase {
   kind: typeof consts.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT;
   selectedReflection?: {
+    // Notice that this is name, not ID
+    // We want to have human-readable, stable URLs, so we use name instead of ID as selected reflection reference.
+    // This is not generally robust way, as there might be types and consts exported with same name in the packages.
+    // For TyRAS, however, this is not true, and thus we can use the name instead of numeric ID here.
     name: string;
     docKind: versions.VersionKind;
   };
