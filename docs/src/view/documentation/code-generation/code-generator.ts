@@ -11,7 +11,7 @@ import * as someType from "./some-type";
 import * as sig from "./signature";
 import * as imports from "./imports";
 import * as get from "./get-with-check";
-import type * as text from "./text";
+import * as text from "./text";
 
 export const createCodeGenerator = (
   index: functionality.ModelIndex,
@@ -37,12 +37,18 @@ export const createCodeGenerator = (
   return {
     generation: {
       getTypeText: (type) => {
-        const { importContext, typeToText } = createCallbacks(index);
+        const {
+          textGenerator: { code },
+          importContext,
+          typeToText,
+        } = createCallbacks(index);
         return {
           code: textWithImports(
             importContext,
             // We must prefix with `type ___X___ = <actual type> in order to make it valid TypeScript program
-            `${TYPE} ${TYPE_NAME} ${EQUALS} ${typeToText(type)}`,
+            code`${text.text(TYPE)} ${text.text(TYPE_NAME)} ${text.text(
+              EQUALS,
+            )} ${typeToText(type)}`,
           ),
           processTokenInfos: (tokenInfos) =>
             remainingTokensAfter(
@@ -52,11 +58,15 @@ export const createCodeGenerator = (
         };
       },
       getSignatureText: (sig) => {
-        const { importContext, sigToText } = createCallbacks(index);
+        const {
+          textGenerator: { code },
+          importContext,
+          sigToText,
+        } = createCallbacks(index);
         const sigText = sigToText(sig, ":");
         return textWithImports(
           importContext,
-          `export declare function ${sig.name}${sigText}`,
+          code`export declare function ${text.text(sig.name)}${sigText}`,
         );
       },
       getDeclarationText,
@@ -130,19 +140,27 @@ const createCallbacks = (index: functionality.ModelIndex) => {
     imports: {},
     globals: new Set(["typescript"]),
   };
-  const registerImport = imports.createRegisterImport(importContext);
+  const registerImport = imports.createRegisterImport(
+    textGenerator,
+    importContext,
+  );
   const typeToText = someType.createGetSomeTypeText(
     textGenerator,
     ({ target, ...type }) =>
-      typeof target === "number"
-        ? `${
-            type.qualifiedName ??
-            type.name ??
-            functionality.doThrow(
-              `Internal reference ${target} had no qualified name`,
+      textGenerator.code`${
+        typeof target === "number"
+          ? text.ref(
+              `${
+                type.qualifiedName ??
+                type.name ??
+                functionality.doThrow(
+                  `Internal reference ${target} had no qualified name`,
+                )
+              }`,
+              target,
             )
-          }`
-        : registerImport(type, target),
+          : registerImport(type, target)
+      }`,
     (sig) => sigToText(sig, "=>"),
     (dec) => declarationToText(dec),
   );
@@ -155,13 +173,19 @@ const createCallbacks = (index: functionality.ModelIndex) => {
     typeToText,
     sigToText,
   );
-  return { importContext, typeToText, sigToText, declarationToText };
+  return {
+    textGenerator,
+    importContext,
+    typeToText,
+    sigToText,
+    declarationToText,
+  };
 };
 
 const textWithImports = (
   importContext: imports.ImportContext,
-  text: string,
-) => {
+  text: text.IntermediateCode,
+): types.Code => {
   return `${Object.entries(importContext.imports)
     .map(
       ([, importInfo]) =>
@@ -173,7 +197,7 @@ const textWithImports = (
     )
     .join("\n")}
 
-${text}`;
+${intermediateToComplete(text)}`;
 };
 
 function* constructTokenInfoArray(
@@ -237,17 +261,55 @@ const TYPE_STRING_TOKEN_PROCESSOR_MATCHERS: TokenProcessorMatchers = [
 
 const createCodeGenerationContext = (): text.CodeGenerationContext => ({
   code: (fragments, ...args) =>
-    Array.from(saveCodeTemplateArgs(fragments, args)).join(""),
+    Array.from(saveCodeTemplateArgs(fragments, args)),
 });
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function* saveCodeTemplateArgs(
   fragments: ReadonlyArray<string>,
-  args: Readonly<text.CodeGenerationFragments>,
+  args: Readonly<text.TemplateStringArgs>,
 ): Generator<text.CodeGenerationFragment, void, unknown> {
   for (const [idx, fragment] of fragments.entries()) {
-    yield fragment;
+    if (fragment.length > 0) {
+      yield fragment;
+    }
     if (idx < args.length) {
-      yield args[idx];
+      const arg = args[idx];
+      if (Array.isArray(arg)) {
+        for (const frag of arg) {
+          if (typeof frag !== "string" || frag.length > 0) {
+            yield frag;
+          }
+        }
+      } else if (typeof arg === "object") {
+        if (arg === null) {
+          // Literal 'null'
+          yield "null";
+        } else {
+          if ("text" in arg) {
+            // Plain text
+            if (arg.text.length > 0) {
+              yield arg.text;
+            }
+          } else if ("value" in arg && "negative" in arg) {
+            // Big int literal
+            yield `${arg.negative ? "-" : ""}${arg.value}n`;
+          } else {
+            // Type reference
+            yield arg;
+          }
+        }
+      } else {
+        // Number or boolean literal
+        yield `${arg}`;
+      }
     }
   }
 }
+
+const intermediateToComplete = (code: text.IntermediateCode): types.Code =>
+  code
+    .map((fragment) =>
+      typeof fragment === "string" ? fragment : fragment.name,
+    )
+    .join("");

@@ -9,43 +9,49 @@ import functions from "./functions";
 import type * as toTextTypes from "./types";
 
 export const createGetDeclarationText = (
-  textGenerationContext: text.CodeGenerationContext,
+  codeGenerationContext: text.CodeGenerationContext,
   index: functionality.ModelIndex,
   getTypeText: types.GetSomeTypeText,
   getSignatureText: types.GetSignatureText,
 ): types.GetDeclarationText => {
+  const { code } = codeGenerationContext;
   function getDeclarationText(
     declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
-  ): types.Code {
+  ): text.IntermediateCode {
     const textFunctionality = useFunctionality(declaration, "text");
     return typeof textFunctionality === "function"
       ? textFunctionality({
+          codeGenerationContext,
           index,
           getTypeText,
           getSignatureText,
           getDeclarationText,
           declaration,
         })
-      : textGenerationContext.code`${textFunctionality.getPrefixText({
+      : code`${textFunctionality.getPrefixText({
+          codeGenerationContext,
           declaration,
-        })} ${declaration.name}${text.getOptionalValueText(
+        })} ${text.ref(
+          declaration.name,
+          declaration.id,
+        )}${text.getOptionalValueText(
           declaration.typeParameters,
           (typeParams) =>
-            `<${typeParams
-              .map(
+            code`<${text.join(
+              typeParams.map(
                 (typeParam) =>
-                  textGenerationContext.code`${
-                    typeParam.name
-                  }${text.getOptionalValueText(
+                  code`${text.text(typeParam.name)}${text.getOptionalValueText(
                     typeParam.type,
-                    (parentType) => ` extends ${getTypeText(parentType)}`,
+                    (parentType) => code` extends ${getTypeText(parentType)}`,
                   )}${text.getOptionalValueText(
                     typeParam.default,
-                    (defaultValue) => ` = ${getTypeText(defaultValue)}`,
+                    (defaultValue) => code` = ${getTypeText(defaultValue)}`,
                   )}`,
-              )
-              .join(", ")}>`,
+              ),
+              ", ",
+            )}>`,
         )}${textFunctionality.getBodyText({
+          codeGenerationContext,
           index,
           getTypeText,
           getSignatureText,

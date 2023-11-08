@@ -1,7 +1,7 @@
-import * as functionality from "../../functionality";
 import * as get from "../get-with-check";
 import type * as types from "./types";
 import * as flags from "../flags";
+import * as text from "../text";
 
 const getChildren: types.GetChildren = ({ declaration, index }) =>
   declaration.groups
@@ -23,28 +23,31 @@ const getChildren: types.GetChildren = ({ declaration, index }) =>
 
 export default {
   text: {
-    getPrefixText: ({ declaration }) =>
-      `export declare ${flags.getFlagsText(declaration.flags)} class`,
+    getPrefixText: ({ codeGenerationContext: { code }, declaration }) =>
+      code`export declare ${text.text(
+        flags.getFlagsText(declaration.flags),
+      )} class`,
     getBodyText: ({
+      codeGenerationContext: { code },
       index,
       getTypeText,
       getDeclarationText,
       declaration,
-    }) => `${functionality.getOptionalValueText(
+    }) => code`${text.getOptionalValueText(
       declaration.extendedTypes,
-      (parentTypes) => ` extends ${parentTypes.map(getTypeText).join(", ")}`,
-    )}${functionality.getOptionalValueText(
+      (parentTypes) =>
+        code` extends ${text.join(parentTypes.map(getTypeText), ", ")}`,
+    )}${text.getOptionalValueText(
       declaration.implementedTypes,
       (implementedTypes) =>
-        ` implements ${implementedTypes.map(getTypeText).join(", ")}`,
+        code` implements ${text.join(implementedTypes.map(getTypeText), ", ")}`,
     )} {
-${
-  getChildren({ declaration, index })
-    .map((childId) =>
-      getDeclarationText(get.getIndexedModel(childId, declaration, index)),
-    )
-    .join("\n") ?? ""
-}
+${text.join(
+  getChildren({ declaration, index }).map((childId) =>
+    getDeclarationText(get.getIndexedModel(childId, declaration, index)),
+  ),
+  "\n",
+)}
   }`,
   },
   getChildren,

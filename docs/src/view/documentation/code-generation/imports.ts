@@ -1,17 +1,20 @@
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import * as functionality from "../functionality";
+import * as text from "./text";
 
 export const createRegisterImport = (
+  { code }: text.CodeGenerationContext,
   importContext: ImportContext,
 ): RegisterImport => {
   function registerImport(
     { package: typePackage, name }: Omit<typedoc.ReferenceType, "target">,
     target: typedoc.ReflectionSymbolId,
-  ): string {
+  ): text.IntermediateCode {
     const packageName =
       typePackage ??
       functionality.doThrow(`Reference type did not specify package name.`);
-    if (!importContext.globals.has(packageName)) {
+    const isGlobal = importContext.globals.has(packageName);
+    if (!isGlobal) {
       const kind = target.qualifiedName === name ? "individual" : "named";
       const currentImport = importContext.imports[packageName];
       if (currentImport) {
@@ -39,7 +42,7 @@ export const createRegisterImport = (
         );
       }
     }
-    return name;
+    return code`${isGlobal ? text.text(name) : text.ref(name, target)}`;
   }
   return registerImport;
 };
@@ -67,7 +70,7 @@ export interface ImportInfoIndividual extends ImportInfoBase {
 export type RegisterImport = (
   refType: Omit<typedoc.ReferenceType, "target">,
   target: typedoc.ReflectionSymbolId,
-) => string;
+) => text.IntermediateCode;
 
 const getImportAlias = (name: string, qualifiedName: string) =>
   qualifiedName.substring(0, qualifiedName.indexOf(`.${name}`));

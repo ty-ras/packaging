@@ -4,77 +4,77 @@ import * as types from "./types";
 import * as text from "./text";
 
 export const createGetSomeTypeText = (
-  textGenerationContext: text.CodeGenerationContext,
-  refToStr: (ref: typedoc.ReferenceType) => string,
+  { code }: text.CodeGenerationContext,
+  refToStr: (ref: typedoc.ReferenceType) => text.IntermediateCode,
   getSignatureText: types.GetSignatureText,
   getDeclarationText: types.GetDeclarationText,
 ): types.GetSomeTypeText => {
-  function getSomeTypeText(type: typedoc.SomeType): types.Code {
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  function getSomeTypeText(type: typedoc.SomeType): text.IntermediateCode {
     switch (type.type) {
       case "array":
-        return textGenerationContext.code`Array<${getSomeTypeText(
-          type.elementType,
-        )}>`;
+        return code`Array<${getSomeTypeText(type.elementType)}>`;
       case "conditional":
-        return textGenerationContext.code`${getSomeTypeText(
+        return code`${getSomeTypeText(
           type.checkType,
         )} extends ${getSomeTypeText(type.extendsType)} ? ${getSomeTypeText(
           type.trueType,
         )} : ${getSomeTypeText(type.falseType)}`;
       case "indexedAccess":
-        return textGenerationContext.code`${getSomeTypeText(
-          type.objectType,
-        )}[${getSomeTypeText(type.indexType)}]`;
+        return code`${getSomeTypeText(type.objectType)}[${getSomeTypeText(
+          type.indexType,
+        )}]`;
       case "inferred":
-        return textGenerationContext.code`infer ${
-          type.name
-        }${text.getOptionalValueText(
+        return code`infer ${text.text(type.name)}${text.getOptionalValueText(
           type.constraint,
-          (constraint) => ` extends ${getSomeTypeText(constraint)}`,
+          (constraint) => code` extends ${getSomeTypeText(constraint)}`,
         )}`;
       case "intersection":
-        return type.types.map(getSomeTypeText).join(" & ");
+        return code`${text.join(type.types.map(getSomeTypeText), " & ")}`;
       case "intrinsic":
-        return textGenerationContext.code`${type.name}`;
+        return code`${text.text(type.name)}`;
       case "literal":
-        return `"${type.value}"`;
+        return code`${
+          typeof type.value === "string"
+            ? code`"${text.text(type.value)}"`
+            : isBigInt(type.value)
+            ? code`${type.value}`
+            : type.value
+        }`;
       case "mapped":
-        return textGenerationContext.code`{${text.getOptionalValueText(
+        return code`{${text.getOptionalValueText(
           type.readonlyModifier,
-          (roMod) => ` ${onlyMinus(roMod)}readonly `,
-        )}[${type.parameter} in ${getSomeTypeText(
+          (roMod) => code` ${onlyMinus(roMod)}readonly `,
+        )}[${text.text(type.parameter)} in ${getSomeTypeText(
           type.parameterType,
         )}${text.getOptionalValueText(
           type.nameType,
-          (nameType) => ` as ${getSomeTypeText(nameType)}`,
+          (nameType) => code` as ${getSomeTypeText(nameType)}`,
         )}]${text.getOptionalValueText(
           type.optionalModifier,
-          (optMod) => `${onlyMinus(optMod)}?`,
+          (optMod) => code`${onlyMinus(optMod)}?`,
         )}: ${getSomeTypeText(type.templateType)}}`;
       case "namedTupleMember":
-        return textGenerationContext.code`[${type.name}${
-          type.isOptional ? "?" : ""
-        }: ${getSomeTypeText(type.element)}]`;
+        return code`[${text.text(type.name)}${text.text(
+          type.isOptional ? "?" : "",
+        )}: ${getSomeTypeText(type.element)}]`;
       case "optional":
-        return textGenerationContext.code`${getSomeTypeText(
-          type.elementType,
-        )}?`;
+        return code`${getSomeTypeText(type.elementType)}?`;
       case "predicate":
         return type.targetType
-          ? textGenerationContext.code`${type.asserts ? "asserts " : ""}${
-              type.name
-            } is ${getSomeTypeText(type.targetType)}`
-          : textGenerationContext.code`asserts ${type.name}`;
+          ? code`${text.text(type.asserts ? "asserts " : "")}${text.text(
+              type.name,
+            )} is ${getSomeTypeText(type.targetType)}`
+          : code`asserts ${text.text(type.name)}`;
       case "query":
-        return textGenerationContext.code`typeof ${getSomeTypeText(
-          type.queryType,
-        )}`;
+        return code`typeof ${getSomeTypeText(type.queryType)}`;
       case "reference":
-        return textGenerationContext.code`${
-          type.refersToTypeParameter ? type.name : refToStr(type)
+        return code`${
+          type.refersToTypeParameter ? text.text(type.name) : refToStr(type)
         }${text.getOptionalValueText(
           type.typeArguments,
-          (typeArgs) => `<${typeArgs.map(getSomeTypeText)}>`,
+          (typeArgs) =>
+            code`<${text.join(typeArgs.map(getSomeTypeText), ", ")}>`,
         )}`;
       case "reflection":
         return getDeclarationReferenceText(
@@ -84,28 +84,28 @@ export const createGetSomeTypeText = (
           getSomeTypeText,
         );
       case "rest":
-        return textGenerationContext.code`...${getSomeTypeText(
-          type.elementType,
-        )}`;
+        return code`...${getSomeTypeText(type.elementType)}`;
       case "templateLiteral":
-        return textGenerationContext.code`${"`"}${type.head}${type.tail
-          .map(
+        return code`${text.text("`")}${text.text(type.head)}${text.join(
+          type.tail.map(
             ([someType, strFrag]) =>
-              `\${${getSomeTypeText(someType)}}${strFrag}`,
-          )
-          .join("")}${"`"}`;
+              code`\${${getSomeTypeText(someType)}}${text.text(strFrag)}`,
+          ),
+          "",
+        )}${text.text("`")}`;
       case "tuple":
-        return textGenerationContext.code`[${
-          type.elements?.map(getSomeTypeText).join(", ") ?? ""
-        }]`;
+        return code`[${text.join(
+          type.elements?.map(getSomeTypeText) ?? [],
+          ", ",
+        )}]`;
       case "typeOperator":
-        return textGenerationContext.code`${type.operator} ${getSomeTypeText(
+        return code`${text.text(type.operator)} ${getSomeTypeText(
           type.target,
         )}`;
       case "union":
-        return type.types.map(getSomeTypeText).join(" | ");
+        return text.join(type.types.map(getSomeTypeText), " | ");
       case "unknown":
-        return type.name;
+        return code`${text.text(type.name)}`;
       default:
         throw new Error(
           `No implementation for type ${(type as typedoc.SomeType).type}`,
@@ -120,13 +120,13 @@ const getDeclarationReferenceText = (
   getSignatureText: types.GetSignatureText,
   getDeclarationText: types.GetDeclarationText,
   getSomeTypeText: types.GetSomeTypeText,
-): types.Code => {
+): text.IntermediateCode => {
   switch (declaration.kind) {
     case functionality.ReflectionKind.Enum:
     case functionality.ReflectionKind.EnumMember:
     case functionality.ReflectionKind.Class:
     case functionality.ReflectionKind.Interface:
-      return declaration.name;
+      return [text.ref(declaration.name, declaration.id)];
     case functionality.ReflectionKind.Function:
     case functionality.ReflectionKind.Constructor:
       return getSignatureText(
@@ -147,6 +147,11 @@ const getDeclarationReferenceText = (
   }
 };
 
-function onlyMinus(str: "+" | "-") {
-  return str === "-" ? str : "";
+function onlyMinus(str: "+" | "-"): text.JustText {
+  return text.text(str === "-" ? str : "");
 }
+
+const isBigInt = (
+  val: text.LiteralValue,
+): val is { value: string; negative: boolean } =>
+  typeof val === "object" && !!val && "value" in val && "negative" in val;

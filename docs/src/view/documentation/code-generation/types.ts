@@ -1,6 +1,7 @@
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import type * as prettier from "prettier";
 import type * as functionality from "../functionality";
+import type * as text from "./text";
 
 export interface CodeGeneratorGenerationFunctionMap {
   getTypeText: typedoc.SomeType;
@@ -12,14 +13,18 @@ export interface CodeGeneratorGenerationFunctionMap {
 
 export type PrettierOptions = Omit<prettier.Options, "parser" | "plugins">;
 
+export type GetDeclarationText = (
+  declaration: CodeGeneratorGenerationFunctionMap["getDeclarationText"],
+) => text.IntermediateCode;
+
 export type GetSomeTypeText = (
   type: CodeGeneratorGenerationFunctionMap["getTypeText"],
-) => Code;
+) => text.IntermediateCode;
 
 export type GetSignatureText = (
   signature: CodeGeneratorGenerationFunctionMap["getSignatureText"],
   returnTypeSeparator?: SignatureContext,
-) => Code;
+) => text.IntermediateCode;
 
 export const SIG_CONTEXT_DEF = ":";
 export const SIG_CONTEXT_TYPE = "=>";
@@ -28,9 +33,5 @@ export type SignatureContext =
   | typeof SIG_CONTEXT_DEF
   | typeof SIG_CONTEXT_TYPE
   | null;
-
-export type GetDeclarationText = (
-  declaration: CodeGeneratorGenerationFunctionMap["getDeclarationText"],
-) => Code;
 
 export type Code = string;

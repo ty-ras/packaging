@@ -1,5 +1,6 @@
 import * as functionality from "../../functionality";
 import * as types from "../types";
+import type * as text from "../text";
 
 export interface ReflectionKindFunctionality {
   text: ReflectionKindFunctionalityToText;
@@ -8,18 +9,22 @@ export interface ReflectionKindFunctionality {
 
 export type ReflectionKindFunctionalityToText =
   | {
-      getPrefixText: (args: GetPrefixTextArgs) => string;
-      getBodyText: (args: GetBodyTextArgs) => string;
+      getPrefixText: (args: GetPrefixTextArgs) => text.IntermediateCode;
+      getBodyText: (args: GetBodyTextArgs) => text.IntermediateCode;
     }
-  | ((args: GetBodyTextArgs) => string);
+  | ((args: GetBodyTextArgs) => text.IntermediateCode);
 
 export type GetChildren = (args: GetChildrenArgs) => Array<number>;
 
-export interface GetPrefixTextArgs {
+export interface GetSomeTextArgs {
+  codeGenerationContext: text.CodeGenerationContext;
+}
+
+export interface GetPrefixTextArgs extends GetSomeTextArgs {
   declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"];
 }
 
-export interface GetBodyTextArgs {
+export interface GetBodyTextArgs extends GetSomeTextArgs {
   index: functionality.ModelIndex;
   getTypeText: types.GetSomeTypeText;
   getDeclarationText: types.GetDeclarationText;
