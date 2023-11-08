@@ -14,12 +14,12 @@ export type PrettierOptions = Omit<prettier.Options, "parser" | "plugins">;
 
 export type GetSomeTypeText = (
   type: CodeGeneratorGenerationFunctionMap["getTypeText"],
-) => string;
+) => Code;
 
 export type GetSignatureText = (
   signature: CodeGeneratorGenerationFunctionMap["getSignatureText"],
   returnTypeSeparator?: SignatureContext,
-) => string;
+) => Code;
 
 export const SIG_CONTEXT_DEF = ":";
 export const SIG_CONTEXT_TYPE = "=>";
@@ -31,4 +31,6 @@ export type SignatureContext =
 
 export type GetDeclarationText = (
   declaration: CodeGeneratorGenerationFunctionMap["getDeclarationText"],
-) => string;
+) => Code;
+
+export type Code = string;

@@ -11,6 +11,7 @@ import * as someType from "./some-type";
 import * as sig from "./signature";
 import * as imports from "./imports";
 import * as get from "./get-with-check";
+import type * as text from "./text";
 
 export const createCodeGenerator = (
   index: functionality.ModelIndex,
@@ -96,27 +97,26 @@ export interface CodeGenerator {
 
 export type CodeGeneratorGeneration = {
   [P in keyof types.CodeGeneratorGenerationFunctionMap]: (
+    this: void,
     reflection: types.CodeGeneratorGenerationFunctionMap[P],
   ) => CodeGenerationResult;
 };
 
 export type CodeGenerationResult =
-  | Code
+  | types.Code
   | {
-      code: Code;
+      code: types.Code;
       processTokenInfos: TokenInfoProcessor;
     };
-
-export type Code = string;
 
 export type TokenInfoProcessor = (result: TokenInfos) => TokenInfos;
 
 export type TokenInfos = Array<TokenInfo>;
-export type TokenInfo = TSESTree.Token | Code;
+export type TokenInfo = TSESTree.Token | types.Code;
 
 export interface CodeGeneratorFormatting {
-  formatCode: (code: Code) => Promise<Code>;
-  getTokenInfos: (code: Code) => TokenInfos;
+  formatCode: (this: void, code: types.Code) => Promise<types.Code>;
+  getTokenInfos: (this: void, code: types.Code) => TokenInfos;
 }
 
 const isReference = (
@@ -125,12 +125,14 @@ const isReference = (
   reflection.variant === "reference";
 
 const createCallbacks = (index: functionality.ModelIndex) => {
+  const textGenerator = createCodeGenerationContext();
   const importContext: imports.ImportContext = {
     imports: {},
     globals: new Set(["typescript"]),
   };
   const registerImport = imports.createRegisterImport(importContext);
   const typeToText = someType.createGetSomeTypeText(
+    textGenerator,
     ({ target, ...type }) =>
       typeof target === "number"
         ? `${
@@ -144,8 +146,11 @@ const createCallbacks = (index: functionality.ModelIndex) => {
     (sig) => sigToText(sig, "=>"),
     (dec) => declarationToText(dec),
   );
-  const sigToText = sig.createGetSignatureText((type) => typeToText(type));
+  const sigToText = sig.createGetSignatureText(textGenerator, (type) =>
+    typeToText(type),
+  );
   const declarationToText = declaration.createGetDeclarationText(
+    textGenerator,
     index,
     typeToText,
     sigToText,
@@ -229,3 +234,20 @@ const TYPE_STRING_TOKEN_PROCESSOR_MATCHERS: TokenProcessorMatchers = [
   (token2) => token2.type === "Identifier" && token2.value === TYPE_NAME,
   (token3) => token3.type === "Punctuator" && token3.value === EQUALS,
 ];
+
+const createCodeGenerationContext = (): text.CodeGenerationContext => ({
+  code: (fragments, ...args) =>
+    Array.from(saveCodeTemplateArgs(fragments, args)).join(""),
+});
+
+function* saveCodeTemplateArgs(
+  fragments: ReadonlyArray<string>,
+  args: Readonly<text.CodeGenerationFragments>,
+): Generator<text.CodeGenerationFragment, void, unknown> {
+  for (const [idx, fragment] of fragments.entries()) {
+    yield fragment;
+    if (idx < args.length) {
+      yield args[idx];
+    }
+  }
+}

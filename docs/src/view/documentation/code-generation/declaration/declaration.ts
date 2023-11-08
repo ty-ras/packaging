@@ -1,5 +1,6 @@
 import * as functionality from "../../functionality";
 import type * as types from "../types";
+import * as text from "../text";
 import classes from "./classes";
 import constructors from "./constructors";
 import properties from "./properties";
@@ -8,13 +9,14 @@ import functions from "./functions";
 import type * as toTextTypes from "./types";
 
 export const createGetDeclarationText = (
+  textGenerationContext: text.CodeGenerationContext,
   index: functionality.ModelIndex,
   getTypeText: types.GetSomeTypeText,
   getSignatureText: types.GetSignatureText,
 ): types.GetDeclarationText => {
   function getDeclarationText(
     declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
-  ) {
+  ): types.Code {
     const textFunctionality = useFunctionality(declaration, "text");
     return typeof textFunctionality === "function"
       ? textFunctionality({
@@ -24,18 +26,20 @@ export const createGetDeclarationText = (
           getDeclarationText,
           declaration,
         })
-      : `${textFunctionality.getPrefixText({
+      : textGenerationContext.code`${textFunctionality.getPrefixText({
           declaration,
-        })} ${declaration.name}${functionality.getOptionalValueText(
+        })} ${declaration.name}${text.getOptionalValueText(
           declaration.typeParameters,
           (typeParams) =>
             `<${typeParams
               .map(
                 (typeParam) =>
-                  `${typeParam.name}${functionality.getOptionalValueText(
+                  textGenerationContext.code`${
+                    typeParam.name
+                  }${text.getOptionalValueText(
                     typeParam.type,
                     (parentType) => ` extends ${getTypeText(parentType)}`,
-                  )}${functionality.getOptionalValueText(
+                  )}${text.getOptionalValueText(
                     typeParam.default,
                     (defaultValue) => ` = ${getTypeText(defaultValue)}`,
                   )}`,
