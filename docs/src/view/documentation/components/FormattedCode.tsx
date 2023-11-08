@@ -3,6 +3,7 @@ import { ErrorBoundary, For, createResource, useContext } from "solid-js";
 import singleElementContext from "../context/single-element-contents";
 import MultiLineCode from "./MultiLineCode";
 import type * as codeGen from "../code-generation";
+import Link from "./Link";
 
 export default function FormattedCode<
   TKind extends keyof codeGen.CodeGeneratorGeneration,
@@ -34,7 +35,9 @@ export default function FormattedCode<
               typeof token === "string" ? (
                 token
               ) : "token" in token ? (
-                token.token.value
+                <Link
+                  target={{ text: token.token.value, target: token.typeRef }}
+                />
               ) : token.type !== "Keyword" ? (
                 token.value
               ) : (

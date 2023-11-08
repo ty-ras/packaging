@@ -10,9 +10,10 @@ export const createRegisterImport = (
     { package: typePackage, name }: Omit<typedoc.ReferenceType, "target">,
     target: typedoc.ReflectionSymbolId,
   ): text.IntermediateCode {
-    const packageName =
+    const packageName = importContext.getPackageNameFromPathName(
       typePackage ??
-      functionality.doThrow(`Reference type did not specify package name.`);
+        functionality.doThrow(`Reference type did not specify package name.`),
+    );
     const isGlobal = importContext.globals.has(packageName);
     if (!isGlobal) {
       const kind = target.qualifiedName === name ? "individual" : "named";
@@ -53,6 +54,7 @@ export const createRegisterImport = (
 export interface ImportContext {
   imports: Record<string, ImportInfo>;
   globals: Set<string>;
+  getPackageNameFromPathName: (pathName: string) => string;
 }
 
 export type ImportInfo = ImportInfoNamed | ImportInfoIndividual;
@@ -75,8 +77,19 @@ export type RegisterImport = (
   target: typedoc.ReflectionSymbolId,
 ) => text.IntermediateCode;
 
-const getImportAlias = (name: string, qualifiedName: string) =>
-  qualifiedName.substring(0, qualifiedName.indexOf(`.${name}`));
+const getImportAlias = (name: string, qualifiedName: string) => {
+  let idx = qualifiedName.indexOf(`.${name}`);
+  if (idx < 1) {
+    idx = name.indexOf(".");
+    if (idx < 1) {
+      throw new Error(
+        `Failed to get import alias from name "${name}", qualified name "${qualifiedName}".`,
+      );
+    }
+    qualifiedName = name;
+  }
+  return qualifiedName.substring(0, idx);
+};
 
 const createImportInfo = (
   kind: ImportInfo["import"],

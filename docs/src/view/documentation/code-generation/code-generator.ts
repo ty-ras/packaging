@@ -83,24 +83,6 @@ export const createCodeGenerator = (
         });
         return fixTypeReferences(code, formattedCode);
       },
-      // getTokenInfos: (code) => {
-      //   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      //   const { tokens }: TSESTree.Program =
-      //     typescript.parsers.typescript.parse(
-      //       code.code,
-      //       // Options are not used for anything useful for us
-      //       // See https://github.com/prettier/prettier/blob/main/src/language-js/parse/typescript.js
-      //       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-      //       undefined as any,
-      //     );
-      //   return Array.from(
-      //     constructTokenInfoArray(
-      //       code.code,
-      //       tokens ??
-      //         functionality.doThrow("Parsed TS program without tokens?"),
-      //     ),
-      //   );
-      // },
     },
   };
 };
@@ -147,6 +129,10 @@ const createCallbacks = (index: functionality.ModelIndex) => {
   const importContext: imports.ImportContext = {
     imports: {},
     globals: new Set(["typescript"]),
+    getPackageNameFromPathName: (pathName) =>
+      pathName.startsWith(TYPES_PACKAGE_PREFIX)
+        ? pathName.substring(TYPES_PACKAGE_PREFIX.length)
+        : pathName,
   };
   const registerImport = imports.createRegisterImport(
     textGenerator,
@@ -218,23 +204,56 @@ ${intermediate}`;
   return intermediateToComplete(fullCode);
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function* constructTokenInfoArray(
-  source: string,
-  tokens: ReadonlyArray<TSESTree.Token>,
-) {
+  originalCodeTokens: ReadonlyArray<TSESTree.Token>,
+  typeRefTokenInfos: ReadonlyArray<TokenIndexAndTypeRef>,
+  formattedCode: string,
+  formattedCodeTokens: ReadonlyArray<TSESTree.Token>,
+): Generator<TokenInfo, void, unknown> {
   let prevIndex = 0;
-  for (const token of tokens) {
+  let originalCodeTokenIndex = 0; // Index to originalCodeTokens
+  let typeRefTokenInfoIndex = 0; // Index to typeRefTokenInfos
+  for (const token of formattedCodeTokens) {
     const {
       range: [start, end],
     } = token;
     if (start > prevIndex) {
-      yield source.substring(prevIndex, start);
+      yield formattedCode.substring(prevIndex, start);
     }
-    yield token;
+
+    // We exploit the two facts:
+    // - formatting the code never breaks the identifier tokens which are type references, and
+    // - the type reference tokens always will come in same order
+    const startingTypeRefTokenInfoIndex = typeRefTokenInfoIndex;
+    if (typeRefTokenInfoIndex < typeRefTokenInfos.length) {
+      const originalToken = originalCodeTokens[originalCodeTokenIndex];
+      if (
+        originalToken.type === token.type &&
+        originalToken.value === token.value
+      ) {
+        // We found the matching token, now check if it is type reference
+        const { tokenIndex: typeRefTokenIndex, typeRef } =
+          typeRefTokenInfos[typeRefTokenInfoIndex];
+        if (originalCodeTokenIndex === typeRefTokenIndex) {
+          yield {
+            token: ensureIdentifierToken(token),
+            typeRef,
+          };
+          ++typeRefTokenInfoIndex;
+        }
+        // Advance original token index
+        ++originalCodeTokenIndex;
+      }
+    }
+
+    if (startingTypeRefTokenInfoIndex === typeRefTokenInfoIndex) {
+      yield token;
+    }
     prevIndex = end; // The end of the token range is exclusive
   }
-  if (prevIndex < source.length) {
-    yield source.substring(prevIndex);
+  if (prevIndex < formattedCode.length) {
+    yield formattedCode.substring(prevIndex);
   }
 }
 
@@ -359,12 +378,13 @@ const fixTypeReferences = (
 ): TokenInfos => {
   // Find out which tokens are the ones which are type refs
   const originalTokens = getTSTokens(originalCode);
-  const typeRefTokenIndices: Array<number> = [];
+  const typeRefTokenInfos: Array<TokenIndexAndTypeRef> = [];
   let curTypeRefIdx = 0;
   for (const [tokenIdx, token] of originalTokens.entries()) {
     if (token.type === "Identifier" && curTypeRefIdx < typeReferences.length) {
       const {
         range: { start: refStart, length: refLength },
+        ref,
       } = typeReferences[curTypeRefIdx];
       const [tokenStart, tokenEnd] = token.range;
       if (refStart === tokenStart) {
@@ -374,15 +394,19 @@ const fixTypeReferences = (
             `Token started at ${tokenStart} and ended at ${tokenEnd}, but type ref length was ${refLength}.`,
           );
         }
-        typeRefTokenIndices.push(tokenIdx);
+        typeRefTokenInfos.push({ tokenIndex: tokenIdx, typeRef: ref });
         ++curTypeRefIdx;
       }
     }
   }
 
-  // We exploit the fact that tokens from formatted code only may have extra punctuation tokens in comparison from tokens from original code.
   return Array.from(
-    constructTokenInfoArray(formattedCode, getTSTokens(formattedCode)),
+    constructTokenInfoArray(
+      originalTokens,
+      typeRefTokenInfos,
+      formattedCode,
+      getTSTokens(formattedCode),
+    ),
   );
 };
 
@@ -396,3 +420,19 @@ const getTSTokens = (code: string) =>
       undefined as any,
     ) as TSESTree.Program
   ).tokens ?? functionality.doThrow("Parsed TS program without tokens?");
+
+interface TokenIndexAndTypeRef {
+  tokenIndex: number;
+  typeRef: text.CodeGenerationTypeRef;
+}
+
+const ensureIdentifierToken = (
+  token: TSESTree.Token,
+): TSESTree.IdentifierToken => {
+  if (token.type !== "Identifier") {
+    throw new Error("Not identifier token when expected one");
+  }
+  return token;
+};
+
+const TYPES_PACKAGE_PREFIX = "@types/";
