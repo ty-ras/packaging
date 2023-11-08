@@ -13,11 +13,10 @@ export default function FormattedCode<
     async (reflection) => {
       const codeGenerator = context.codeGenerator();
       const rawCode = codeGenerator.generation[props.kind](reflection);
-      const formattedCode = await codeGenerator.formatting.formatCode(
-        typeof rawCode === "string" ? rawCode : rawCode.code,
+      let tokenInfos = await codeGenerator.formatting.formatCode(
+        "processTokenInfos" in rawCode ? rawCode.code : rawCode,
       );
-      let tokenInfos = codeGenerator.formatting.getTokenInfos(formattedCode);
-      if (typeof rawCode !== "string") {
+      if ("processTokenInfos" in rawCode) {
         tokenInfos = rawCode.processTokenInfos(tokenInfos);
       }
 
@@ -34,6 +33,8 @@ export default function FormattedCode<
             {(token) =>
               typeof token === "string" ? (
                 token
+              ) : "token" in token ? (
+                token.token.value
               ) : token.type !== "Keyword" ? (
                 token.value
               ) : (

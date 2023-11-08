@@ -25,7 +25,10 @@ export const createRegisterImport = (
         }
         switch (currentImport.import) {
           case "individual":
-            currentImport.importedElements.push(target.qualifiedName);
+            currentImport.importedElements.push({
+              name: target.qualifiedName,
+              ref: target,
+            });
             break;
           case "named":
             // Nothing to do;
@@ -64,7 +67,7 @@ export interface ImportInfoNamed extends ImportInfoBase {
 
 export interface ImportInfoIndividual extends ImportInfoBase {
   import: "individual";
-  importedElements: Array<string>;
+  importedElements: Array<{ name: string; ref: typedoc.ReflectionSymbolId }>;
 }
 
 export type RegisterImport = (
@@ -85,7 +88,7 @@ const createImportInfo = (
     ? {
         import: kind,
         packageName,
-        importedElements: [target.qualifiedName],
+        importedElements: [{ name: target.qualifiedName, ref: target }],
       }
     : {
         import: "named",

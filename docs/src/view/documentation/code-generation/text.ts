@@ -31,8 +31,10 @@ export type CodeGenerationFragment = string | CodeGenerationFragmentRef;
 
 export interface CodeGenerationFragmentRef {
   name: string;
-  ref: number | typedoc.ReflectionSymbolId;
+  ref: CodeGenerationTypeRef;
 }
+
+export type CodeGenerationTypeRef = number | typedoc.ReflectionSymbolId;
 
 export interface JustText {
   text: string;

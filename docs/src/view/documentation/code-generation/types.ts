@@ -34,4 +34,12 @@ export type SignatureContext =
   | typeof SIG_CONTEXT_TYPE
   | null;
 
-export type Code = string;
+export interface Code {
+  code: string;
+  typeReferences: TypeReferencesInCode;
+}
+
+export type TypeReferencesInCode = Array<{
+  ref: text.CodeGenerationTypeRef;
+  range: { start: number; length: number };
+}>;

@@ -19,9 +19,14 @@ export const createCodeGenerator = (
 ): CodeGenerator => {
   const getDeclarationTextImpl = (
     reflection: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
-  ): string => {
-    const { importContext, declarationToText } = createCallbacks(index);
-    return textWithImports(importContext, declarationToText(reflection));
+  ): types.Code => {
+    const { textGenerator, importContext, declarationToText } =
+      createCallbacks(index);
+    return textWithImports(
+      textGenerator,
+      importContext,
+      declarationToText(reflection),
+    );
   };
 
   const getDeclarationText: CodeGeneratorGeneration["getDeclarationText"] = (
@@ -37,18 +42,16 @@ export const createCodeGenerator = (
   return {
     generation: {
       getTypeText: (type) => {
-        const {
-          textGenerator: { code },
-          importContext,
-          typeToText,
-        } = createCallbacks(index);
+        const { textGenerator, importContext, typeToText } =
+          createCallbacks(index);
         return {
           code: textWithImports(
+            textGenerator,
             importContext,
             // We must prefix with `type ___X___ = <actual type> in order to make it valid TypeScript program
-            code`${text.text(TYPE)} ${text.text(TYPE_NAME)} ${text.text(
-              EQUALS,
-            )} ${typeToText(type)}`,
+            textGenerator.code`${text.text(TYPE)} ${text.text(
+              TYPE_NAME,
+            )} ${text.text(EQUALS)} ${typeToText(type)}`,
           ),
           processTokenInfos: (tokenInfos) =>
             remainingTokensAfter(
@@ -58,44 +61,46 @@ export const createCodeGenerator = (
         };
       },
       getSignatureText: (sig) => {
-        const {
-          textGenerator: { code },
-          importContext,
-          sigToText,
-        } = createCallbacks(index);
+        const { textGenerator, importContext, sigToText } =
+          createCallbacks(index);
         const sigText = sigToText(sig, ":");
         return textWithImports(
+          textGenerator,
           importContext,
-          code`export declare function ${text.text(sig.name)}${sigText}`,
+          textGenerator.code`export declare function ${text.text(
+            sig.name,
+          )}${sigText}`,
         );
       },
       getDeclarationText,
     },
     formatting: {
-      formatCode: async (code) =>
-        await prettier.format(code, {
+      formatCode: async (code) => {
+        const formattedCode = await prettier.format(code.code, {
           ...prettierOptions,
           parser: "typescript",
           plugins: [estree, typescript],
-        }),
-      getTokenInfos: (code) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const { tokens }: TSESTree.Program =
-          typescript.parsers.typescript.parse(
-            code,
-            // Options are not used for anything useful for us
-            // See https://github.com/prettier/prettier/blob/main/src/language-js/parse/typescript.js
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-            undefined as any,
-          );
-        return Array.from(
-          constructTokenInfoArray(
-            code,
-            tokens ??
-              functionality.doThrow("Parsed TS program without tokens?"),
-          ),
-        );
+        });
+        return fixTypeReferences(code, formattedCode);
       },
+      // getTokenInfos: (code) => {
+      //   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      //   const { tokens }: TSESTree.Program =
+      //     typescript.parsers.typescript.parse(
+      //       code.code,
+      //       // Options are not used for anything useful for us
+      //       // See https://github.com/prettier/prettier/blob/main/src/language-js/parse/typescript.js
+      //       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
+      //       undefined as any,
+      //     );
+      //   return Array.from(
+      //     constructTokenInfoArray(
+      //       code.code,
+      //       tokens ??
+      //         functionality.doThrow("Parsed TS program without tokens?"),
+      //     ),
+      //   );
+      // },
     },
   };
 };
@@ -122,11 +127,14 @@ export type CodeGenerationResult =
 export type TokenInfoProcessor = (result: TokenInfos) => TokenInfos;
 
 export type TokenInfos = Array<TokenInfo>;
-export type TokenInfo = TSESTree.Token | types.Code;
+export type TokenInfo =
+  | TSESTree.Token
+  | string
+  | { token: TSESTree.IdentifierToken; typeRef: text.CodeGenerationTypeRef };
 
 export interface CodeGeneratorFormatting {
-  formatCode: (this: void, code: types.Code) => Promise<types.Code>;
-  getTokenInfos: (this: void, code: types.Code) => TokenInfos;
+  formatCode: (this: void, code: types.Code) => Promise<TokenInfos>;
+  // getTokenInfos: (this: void, code: types.Code) => TokenInfos;
 }
 
 const isReference = (
@@ -183,21 +191,31 @@ const createCallbacks = (index: functionality.ModelIndex) => {
 };
 
 const textWithImports = (
+  { code }: text.CodeGenerationContext,
   importContext: imports.ImportContext,
-  text: text.IntermediateCode,
+  intermediate: text.IntermediateCode,
 ): types.Code => {
-  return `${Object.entries(importContext.imports)
-    .map(
+  const fullCode = code`${text.join(
+    Object.entries(importContext.imports).map(
       ([, importInfo]) =>
-        `import ${
+        code`import type ${
           importInfo.import === "named"
-            ? `* as ${importInfo.alias}`
-            : `{ ${importInfo.importedElements.join(", ")} }`
-        } from "${importInfo.packageName}";`,
-    )
-    .join("\n")}
+            ? text.text(`* as ${importInfo.alias}`)
+            : code`{ ${text.join(
+                importInfo.importedElements.map(
+                  (importedType) =>
+                    code`${text.ref(importedType.name, importedType.ref)}`,
+                ),
+                ", ",
+              )} }`
+        } from "${text.text(importInfo.packageName)}";`,
+    ),
+    "\n",
+  )}
 
-${intermediateToComplete(text)}`;
+${intermediate}`;
+
+  return intermediateToComplete(fullCode);
 };
 
 function* constructTokenInfoArray(
@@ -238,7 +256,11 @@ const remainingTokensAfter = (
   ) {
     const tokenInfo = tokenInfos[tokenIndex];
     if (typeof tokenInfo !== "string") {
-      if (matchers[matcherIndex](tokenInfo)) {
+      if (
+        matchers[matcherIndex](
+          "token" in tokenInfo ? tokenInfo.token : tokenInfo,
+        )
+      ) {
         ++matcherIndex;
       } else {
         matcherIndex = 0;
@@ -307,9 +329,70 @@ function* saveCodeTemplateArgs(
   }
 }
 
-const intermediateToComplete = (code: text.IntermediateCode): types.Code =>
-  code
-    .map((fragment) =>
-      typeof fragment === "string" ? fragment : fragment.name,
-    )
-    .join("");
+const intermediateToComplete = (
+  intermediate: text.IntermediateCode,
+): types.Code => {
+  let code = "";
+  const typeReferences: types.TypeReferencesInCode = [];
+  for (const fragment of intermediate) {
+    if (typeof fragment === "string") {
+      code += fragment;
+    } else {
+      const textual = fragment.name;
+      typeReferences.push({
+        range: { start: code.length, length: textual.length },
+        ref: fragment.ref,
+      });
+      code += textual;
+    }
+  }
+
+  return {
+    code,
+    typeReferences,
+  };
+};
+
+const fixTypeReferences = (
+  { code: originalCode, typeReferences }: types.Code,
+  formattedCode: string,
+): TokenInfos => {
+  // Find out which tokens are the ones which are type refs
+  const originalTokens = getTSTokens(originalCode);
+  const typeRefTokenIndices: Array<number> = [];
+  let curTypeRefIdx = 0;
+  for (const [tokenIdx, token] of originalTokens.entries()) {
+    if (token.type === "Identifier" && curTypeRefIdx < typeReferences.length) {
+      const {
+        range: { start: refStart, length: refLength },
+      } = typeReferences[curTypeRefIdx];
+      const [tokenStart, tokenEnd] = token.range;
+      if (refStart === tokenStart) {
+        if (refStart + refLength !== tokenEnd) {
+          // eslint-disable-next-line no-console
+          console.error(
+            `Token started at ${tokenStart} and ended at ${tokenEnd}, but type ref length was ${refLength}.`,
+          );
+        }
+        typeRefTokenIndices.push(tokenIdx);
+        ++curTypeRefIdx;
+      }
+    }
+  }
+
+  // We exploit the fact that tokens from formatted code only may have extra punctuation tokens in comparison from tokens from original code.
+  return Array.from(
+    constructTokenInfoArray(formattedCode, getTSTokens(formattedCode)),
+  );
+};
+
+const getTSTokens = (code: string) =>
+  (
+    typescript.parsers.typescript.parse(
+      code,
+      // Options are not used for anything useful for us
+      // See https://github.com/prettier/prettier/blob/main/src/language-js/parse/typescript.js
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
+      undefined as any,
+    ) as TSESTree.Program
+  ).tokens ?? functionality.doThrow("Parsed TS program without tokens?");
