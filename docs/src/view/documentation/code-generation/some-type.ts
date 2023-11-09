@@ -5,7 +5,7 @@ import * as text from "./text";
 
 export const createGetSomeTypeText = (
   { code }: text.CodeGenerationContext,
-  refToStr: (ref: typedoc.ReferenceType) => text.IntermediateCode,
+  registerImport: types.RegisterImport,
   getSignatureText: types.GetSignatureText,
   getDeclarationText: types.GetDeclarationText,
 ): types.GetSomeTypeText => {
@@ -70,7 +70,9 @@ export const createGetSomeTypeText = (
         return code`typeof ${getSomeTypeText(type.queryType)}`;
       case "reference":
         return code`${
-          type.refersToTypeParameter ? text.text(type.name) : refToStr(type)
+          type.refersToTypeParameter
+            ? text.text(type.name)
+            : refToStr(code, registerImport, type)
         }${text.getOptionalValueText(
           type.typeArguments,
           (typeArgs) =>
@@ -155,3 +157,23 @@ const isBigInt = (
   val: text.LiteralValue,
 ): val is { value: string; negative: boolean } =>
   typeof val === "object" && !!val && "value" in val && "negative" in val;
+
+const refToStr = (
+  code: text.CodeGenerationContext["code"],
+  registerImport: types.RegisterImport,
+  { target, ...type }: typedoc.ReferenceType,
+) =>
+  code`${
+    typeof target === "number"
+      ? text.ref(
+          `${
+            type.qualifiedName ??
+            type.name ??
+            functionality.doThrow(
+              `Internal reference ${target} had no qualified name`,
+            )
+          }`,
+          target,
+        )
+      : registerImport(type, target)
+  }`;

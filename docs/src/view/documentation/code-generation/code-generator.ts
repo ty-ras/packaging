@@ -121,18 +121,31 @@ export interface CodeGeneratorFormatting {
 
 const isReference = (
   reflection: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
-): reflection is functionality.MakeChildrenIntegers<typedoc.ReferenceReflection> =>
-  reflection.variant === "reference";
+): reflection is functionality.MakeChildrenIntegers<typedoc.ReferenceReflection> &
+  functionality.WithParentID => reflection.variant === "reference";
 
 const createCallbacks = (index: functionality.ModelIndex) => {
   const textGenerator = createCodeGenerationContext();
   const importContext: imports.ImportContext = {
     imports: {},
     globals: new Set(["typescript"]),
-    getPackageNameFromPathName: (pathName) =>
-      pathName.startsWith(TYPES_PACKAGE_PREFIX)
-        ? pathName.substring(TYPES_PACKAGE_PREFIX.length)
-        : pathName,
+    // TODO make this callback customizable
+    getVisiblePackageName: (packageName, { qualifiedName }) => {
+      let visiblePackageName = packageName.startsWith(TYPES_PACKAGE_PREFIX)
+        ? packageName.substring(TYPES_PACKAGE_PREFIX.length)
+        : packageName;
+      if (visiblePackageName === "node") {
+        // Node is special
+        const secondIdx = qualifiedName.indexOf('".', 1);
+        if (secondIdx < 0 || !qualifiedName.startsWith('"')) {
+          throw new Error(
+            `Named Node module import "${qualifiedName}" did not have quotes`,
+          );
+        }
+        visiblePackageName = `node:${qualifiedName.substring(1, secondIdx)}`;
+      }
+      return visiblePackageName;
+    },
   };
   const registerImport = imports.createRegisterImport(
     textGenerator,
@@ -140,21 +153,7 @@ const createCallbacks = (index: functionality.ModelIndex) => {
   );
   const typeToText = someType.createGetSomeTypeText(
     textGenerator,
-    ({ target, ...type }) =>
-      textGenerator.code`${
-        typeof target === "number"
-          ? text.ref(
-              `${
-                type.qualifiedName ??
-                type.name ??
-                functionality.doThrow(
-                  `Internal reference ${target} had no qualified name`,
-                )
-              }`,
-              target,
-            )
-          : registerImport(type, target)
-      }`,
+    registerImport,
     (sig) => sigToText(sig, "=>"),
     (dec) => declarationToText(dec),
   );
@@ -286,7 +285,10 @@ const remainingTokensAfter = (
       }
     }
   }
-  while (tokenIndex < tokenInfos.length && typeof tokenInfos === "string") {
+  while (
+    tokenIndex < tokenInfos.length &&
+    typeof tokenInfos[tokenIndex] === "string"
+  ) {
     ++tokenIndex;
   }
   return tokenInfos.slice(tokenIndex);

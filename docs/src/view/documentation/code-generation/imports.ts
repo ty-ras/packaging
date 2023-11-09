@@ -1,23 +1,29 @@
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import * as functionality from "../functionality";
 import * as text from "./text";
+import type * as types from "./types";
 
 export const createRegisterImport = (
   { code }: text.CodeGenerationContext,
   importContext: ImportContext,
-): RegisterImport => {
+): types.RegisterImport => {
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   function registerImport(
     { package: typePackage, name }: Omit<typedoc.ReferenceType, "target">,
     target: typedoc.ReflectionSymbolId,
   ): text.IntermediateCode {
-    const packageName = importContext.getPackageNameFromPathName(
+    const packageName = importContext.getVisiblePackageName(
       typePackage ??
         functionality.doThrow(`Reference type did not specify package name.`),
+      target,
     );
     const isGlobal = importContext.globals.has(packageName);
-    if (!isGlobal) {
+    let retVal: text.IntermediateCode;
+    if (isGlobal) {
+      retVal = code`${text.text(name)}`;
+    } else {
       const kind = target.qualifiedName === name ? "individual" : "named";
-      const currentImport = importContext.imports[packageName];
+      let currentImport = importContext.imports[packageName];
       if (currentImport) {
         if (currentImport.import !== kind) {
           throw new Error(
@@ -38,15 +44,22 @@ export const createRegisterImport = (
             throw new Error("Implement functionality for new import kind");
         }
       } else {
-        importContext.imports[packageName] = createImportInfo(
+        importContext.imports[packageName] = currentImport = createImportInfo(
           kind,
           packageName,
           name,
           target,
         );
       }
+      retVal =
+        currentImport.import === "individual"
+          ? code`${text.ref(name, target)}`
+          : code`${text.text(`${currentImport.alias}.`)}${text.ref(
+              getTypeName(name, currentImport.alias),
+              target,
+            )}`;
     }
-    return code`${isGlobal ? text.text(name) : text.ref(name, target)}`;
+    return retVal;
   }
   return registerImport;
 };
@@ -54,7 +67,10 @@ export const createRegisterImport = (
 export interface ImportContext {
   imports: Record<string, ImportInfo>;
   globals: Set<string>;
-  getPackageNameFromPathName: (pathName: string) => string;
+  getVisiblePackageName: (
+    packageName: string,
+    target: typedoc.ReflectionSymbolId,
+  ) => string;
 }
 
 export type ImportInfo = ImportInfoNamed | ImportInfoIndividual;
@@ -71,11 +87,6 @@ export interface ImportInfoIndividual extends ImportInfoBase {
   import: "individual";
   importedElements: Array<{ name: string; ref: typedoc.ReflectionSymbolId }>;
 }
-
-export type RegisterImport = (
-  refType: Omit<typedoc.ReferenceType, "target">,
-  target: typedoc.ReflectionSymbolId,
-) => text.IntermediateCode;
 
 const getImportAlias = (name: string, qualifiedName: string) => {
   let idx = qualifiedName.indexOf(`.${name}`);
@@ -108,3 +119,12 @@ const createImportInfo = (
         packageName,
         alias: getImportAlias(name, target.qualifiedName),
       };
+
+const getTypeName = (name: string, importAlias: string) => {
+  if (!name.startsWith(`${importAlias}.`)) {
+    throw new Error(
+      `Name "${name}" did not start with import alias "${importAlias}".`,
+    );
+  }
+  return name.substring(importAlias.length + 1);
+};

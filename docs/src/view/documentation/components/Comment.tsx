@@ -16,7 +16,7 @@ export default function Comment(props: CommentProps) {
               <Switch
                 fallback={
                   <Typography component="span" color="red">
-                    Unknown comment fragment kind.
+                    Unknown comment fragment kind {JSON.stringify(summary)}.
                   </Typography>
                 }
               >

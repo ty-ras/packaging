@@ -111,5 +111,6 @@ const typeTokensProcessor: codeGen.TokenInfoProcessor = (tokenInfos) => {
 
 const shouldBeDroppedFromEndOfTypeTokens = (tokenInfo: codeGen.TokenInfo) =>
   typeof tokenInfo === "string" ||
-  "token" in tokenInfo ||
-  (tokenInfo.type === "Punctuator" && tokenInfo.value === ";");
+  (!("token" in tokenInfo) &&
+    tokenInfo.type === "Punctuator" &&
+    tokenInfo.value === ";");

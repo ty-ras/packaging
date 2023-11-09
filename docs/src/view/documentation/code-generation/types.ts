@@ -43,3 +43,8 @@ export type TypeReferencesInCode = Array<{
   ref: text.CodeGenerationTypeRef;
   range: { start: number; length: number };
 }>;
+
+export type RegisterImport = (
+  refType: Omit<typedoc.ReferenceType, "target">,
+  target: typedoc.ReflectionSymbolId,
+) => text.IntermediateCode;

@@ -10,7 +10,11 @@ export type Project = MakeChildrenIntegers<typedoc.ProjectReflection>;
 export type ModelIndex = Record<number, IndexableModel>;
 
 export type IndexableModel =
-  MakeChildrenIntegers<typedoc.DeclarationReflection>;
+  MakeChildrenIntegers<typedoc.DeclarationReflection> & WithParentID;
+
+export interface WithParentID {
+  parentId?: number;
+}
 
 export type MakeChildrenIntegers<
   T extends { children?: Array<typedoc.DeclarationReflection> | undefined },

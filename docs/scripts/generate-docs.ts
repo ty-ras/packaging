@@ -484,6 +484,7 @@ const indexProject = ({
   const modelIndex: docs.Documentation["modelIndex"] = {};
   const indexReflection = (
     reflection: td.JSONOutput.DeclarationReflection,
+    parentId: number | undefined,
   ): number => {
     const id = reflection.id;
     if (id in modelIndex) {
@@ -493,15 +494,23 @@ const indexProject = ({
     modelIndex[id] = {
       ...rest,
       ...((children?.length ?? 0) > 0
-        ? { children: children?.map(indexReflection) }
+        ? {
+            children: children?.map((child) =>
+              indexReflection(child, reflection.id),
+            ),
+          }
         : {}),
+      ...(parentId === undefined ? {} : { parentId }),
     } as docs.Documentation["modelIndex"][number];
     return id;
   };
 
   return {
     modelIndex,
-    project: { ...project, children: children?.map(indexReflection) },
+    project: {
+      ...project,
+      children: children?.map((child) => indexReflection(child, undefined)),
+    },
   };
 };
 
