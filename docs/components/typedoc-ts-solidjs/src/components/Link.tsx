@@ -7,9 +7,10 @@ import {
   type JSX,
 } from "solid-js";
 import { OpenInNew } from "@suid/icons-material";
+import { Link as LinkMUI } from "@suid/material";
 import type * as typedoc from "typedoc/dist/lib/serialization/schema";
-import singleElementContext from "../context/single-element-contents";
 import type * as navigation from "@typedoc-2-ts/browser";
+import singleElementContext from "../context/single-element-contents";
 import type * as types from "./types";
 import SingleLineCode from "./SingleLineCode";
 
@@ -80,20 +81,25 @@ interface AnchorProps {
 
 function Anchor(props: AnchorProps) {
   return (
-    <a
+    <LinkMUI
+      sx={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyItems: "center",
+      }}
       href={props.href}
-      onclick={
+      onClick={
         props.navigation === undefined || typeof props.navigation === "object"
           ? undefined
           : getEventHandler(props.href, props.navigation, props.onClick)
       }
       target={props.navigation === undefined ? "_blank" : undefined}
     >
-      {props.text}
+      <span>{props.text}</span>
       <Show when={props.navigation === undefined}>
         <OpenInNew fontSize="small" />
       </Show>
-    </a>
+    </LinkMUI>
   );
 }
 

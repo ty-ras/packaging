@@ -5,9 +5,30 @@
   "engines": {
     "node": ">= 18"
   },
-  "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": {
+        "types": "./src/index.ts",
+        "default": "./src/index.ts"
+      },
+      "require": {
+        "types": "./src/index.ts",
+        "default": "./src/index.ts"
+      }
+    },
+    "./*": {
+      "types": "./src/*.tsx",
+      "import": {
+        "types": "./src/*.tsx",
+        "default": "./src/*.tsx"
+      },
+      "require": {
+        "types": "./src/*.tsx",
+        "default": "./src/*.tsx"
+      }
+    }
+  },
   "module": "./src/index.ts",
   "dependencies": {
     "@suid/material": "0.15.1",

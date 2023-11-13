@@ -11,7 +11,8 @@
     "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "moduleResolution": "Bundler"
   },
   "include": [
     "src/**/*",

@@ -14,7 +14,7 @@ import * as structure from "../structure";
 import type * as types from "./tyras-view.types";
 import TyRASDocumentationToolbar from "./TyRASDocumentationToolbar";
 import * as documentation from "@typedoc-2-ts/browser";
-import { TopLevelElementsToolbar } from "@typedoc-2-ts/solidjs";
+import TopLevelElementsToolbar from "@typedoc-2-ts/solidjs/views/TopLevelElementsToolbar";
 import TyRASDocumentationContents from "./TyRASDocumentationContents";
 import * as routing from "./routing";
 

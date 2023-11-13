@@ -12,18 +12,20 @@ import { Box, Typography } from "@suid/material";
 import equals from "fast-deep-equal";
 import * as documentation from "@typedoc-2-ts/browser";
 import type * as codeGen from "@typedoc-2-ts/transform";
-import {
-  TopLevelElementsList,
-  SingleElementContents,
-} from "@typedoc-2-ts/solidjs";
+import TopLevelElementsList from "@typedoc-2-ts/solidjs/views/TopLevelElementsList";
+import SingleElementContents from "@typedoc-2-ts/solidjs/views/SingleElementContents";
+
 import * as structure from "../structure";
 import type * as types from "./tyras-view.types";
 import * as routing from "./routing";
 
 // Put the context provider behind `lazy` as it imports Prettier libs, which are pretty  big
-const SingleElementContentsContextProvider = lazy(async () => ({
-  default: (await import("@typedoc-2-ts/solidjs")).SingleElementContentsContext,
-}));
+const SingleElementContentsContextProvider = lazy(
+  async () =>
+    await import(
+      "@typedoc-2-ts/solidjs/components/SingleElementContentsContextProvider"
+    ),
+);
 
 export default function TyRASDocumentationContents(
   props: TyRASDocumentationContentsProps,
