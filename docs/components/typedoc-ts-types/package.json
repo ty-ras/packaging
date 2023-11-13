@@ -1,0 +1,12 @@
+{
+  "name": "@typedoc-2-ts/types",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">= 18"
+  },
+  "type": "module",
+  "types": "./src/index.ts",
+  "dependencies": {},
+  "devDependencies": {}
+}

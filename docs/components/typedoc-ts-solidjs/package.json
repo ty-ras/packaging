@@ -1,0 +1,19 @@
+{
+  "name": "@typedoc-2-ts/solidjs",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">= 18"
+  },
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "module": "./src/index.ts",
+  "dependencies": {
+    "@suid/material": "0.15.1",
+    "@suid/icons-material": "0.6.11",
+    "fast-deep-equal": "3.1.3",
+    "solid-js": "1.8.5"
+  },
+  "devDependencies": {}
+}

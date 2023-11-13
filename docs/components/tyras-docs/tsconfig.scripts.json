@@ -1,0 +1,24 @@
+// This file is provided only for IDE experience, it is not used during build/dev
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Lib and target needs to be compatible with Node18 tho
+    "lib": [
+      "ES2022"
+    ],
+    "target": "ES2022",
+    "rootDir": ".",
+    "tsBuildInfoFile": "./build/tsconfig-scripts.tsbuildinfo",
+    "resolveJsonModule": true
+  },
+  "exclude": [
+    "src/**/*"
+  ],
+  "include": [
+    "scripts/**/*",
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+}
