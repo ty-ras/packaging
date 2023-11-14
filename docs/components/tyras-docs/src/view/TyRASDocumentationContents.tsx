@@ -256,9 +256,17 @@ const getCurrentElementFromNavigationParams = (
       typeof selectedReflection === "string"
         ? selectedReflection
         : selectedReflection.name;
+    const docKind =
+      typeof selectedReflection === "string"
+        ? undefined
+        : selectedReflection.docKind;
     const topLevel = documentation
       .getTopLevelElements(docs)
-      .find(({ element: { name: topLevelName } }) => topLevelName === name);
+      .find(
+        ({ allDocKinds, element: { name: topLevelName } }) =>
+          topLevelName === name &&
+          (docKind === undefined || allDocKinds.indexOf(docKind) >= 0),
+      );
     return topLevel ? topLevelElementToSelectedElement(topLevel) : undefined;
   }
 };
