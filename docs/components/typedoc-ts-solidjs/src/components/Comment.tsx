@@ -1,11 +1,12 @@
 import { Typography } from "@suid/material";
-import { For, Match, Show, Switch } from "solid-js";
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
-import type * as types from "./types";
+import { useContext, For, Match, Show, Switch } from "solid-js";
+import type * as typedoc from "typedoc";
+import linkContextContextDef from "../context-def/link-context";
 import SingleLineCode from "./SingleLineCode";
-import Link from "./Link";
+import Link, { type InlineLink } from "./Link";
 
 export default function Comment(props: CommentProps) {
+  const linkContextContext = useContext(linkContextContextDef);
   // TODO multi-line code blocks might need breaking props.comment.summary into multiple arrays, each being its own <p>aragraph.
   return (
     <Show when={props.comment}>
@@ -40,7 +41,10 @@ export default function Comment(props: CommentProps) {
                 <Match when={tryGetLink(summary)}>
                   {(summaryLink) => (
                     <Typography component="span">
-                      <Link target={summaryLink()} />
+                      <Link
+                        linkContext={linkContextContext.linkContext()}
+                        target={summaryLink()}
+                      />
                     </Typography>
                   )}
                 </Match>
@@ -54,19 +58,22 @@ export default function Comment(props: CommentProps) {
 }
 
 export interface CommentProps {
-  comment: typedoc.Comment | Array<typedoc.CommentDisplayPart> | undefined;
+  comment:
+    | typedoc.JSONOutput.Comment
+    | Array<typedoc.JSONOutput.CommentDisplayPart>
+    | undefined;
 }
 
-const tryGetText = (summary: typedoc.CommentDisplayPart) =>
+const tryGetText = (summary: typedoc.JSONOutput.CommentDisplayPart) =>
   summary.kind === "text" ? summary : undefined;
 
-const tryGetCode = (summary: typedoc.CommentDisplayPart) =>
+const tryGetCode = (summary: typedoc.JSONOutput.CommentDisplayPart) =>
   summary.kind === "code" ? summary : undefined;
 
 const tryGetLink = ({
   text,
   ...summary
-}: typedoc.CommentDisplayPart): types.InlineLink | undefined =>
+}: typedoc.JSONOutput.CommentDisplayPart): InlineLink | undefined =>
   summary.kind === "inline-tag" && !!summary.target
     ? {
         text:

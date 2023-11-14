@@ -10,6 +10,8 @@
     "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
+    // Because of @typescript-eslint/types
+    "moduleResolution": "Bundler"
   },
   "include": [
     "src/**/*"

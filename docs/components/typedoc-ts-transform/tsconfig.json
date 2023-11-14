@@ -6,7 +6,9 @@
     ],
     "outDir": "./dist",
     "rootDir": "./src",
-    "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
+    // Because of @typescript-eslint/types
+    "moduleResolution": "Bundler"
   },
   "include": [
     "src/**/*"

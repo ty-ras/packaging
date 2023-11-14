@@ -1,17 +1,14 @@
+import { Throw } from "throw-expression";
 import { createMemo, type JSX } from "solid-js";
 import * as codeGen from "@typedoc-2-ts/transform";
 import * as formatter from "@typedoc-2-ts/format";
-import SingleElementContentsContext, {
-  type SingleElementContext,
-} from "../context/single-element-contents";
+import * as contextDef from "../context-def/code-functionality";
 import type * as navigation from "@typedoc-2-ts/browser";
-import { Throw } from "throw-expression";
 
-export default function SingleElementContentsContextProvider(
-  props: SingleElementContentsContextProviderProps,
+export default function CodeFunctionalityContextProvider(
+  props: CodeFunctionalityContextProviderProps,
 ) {
-  const context = createMemo<SingleElementContext>(() => ({
-    linkFunctionality: () => props.linkFunctionality,
+  const context = createMemo<contextDef.CodeFunctionalityContext>(() => ({
     codeGenerator: () =>
       codeGen.createCodeGenerator(
         (id) =>
@@ -34,15 +31,14 @@ export default function SingleElementContentsContextProvider(
       }),
   }));
   return (
-    <SingleElementContentsContext.Provider value={context()}>
+    <contextDef.default.Provider value={context()}>
       {props.children}
-    </SingleElementContentsContext.Provider>
+    </contextDef.default.Provider>
   );
 }
 
-export interface SingleElementContentsContextProviderProps {
+export interface CodeFunctionalityContextProviderProps {
   index: navigation.ModelIndex;
   prettierOptions: codeGen.PrettierOptions;
   children: JSX.Element;
-  linkFunctionality: navigation.LinkHrefFunctionality;
 }

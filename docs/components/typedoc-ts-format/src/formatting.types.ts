@@ -1,4 +1,4 @@
-import { type TSESTree } from "@typescript-eslint/types/dist/index";
+import { type TSESTree } from "@typescript-eslint/types";
 import type * as prettier from "prettier";
 import type * as common from "@typedoc-2-ts/types";
 

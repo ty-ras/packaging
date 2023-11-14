@@ -1,5 +1,5 @@
 import { Throw } from "throw-expression";
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import type * as typedoc from "typedoc";
 import * as text from "./text";
 import type * as types from "./types";
 
@@ -9,8 +9,11 @@ export const createRegisterImport = (
 ): types.RegisterImport => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   function registerImport(
-    { package: typePackage, name }: Omit<typedoc.ReferenceType, "target">,
-    target: typedoc.ReflectionSymbolId,
+    {
+      package: typePackage,
+      name,
+    }: Omit<typedoc.JSONOutput.ReferenceType, "target">,
+    target: typedoc.JSONOutput.ReflectionSymbolId,
   ): text.IntermediateCode {
     const packageName = importContext.getVisiblePackageName(
       typePackage ?? Throw(`Reference type did not specify package name.`),
@@ -68,7 +71,7 @@ export interface ImportContext {
   globals: Set<string>;
   getVisiblePackageName: (
     packageName: string,
-    target: typedoc.ReflectionSymbolId,
+    target: typedoc.JSONOutput.ReflectionSymbolId,
   ) => string;
 }
 
@@ -84,7 +87,10 @@ export interface ImportInfoNamed extends ImportInfoBase {
 
 export interface ImportInfoIndividual extends ImportInfoBase {
   import: "individual";
-  importedElements: Array<{ name: string; ref: typedoc.ReflectionSymbolId }>;
+  importedElements: Array<{
+    name: string;
+    ref: typedoc.JSONOutput.ReflectionSymbolId;
+  }>;
 }
 
 const getImportAlias = (name: string, qualifiedName: string) => {
@@ -105,7 +111,7 @@ const createImportInfo = (
   kind: ImportInfo["import"],
   packageName: string,
   name: string,
-  target: typedoc.ReflectionSymbolId,
+  target: typedoc.JSONOutput.ReflectionSymbolId,
 ): ImportInfo =>
   kind === "individual"
     ? {

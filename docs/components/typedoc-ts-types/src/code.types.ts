@@ -1,4 +1,4 @@
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import type * as typedoc from "typedoc";
 
 export interface Code {
   code: string;
@@ -10,7 +10,9 @@ export type TypeReferencesInCode = Array<{
   range: TokenRange;
 }>;
 
-export type CodeGenerationTypeRef = number | typedoc.ReflectionSymbolId;
+export type CodeGenerationTypeRef =
+  | number
+  | typedoc.JSONOutput.ReflectionSymbolId;
 
 export interface TokenRange {
   start: number;

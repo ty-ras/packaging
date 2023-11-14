@@ -1,6 +1,8 @@
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import type * as typedoc from "typedoc";
 
-export const getFlagsText = (flags: typedoc.ReflectionFlags): string =>
+export const getFlagsText = (
+  flags: typedoc.JSONOutput.ReflectionFlags,
+): string =>
   Object.entries(flags)
     // These two flags are handled in different way
     .filter(([flag]) => flag !== "isOptional" && flag !== "isRest")
@@ -8,7 +10,9 @@ export const getFlagsText = (flags: typedoc.ReflectionFlags): string =>
     .map(([flag]) => flag.substring(flag.search(/[A-Z]/)).toLowerCase())
     .join(" ");
 
-export const getParametersFlagsText = (flags: typedoc.ReflectionFlags) => {
+export const getParametersFlagsText = (
+  flags: typedoc.JSONOutput.ReflectionFlags,
+) => {
   let retVal = "";
   if (flags.isRest) {
     retVal = `${retVal}...`;
@@ -16,7 +20,9 @@ export const getParametersFlagsText = (flags: typedoc.ReflectionFlags) => {
   return retVal;
 };
 
-export const getObjectMemberFlagsText = (flags: typedoc.ReflectionFlags) => {
+export const getObjectMemberFlagsText = (
+  flags: typedoc.JSONOutput.ReflectionFlags,
+) => {
   let retVal = "";
   if (flags.isOptional) {
     retVal = `${retVal}?`;

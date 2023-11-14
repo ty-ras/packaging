@@ -1,5 +1,5 @@
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
-import { type TSESTree } from "@typescript-eslint/types/dist/index";
+import type * as typedoc from "typedoc";
+import { type TSESTree } from "@typescript-eslint/types";
 
 import type * as types from "./types";
 import * as declaration from "./declaration";
@@ -88,7 +88,7 @@ export type TryGetSpecificToken<TTokenInfo> = (item: TTokenInfo) => MaybeToken;
 
 const isReference = (
   reflection: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
-): reflection is types.WithoutChildren<typedoc.ReferenceReflection> =>
+): reflection is types.WithoutChildren<typedoc.JSONOutput.ReferenceReflection> =>
   reflection.variant === "reference";
 
 const createCallbacks = (index: types.ModelIndex) => {

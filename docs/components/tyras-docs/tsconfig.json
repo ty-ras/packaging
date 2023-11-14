@@ -6,13 +6,13 @@
       "ESNext",
       "DOM"
     ],
-    "outDir": "./dist",
-    "rootDir": ".",
     "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "resolveJsonModule": true,
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "outDir": "./dist",
+    "rootDir": ".",
   },
   "include": [
     "src/**/*",

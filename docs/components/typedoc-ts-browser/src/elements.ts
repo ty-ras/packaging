@@ -53,7 +53,6 @@ const getTopLevelElementsWithMutableDocKinds = (
               );
             return {
               allDocKinds: new Set([docKind]),
-              id,
               text: element.name,
               element,
               globalContext,
@@ -119,7 +118,7 @@ const deduplicateTopLevelElements = (
 
 export interface TopLevelElement<TAllDocKinds = ReadonlyArray<string>> {
   allDocKinds: TAllDocKinds;
-  id: number;
+  // id: number;
   text: string;
   showKind: boolean;
   element: types.IndexableModel;

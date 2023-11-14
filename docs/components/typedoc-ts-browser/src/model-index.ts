@@ -1,13 +1,13 @@
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import type * as typedoc from "typedoc";
 import type * as types from "./types";
 
 export const indexProject = ({
   children,
   ...project
-}: typedoc.ProjectReflection): types.Documentation => {
+}: typedoc.JSONOutput.ProjectReflection): types.Documentation => {
   const modelIndex: types.ModelIndex = {};
   const indexReflection = (
-    reflection: typedoc.DeclarationReflection,
+    reflection: typedoc.JSONOutput.DeclarationReflection,
     parentId: number | undefined,
   ): number => {
     const id = reflection.id;

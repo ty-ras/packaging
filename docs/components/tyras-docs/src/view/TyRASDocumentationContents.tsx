@@ -14,16 +14,18 @@ import * as documentation from "@typedoc-2-ts/browser";
 import type * as codeGen from "@typedoc-2-ts/transform";
 import TopLevelElementsList from "@typedoc-2-ts/solidjs/views/TopLevelElementsList";
 import SingleElementContents from "@typedoc-2-ts/solidjs/views/SingleElementContents";
-
+// This context does not need lazy as it doesn't really require any extra big libs
+import LinkFunctionalityContextProvider from "@typedoc-2-ts/solidjs/context/LinkFunctionalityContextProvider";
+import LinkContextContextProvider from "@typedoc-2-ts/solidjs/context/LinkContextContextProvider";
 import * as structure from "../structure";
 import type * as types from "./tyras-view.types";
 import * as routing from "./routing";
 
 // Put the context provider behind `lazy` as it imports Prettier libs, which are pretty  big
-const SingleElementContentsContextProvider = lazy(
+const CodeFunctionalityContextProvider = lazy(
   async () =>
     await import(
-      "@typedoc-2-ts/solidjs/components/SingleElementContentsContextProvider"
+      "@typedoc-2-ts/solidjs/context/CodeFunctionalityContextProvider"
     ),
 );
 
@@ -53,146 +55,138 @@ export default function TyRASDocumentationContents(
   // TODO Not sure if all of these Boxes are strictly necessary.
   // I used the same structure as GitHub webpage, but I'm sure it could be done with lesser amount of Boxes.
   return (
-    <Box>
-      <Box
-        sx={{
-          maxWidth: "100%",
-          marginLeft: "auto",
-          marginRight: "auto",
-          display: "flex",
-          flexWrap: "wrap",
-        }}
-      >
+    <LinkFunctionalityContextProvider
+      linkFunctionality={createLinkHrefFunctionality(
+        props.toolbarNavigationParams,
+        props.setContentNavigationParams,
+        props.setFullNavigationParams,
+        props.docs,
+        // elem().index,
+        // // If we have more than one version kind, for now - just pick first one.
+        // getAllDocKinds(props.docs, elem())?.[0] as
+        //   | structure.VersionKind
+        //   | undefined,
+      )}
+    >
+      <Box>
         <Box
           sx={{
             maxWidth: "100%",
+            marginLeft: "auto",
+            marginRight: "auto",
             display: "flex",
-            flexGrow: 1,
-            flexShrink: 1,
-            flexBasis: "100%",
             flexWrap: "wrap",
           }}
         >
-          <Box sx={{ width: "auto" }}>
-            <Box
-              sx={{
-                display: "flex",
-                width: "auto",
-                height: `calc(100vh - ${props.appBarElementHeigth}px)`,
-                maxHeight: `calc(100vh - ${props.appBarElementHeigth}px) !important`,
-                position: "sticky",
-                top: "0px",
-                flexDirection: "row-reverse",
-                minWidth: "0px",
-              }}
-            >
+          <Box
+            sx={{
+              maxWidth: "100%",
+              display: "flex",
+              flexGrow: 1,
+              flexShrink: 1,
+              flexBasis: "100%",
+              flexWrap: "wrap",
+            }}
+          >
+            <Box sx={{ width: "auto" }}>
               <Box
                 sx={{
-                  height: "100%",
-                  position: "relative",
-                  width: "1px",
-                  backgroundColor: "black",
+                  display: "flex",
+                  width: "auto",
+                  height: `calc(100vh - ${props.appBarElementHeigth}px)`,
+                  maxHeight: `calc(100vh - ${props.appBarElementHeigth}px) !important`,
+                  position: "sticky",
+                  top: "0px",
+                  flexDirection: "row-reverse",
+                  minWidth: "0px",
                 }}
               >
                 <Box
                   sx={{
-                    position: "absolute",
-                    inset: "0px -2px",
-                    cursor: "col-resize",
-                    backgroundColor: "transparent",
-                    transitionDelay: "0.1s",
+                    height: "100%",
+                    position: "relative",
+                    width: "1px",
+                    backgroundColor: "black",
                   }}
-                  onMouseDown={enableResize}
-                />
-              </Box>
-              <Box
-                sx={{
-                  overflow: "auto",
-                  width: width(),
-                }}
-              >
-                <TopLevelElementsList
-                  elements={documentation.getGroupedTopLevelElements(
-                    props.groupNames,
-                    props.groupStates,
-                    props.docs,
-                  )}
-                  lastSelectedGroup={props.lastSelectedGroup}
-                  setCurrentElement={(topLevel) =>
-                    props.setContentNavigationParams(
-                      props.toolbarNavigationParams.kind ===
-                        structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
-                        ? {
-                            selectedReflection: {
-                              docKind: topLevel
-                                .allDocKinds[0] as structure.VersionKind,
-                              name: topLevel.element.name,
-                            },
-                          }
-                        : { selectedReflection: topLevel.element.name },
-                    )
-                  }
-                />
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: "0px -2px",
+                      cursor: "col-resize",
+                      backgroundColor: "transparent",
+                      transitionDelay: "0.1s",
+                    }}
+                    onMouseDown={enableResize}
+                  />
+                </Box>
+                <Box
+                  sx={{
+                    overflow: "auto",
+                    width: width(),
+                  }}
+                >
+                  <TopLevelElementsList
+                    elements={documentation.getGroupedTopLevelElements(
+                      props.groupNames,
+                      props.groupStates,
+                      props.docs,
+                    )}
+                    lastSelectedGroup={props.lastSelectedGroup}
+                  />
+                </Box>
               </Box>
             </Box>
-          </Box>
-          <Box
-            component="main"
-            sx={{
-              display: "flex",
-              flexGrow: 1,
-              flexShrink: 1,
-              flexBasis: "0px",
-              minWidth: "1px",
-              height: `calc(100vh - ${props.appBarElementHeigth}px)`,
-              maxHeight: `calc(100vh - ${props.appBarElementHeigth}px) !important`,
-            }}
-          >
             <Box
+              component="main"
               sx={{
-                width: "100%",
+                display: "flex",
                 flexGrow: 1,
-                overflow: "auto",
+                flexShrink: 1,
+                flexBasis: "0px",
+                minWidth: "1px",
+                height: `calc(100vh - ${props.appBarElementHeigth}px)`,
+                maxHeight: `calc(100vh - ${props.appBarElementHeigth}px) !important`,
               }}
             >
-              <Show
-                when={currentElement()}
-                fallback={
-                  <Typography>
-                    {props.contentNavigationParams.selectedReflection
-                      ? "Loading..."
-                      : "Please select element from the list"}
-                  </Typography>
-                }
+              <Box
+                sx={{
+                  width: "100%",
+                  flexGrow: 1,
+                  overflow: "auto",
+                }}
               >
-                {(elem) => (
-                  <SingleElementContentsContextProvider
-                    index={elem().index}
-                    prettierOptions={prettierOptions()}
-                    linkFunctionality={createLinkHrefFunctionality(
-                      props.toolbarNavigationParams,
-                      props.setContentNavigationParams,
-                      props.setFullNavigationParams,
-                      elem().index,
-                      // If we have more than one version kind, for now - just pick first one.
-                      getAllDocKinds(props.docs, elem())?.[0] as
-                        | structure.VersionKind
-                        | undefined,
-                    )}
-                  >
-                    <SingleElementContents
-                      currentElement={elem().element}
-                      docKinds={getAllDocKinds(props.docs, elem())}
-                      headerLevel={3}
-                    />
-                  </SingleElementContentsContextProvider>
-                )}
-              </Show>
+                <Show
+                  when={currentElement()}
+                  fallback={
+                    <Typography>
+                      {props.contentNavigationParams.selectedReflection
+                        ? "Loading..."
+                        : "Please select element from the list"}
+                    </Typography>
+                  }
+                >
+                  {(elem) => (
+                    <CodeFunctionalityContextProvider
+                      index={elem().index}
+                      prettierOptions={prettierOptions()}
+                    >
+                      <LinkContextContextProvider linkContext={elem().element}>
+                        <SingleElementContents
+                          currentElement={elem().element}
+                          docKinds={getAllDocKinds(props.docs, elem())}
+                          headerLevel={3}
+                        />
+                      </LinkContextContextProvider>
+                    </CodeFunctionalityContextProvider>
+                  )}
+                </Show>
+              </Box>
             </Box>
           </Box>
         </Box>
       </Box>
-    </Box>
+    </LinkFunctionalityContextProvider>
   );
 }
 
@@ -286,76 +280,83 @@ const createLinkHrefFunctionality = (
   toolbarNavigationParams: types.ToolbarNavigationParams,
   setContentNavigationParams: types.SimpleSetter<types.ContentNavigationParams>,
   setFullNavigationParams: types.SimpleSetter<types.FullNavigationParams>,
-  index: documentation.ModelIndex,
-  docKind: structure.VersionKind | undefined,
-): documentation.LinkHrefFunctionality => ({
-  fromReflection: (id) => {
-    const reflection = index[id];
-    return reflection === undefined
-      ? undefined
-      : routing.logicalURL2ActualURL(
-          structure.buildNavigationURL(
+  docs: Record<string, structure.Documentation>,
+  // index: documentation.ModelIndex,
+  // docKind: structure.VersionKind | undefined,
+): documentation.LinkHrefFunctionality => {
+  const docEntries = Object.entries(docs);
+  const findDocKindAndDoc = (
+    linkContext: documentation.LinkContext,
+    id: number,
+  ) => docEntries.find(([, { modelIndex }]) => modelIndex[id] === linkContext);
+  return {
+    fromReflection: (linkContext, id) => {
+      const docKindAndDoc = findDocKindAndDoc(linkContext, id);
+      return docKindAndDoc === undefined
+        ? undefined
+        : routing.logicalURL2ActualURL(
+            structure.buildNavigationURL(
+              toolbarNavigationParams.kind ===
+                structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
+                ? {
+                    ...toolbarNavigationParams,
+                    selectedReflection: {
+                      name: docKindAndDoc[1].modelIndex[id].name,
+                      docKind: ensureDocKind(docKindAndDoc[0]),
+                    },
+                  }
+                : {
+                    ...toolbarNavigationParams,
+                    selectedReflection: docKindAndDoc[1].modelIndex[id].name,
+                  },
+            ),
+          );
+    },
+    fromExternalSymbol: () => `/external-todo`,
+    onClick: ({ context: linkContext, target, href }) => {
+      href = routing.actualURL2LogicalURL(href);
+      let navigate = true;
+      if (target === undefined) {
+        // Some link to something on this same site
+        const maybeParams = structure.parseParamsAndMaybeNewURL(href)?.params;
+        if (maybeParams) {
+          setFullNavigationParams(maybeParams);
+        } else {
+          // There was some internal error related to parsing params from string
+          navigate = false;
+        }
+      } else {
+        // Link to reflection
+        const docKindAndDoc = findDocKindAndDoc(linkContext, target);
+
+        if (docKindAndDoc) {
+          setContentNavigationParams(
             toolbarNavigationParams.kind ===
               structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
               ? {
-                  ...toolbarNavigationParams,
                   selectedReflection: {
-                    name: reflection.name,
-                    docKind: ensureDocKind(docKind),
+                    docKind: ensureDocKind(docKindAndDoc[0]),
+                    name: docKindAndDoc[1].modelIndex[target].name,
                   },
                 }
               : {
-                  ...toolbarNavigationParams,
-                  selectedReflection: reflection.name,
+                  selectedReflection: docKindAndDoc[1].modelIndex[target].name,
                 },
-          ),
-        );
-  },
-  fromExternalSymbol: () => `/external-todo`,
-  onClick: ({ target, href }) => {
-    href = routing.actualURL2LogicalURL(href);
-    let navigate = true;
-    let reflection: documentation.IndexableModel | undefined;
-    if (target === undefined) {
-      // Some link to something on this same site
-      const maybeParams = structure.parseParamsAndMaybeNewURL(href)?.params;
-      if (maybeParams) {
-        setFullNavigationParams(maybeParams);
-      } else {
-        // There was some internal error related to parsing params from string
-        navigate = false;
+          );
+        } else {
+          // Link to non-existing reflection?
+          navigate = false;
+        }
       }
-    } else {
-      // Link to reflection
-      reflection = index[target];
-
-      if (reflection) {
-        setContentNavigationParams(
-          toolbarNavigationParams.kind ===
-            structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
-            ? {
-                selectedReflection: {
-                  docKind: ensureDocKind(docKind),
-                  name: reflection.name,
-                },
-              }
-            : {
-                selectedReflection: reflection.name,
-              },
-        );
+      if (navigate) {
+        routing.afterNavigatingToURL(href);
       } else {
-        // Link to non-existing reflection?
-        navigate = false;
+        // eslint-disable-next-line no-console
+        console.error(`Could not navigate to ${target} via link "${href}"`);
       }
-    }
-    if (navigate) {
-      routing.afterNavigatingToURL(href);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error(`Could not navigate to ${target} via link "${href}"`);
-    }
-  },
-});
+    },
+  };
+};
 
 const getAllDocKinds = (
   docs: Record<string, structure.Documentation>,

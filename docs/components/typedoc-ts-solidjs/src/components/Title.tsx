@@ -1,6 +1,6 @@
-import type * as types from "./types";
-import * as functionality from "@typedoc-2-ts/transform";
+import * as codeGen from "@typedoc-2-ts/transform";
 import SmallHeader, { type SmallHeaderProps } from "./SmallHeader";
+import type * as functionality from "@typedoc-2-ts/browser";
 
 export default function Title(props: TitleProps) {
   return (
@@ -12,29 +12,29 @@ export default function Title(props: TitleProps) {
   );
 }
 
-export interface TitleProps
-  extends types.ReflectionElementProps,
-    SmallHeaderProps {}
+export interface TitleProps extends SmallHeaderProps {
+  element: functionality.IndexableModel;
+}
 
 const getReflectionKindTypeScriptName = (
-  reflectionKind: functionality.ReflectionKind,
+  reflectionKind: codeGen.ReflectionKind,
 ): string => {
   switch (reflectionKind) {
-    case functionality.ReflectionKind.Enum:
+    case codeGen.ReflectionKind.Enum:
       return "enum";
-    case functionality.ReflectionKind.Variable:
+    case codeGen.ReflectionKind.Variable:
       return "const";
-    case functionality.ReflectionKind.Function:
+    case codeGen.ReflectionKind.Function:
       return "function";
-    case functionality.ReflectionKind.Class:
+    case codeGen.ReflectionKind.Class:
       return "class";
-    case functionality.ReflectionKind.Interface:
+    case codeGen.ReflectionKind.Interface:
       return "interface";
-    case functionality.ReflectionKind.Constructor:
+    case codeGen.ReflectionKind.Constructor:
       return "constructor";
-    case functionality.ReflectionKind.Property:
+    case codeGen.ReflectionKind.Property:
       return "property";
-    case functionality.ReflectionKind.Method:
+    case codeGen.ReflectionKind.Method:
       return "method";
     default:
       throw new Error(`Implement TS name for ${reflectionKind}.`);

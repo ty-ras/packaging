@@ -1,4 +1,4 @@
-import { type TSESTree } from "@typescript-eslint/types/dist/index";
+import { type TSESTree } from "@typescript-eslint/types";
 import prettier from "prettier/standalone";
 import estree from "prettier/plugins/estree";
 import typescript from "prettier/plugins/typescript";

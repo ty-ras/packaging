@@ -1,23 +1,25 @@
-import { Match, Switch, useContext } from "solid-js";
+import { type JSX, Match, Switch, useContext } from "solid-js";
 import { OpenInNew } from "@suid/icons-material";
 import { Link as LinkMUI } from "@suid/material";
 import type * as navigation from "@typedoc-2-ts/browser";
-import singleElementContext from "../context/single-element-contents";
-import type * as types from "./types";
+import linkFunctionalityContext from "../context-def/link-functionality";
+import type * as typedoc from "typedoc";
 import SingleLineCode from "./SingleLineCode";
 
 export default function Link(props: LinkProps) {
-  const context = useContext(singleElementContext);
+  const context = useContext(linkFunctionalityContext);
   return (
     <Switch fallback={<BrokenLink text={props.target.text} />}>
       <Match
         when={tryGetInternalLinkInfo(
+          props.linkContext,
           props.target.target,
           context.linkFunctionality(),
         )}
       >
         {(internalLinkInfo) => (
           <InternalLink
+            context={props.linkContext}
             href={internalLinkInfo().href}
             navigation={internalLinkInfo().navigation}
             text={props.target.text}
@@ -43,18 +45,31 @@ export default function Link(props: LinkProps) {
 }
 
 export interface LinkProps {
-  target: types.InlineLink;
+  children?: JSX.Element;
+  linkContext: navigation.LinkContext;
+  target: InlineLink;
 }
 
+export interface InlineLink {
+  text: string;
+  target: InlineLinkTarget;
+}
+
+export type InlineLinkTarget = Exclude<
+  typedoc.JSONOutput.InlineTagDisplayPart["target"],
+  undefined
+>;
+
 const tryGetInternalLinkInfo = (
-  target: types.InlineLinkTarget,
+  context: navigation.LinkContext,
+  target: InlineLinkTarget,
   href: navigation.LinkHrefFunctionality,
 ):
   | { href: string; navigation: InternalLinkProps["navigation"] }
   | undefined => {
   switch (typeof target) {
     case "number": {
-      const hrefText = href.fromReflection(target);
+      const hrefText = href.fromReflection(context, target);
       return hrefText === undefined
         ? undefined
         : { href: hrefText, navigation: target };
@@ -72,7 +87,7 @@ const tryGetInternalLinkInfo = (
 };
 
 const tryGetExternalLinkInfo = (
-  target: types.InlineLinkTarget,
+  target: InlineLinkTarget,
   href: navigation.LinkHrefFunctionality,
 ): { href: string } | undefined => {
   switch (typeof target) {
@@ -102,6 +117,7 @@ interface InternalOrExternalLinkProps extends BaseLinkProps {
 interface InternalLinkProps extends InternalOrExternalLinkProps {
   navigation: number | true;
   onClick: navigation.HandleNavigation;
+  context: navigation.LinkContext;
 }
 
 function InternalLink(props: InternalLinkProps) {
@@ -111,6 +127,7 @@ function InternalLink(props: InternalLinkProps) {
       onClick={(evt) => {
         evt.preventDefault();
         props.onClick({
+          context: props.context,
           href: props.href,
           target: props.navigation === true ? undefined : props.navigation,
         });

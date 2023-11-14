@@ -1,5 +1,5 @@
 import { Throw } from "throw-expression";
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import type * as typedoc from "typedoc";
 import * as types from "./types";
 import * as flags from "./flags";
 import * as text from "./text";
@@ -10,7 +10,7 @@ export const createGetSignatureText = (
   getSomeTypeText: types.GetSomeTypeText,
 ): types.GetSignatureText => {
   function getSignatureText(
-    signature: typedoc.SignatureReflection,
+    signature: typedoc.JSONOutput.SignatureReflection,
     returnTypeSeparator: types.SignatureContext = types.SIG_CONTEXT_DEF,
   ): text.IntermediateCode {
     return code`${text.text(flags.getFlagsText(signature.flags))}${text.text(

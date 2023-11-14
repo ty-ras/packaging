@@ -1,4 +1,4 @@
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import type * as typedoc from "typedoc";
 
 export interface CodeGenerationContext {
   code: (
@@ -25,7 +25,10 @@ export type TemplateStringArgs = Array<
   | IntermediateCode
 >;
 
-export type LiteralValue = Exclude<typedoc.LiteralType["value"], string>;
+export type LiteralValue = Exclude<
+  typedoc.JSONOutput.LiteralType["value"],
+  string
+>;
 
 export type CodeGenerationFragment = string | CodeGenerationFragmentRef;
 
@@ -34,7 +37,9 @@ export interface CodeGenerationFragmentRef {
   ref: CodeGenerationTypeRef;
 }
 
-export type CodeGenerationTypeRef = number | typedoc.ReflectionSymbolId;
+export type CodeGenerationTypeRef =
+  | number
+  | typedoc.JSONOutput.ReflectionSymbolId;
 
 export interface JustText {
   text: string;

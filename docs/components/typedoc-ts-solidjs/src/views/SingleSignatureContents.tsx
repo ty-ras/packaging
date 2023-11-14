@@ -8,7 +8,7 @@ import {
   TableHead,
   TableRow,
 } from "@suid/material";
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import type * as typedoc from "typedoc";
 import type * as format from "@typedoc-2-ts/format";
 import { Throw } from "throw-expression";
 import Comment from "../components/Comment";
@@ -91,12 +91,12 @@ export default function SingleSignatureView(props: SingleSignatureViewProps) {
 }
 
 export interface SingleSignatureViewProps {
-  signature: typedoc.SignatureReflection;
+  signature: typedoc.JSONOutput.SignatureReflection;
   headerLevel: number;
   overloadOrder?: number;
 }
 
-const NOT_DOCUMENTED: Array<typedoc.CommentDisplayPart> = [
+const NOT_DOCUMENTED: Array<typedoc.JSONOutput.CommentDisplayPart> = [
   { kind: "text", text: "<Not documented>" },
 ];
 

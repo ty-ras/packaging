@@ -1,4 +1,4 @@
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import type * as typedoc from "typedoc";
 import { Throw } from "throw-expression";
 import * as types from "./types";
 import * as text from "./text";
@@ -12,7 +12,9 @@ export const createGetSomeTypeText = (
   getDeclarationText: types.GetDeclarationText,
 ): types.GetSomeTypeText => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  function getSomeTypeText(type: typedoc.SomeType): text.IntermediateCode {
+  function getSomeTypeText(
+    type: typedoc.JSONOutput.SomeType,
+  ): text.IntermediateCode {
     switch (type.type) {
       case "array":
         return code`Array<${getSomeTypeText(type.elementType)}>`;
@@ -112,7 +114,9 @@ export const createGetSomeTypeText = (
         return code`${text.text(type.name)}`;
       default:
         throw new Error(
-          `No implementation for type ${(type as typedoc.SomeType).type}`,
+          `No implementation for type ${
+            (type as typedoc.JSONOutput.SomeType).type
+          }`,
         );
     }
   }
@@ -120,7 +124,7 @@ export const createGetSomeTypeText = (
 };
 
 const getDeclarationReferenceText = (
-  declaration: typedoc.DeclarationReflection,
+  declaration: typedoc.JSONOutput.DeclarationReflection,
   getSignatureText: types.GetSignatureText,
   getDeclarationText: types.GetDeclarationText,
   getSomeTypeText: types.GetSomeTypeText,
@@ -163,7 +167,7 @@ const isBigInt = (
 const refToStr = (
   code: text.CodeGenerationContext["code"],
   registerImport: types.RegisterImport,
-  { target, ...type }: typedoc.ReferenceType,
+  { target, ...type }: typedoc.JSONOutput.ReferenceType,
 ) =>
   code`${
     typeof target === "number"

@@ -1,6 +1,7 @@
 import { Box, Typography } from "@suid/material";
 import { ErrorBoundary, For, createResource, useContext } from "solid-js";
-import singleElementContext from "../context/single-element-contents";
+import codeContextDef from "../context-def/code-functionality";
+import linkContextContextDef from "../context-def/link-context";
 import MultiLineCode from "./MultiLineCode";
 import type * as codeGen from "@typedoc-2-ts/transform";
 import type * as formatter from "@typedoc-2-ts/format";
@@ -9,12 +10,13 @@ import Link from "./Link";
 export default function FormattedCode<
   TKind extends keyof codeGen.CodeGenerator,
 >(props: FormattedCodeProps<TKind>) {
-  const context = useContext(singleElementContext);
+  const codeContext = useContext(codeContextDef);
+  const linkContextContext = useContext(linkContextContextDef);
   const [formattedCode] = createResource(
     () => props.reflection,
     async (reflection) => {
-      const rawCode = context.codeGenerator()[props.kind](reflection);
-      let tokenInfos = await context.codeFormatter()(
+      const rawCode = codeContext.codeGenerator()[props.kind](reflection);
+      let tokenInfos = await codeContext.codeFormatter()(
         "processTokenInfos" in rawCode ? rawCode.code : rawCode,
       );
       if ("processTokenInfos" in rawCode) {
@@ -42,6 +44,7 @@ export default function FormattedCode<
                 token
               ) : "token" in token ? (
                 <Link
+                  linkContext={linkContextContext.linkContext()}
                   target={{ text: token.token.value, target: token.typeRef }}
                 />
               ) : token.type !== "Keyword" ? (

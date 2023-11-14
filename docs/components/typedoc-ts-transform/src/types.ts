@@ -1,11 +1,11 @@
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
+import type * as typedoc from "typedoc";
 import type * as prettier from "prettier";
 import type * as common from "@typedoc-2-ts/types";
 import type * as text from "./text";
 
 export interface CodeGeneratorGenerationFunctionMap {
-  getTypeText: typedoc.SomeType;
-  getSignatureText: typedoc.SignatureReflection;
+  getTypeText: typedoc.JSONOutput.SomeType;
+  getSignatureText: typedoc.JSONOutput.SignatureReflection;
   getDeclarationText: IndexableModel;
 }
 
@@ -43,12 +43,13 @@ export type TypeReferencesInCode = Array<{
 }>;
 
 export type RegisterImport = (
-  refType: Omit<typedoc.ReferenceType, "target">,
-  target: typedoc.ReflectionSymbolId,
+  refType: Omit<typedoc.JSONOutput.ReferenceType, "target">,
+  target: typedoc.JSONOutput.ReflectionSymbolId,
 ) => text.IntermediateCode;
 
 export type ModelIndex = (id: number) => IndexableModel;
 
-export type IndexableModel = WithoutChildren<typedoc.DeclarationReflection>;
+export type IndexableModel =
+  WithoutChildren<typedoc.JSONOutput.DeclarationReflection>;
 
 export type WithoutChildren<T> = Omit<T, "children">;
