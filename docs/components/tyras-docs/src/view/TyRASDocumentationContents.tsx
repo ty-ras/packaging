@@ -257,12 +257,7 @@ const getCurrentElementFromNavigationParams = (
         ? selectedReflection
         : selectedReflection.name;
     const topLevel = documentation
-      .getTopLevelElements(
-        typeof selectedReflection === "string" ||
-          !(selectedReflection.docKind in docs)
-          ? docs
-          : { [selectedReflection.docKind]: docs[selectedReflection.docKind] },
-      )
+      .getTopLevelElements(docs)
       .find(({ element: { name: topLevelName } }) => topLevelName === name);
     return topLevel ? topLevelElementToSelectedElement(topLevel) : undefined;
   }
