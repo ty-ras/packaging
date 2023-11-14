@@ -1,14 +1,6 @@
-import {
-  Match,
-  Show,
-  Switch,
-  createMemo,
-  useContext,
-  type JSX,
-} from "solid-js";
+import { Match, Switch, useContext } from "solid-js";
 import { OpenInNew } from "@suid/icons-material";
 import { Link as LinkMUI } from "@suid/material";
-import type * as typedoc from "typedoc/dist/lib/serialization/schema";
 import type * as navigation from "@typedoc-2-ts/browser";
 import singleElementContext from "../context/single-element-contents";
 import type * as types from "./types";
@@ -16,18 +8,33 @@ import SingleLineCode from "./SingleLineCode";
 
 export default function Link(props: LinkProps) {
   const context = useContext(singleElementContext);
-  const hrefInfo = createMemo(() =>
-    getLinkHrefInfo(props.target.target, context.linkFunctionality()),
-  );
   return (
-    <Switch fallback={<SingleLineCode>{props.target.text}</SingleLineCode>}>
-      <Match when={hrefInfo().href}>
-        {(href) => (
-          <Anchor
-            href={href()}
+    <Switch fallback={<BrokenLink text={props.target.text} />}>
+      <Match
+        when={tryGetInternalLinkInfo(
+          props.target.target,
+          context.linkFunctionality(),
+        )}
+      >
+        {(internalLinkInfo) => (
+          <InternalLink
+            href={internalLinkInfo().href}
+            navigation={internalLinkInfo().navigation}
             text={props.target.text}
-            navigation={hrefInfo().navigation}
             onClick={context.linkFunctionality().onClick}
+          />
+        )}
+      </Match>
+      <Match
+        when={tryGetExternalLinkInfo(
+          props.target.target,
+          context.linkFunctionality(),
+        )}
+      >
+        {(externalLinkInfo) => (
+          <ExternalLink
+            href={externalLinkInfo().href}
+            text={props.target.text}
           />
         )}
       </Match>
@@ -39,47 +46,86 @@ export interface LinkProps {
   target: types.InlineLink;
 }
 
-const getLinkHrefInfo = (
+const tryGetInternalLinkInfo = (
   target: types.InlineLinkTarget,
   href: navigation.LinkHrefFunctionality,
-): LinkHrefInfo => {
+):
+  | { href: string; navigation: InternalLinkProps["navigation"] }
+  | undefined => {
   switch (typeof target) {
-    case "number":
-      return { href: href.fromReflection(target), navigation: target };
-    case "string": {
-      const origin = window.location.origin;
-      const targetURL = new URL(target, origin);
-      return {
-        href: targetURL.href,
-        navigation: targetURL.origin === origin ? true : undefined,
-      };
+    case "number": {
+      const hrefText = href.fromReflection(target);
+      return hrefText === undefined
+        ? undefined
+        : { href: hrefText, navigation: target };
     }
-    case "object":
-      return { href: href.fromExternalSymbol(target), navigation: undefined };
-    default:
-      throw new Error(`Unrecognized target ${target}`);
+    case "string": {
+      const { origin, targetURL } = getTargetURL(target);
+      return targetURL.origin === origin
+        ? {
+            href: targetURL.href,
+            navigation: true,
+          }
+        : undefined;
+    }
   }
 };
 
-interface LinkHrefInfo {
-  href: string | undefined;
-  navigation: NavigationInfo | undefined;
-}
-type NavigationInfo = number | typedoc.ReflectionSymbolId | true;
+const tryGetExternalLinkInfo = (
+  target: types.InlineLinkTarget,
+  href: navigation.LinkHrefFunctionality,
+): { href: string } | undefined => {
+  switch (typeof target) {
+    case "string": {
+      const { origin, targetURL } = getTargetURL(target);
+      return targetURL.origin === origin
+        ? undefined
+        : {
+            href: targetURL.href,
+          };
+    }
+    case "object": {
+      const hrefText = href.fromExternalSymbol(target);
+      return hrefText === undefined ? undefined : { href: hrefText };
+    }
+  }
+};
 
-// <SwitchDiscriminating object={obj} discriminator="type" fallback={(objFallback) => <></>}>
-//   <Match when="kind1">{(objKind1) => <></>}</Match>
-//   <Match when="kind2">{(objKind2) => <></>}</Match>
-// </SwitchDiscriminating>
-
-interface AnchorProps {
-  href: string;
-  navigation: NavigationInfo | undefined;
+interface BaseLinkProps {
   text: string;
+}
+
+interface InternalOrExternalLinkProps extends BaseLinkProps {
+  href: string;
+}
+
+interface InternalLinkProps extends InternalOrExternalLinkProps {
+  navigation: number | true;
   onClick: navigation.HandleNavigation;
 }
 
-function Anchor(props: AnchorProps) {
+function InternalLink(props: InternalLinkProps) {
+  return (
+    <LinkMUI
+      href={props.href}
+      onClick={(evt) => {
+        evt.preventDefault();
+        props.onClick({
+          href: props.href,
+          target: props.navigation === true ? undefined : props.navigation,
+        });
+      }}
+    >
+      {props.text}
+    </LinkMUI>
+  );
+}
+
+interface ExternalLinkProps extends InternalOrExternalLinkProps {
+  // No additional props
+}
+
+function ExternalLink(props: ExternalLinkProps) {
   return (
     <LinkMUI
       sx={{
@@ -88,28 +134,25 @@ function Anchor(props: AnchorProps) {
         justifyItems: "center",
       }}
       href={props.href}
-      onClick={
-        props.navigation === undefined || typeof props.navigation === "object"
-          ? undefined
-          : getEventHandler(props.href, props.navigation, props.onClick)
-      }
-      target={props.navigation === undefined ? "_blank" : undefined}
+      target={"_blank"}
+      rel="noreferrer"
     >
       <span>{props.text}</span>
-      <Show when={props.navigation === undefined}>
-        <OpenInNew fontSize="small" />
-      </Show>
+      <OpenInNew fontSize="inherit" />
     </LinkMUI>
   );
 }
+interface BrokenLinkProps extends BaseLinkProps {
+  // No custom properties so far
+}
+function BrokenLink(props: BrokenLinkProps) {
+  return <SingleLineCode>{props.text}</SingleLineCode>;
+}
 
-const getEventHandler =
-  (
-    href: string,
-    target: Exclude<NavigationInfo, typedoc.ReflectionSymbolId>,
-    onClick: AnchorProps["onClick"],
-  ): JSX.EventHandlerUnion<HTMLAnchorElement, MouseEvent> =>
-  (evt) => {
-    evt.preventDefault();
-    onClick({ href, target: target === true ? undefined : target });
+const getTargetURL = (href: string) => {
+  const origin = window.location.origin;
+  return {
+    origin,
+    targetURL: new URL(href, origin),
   };
+};
