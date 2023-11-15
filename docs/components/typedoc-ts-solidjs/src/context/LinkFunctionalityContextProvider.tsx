@@ -17,5 +17,5 @@ export default function LinkFunctionalityContextProvider(
 
 export interface LinkFunctionalityContextProviderProps {
   children: JSX.Element;
-  linkFunctionality: navigation.LinkHrefFunctionality;
+  linkFunctionality: navigation.LinkFunctionality;
 }

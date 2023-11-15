@@ -23,7 +23,7 @@ export default function TopLevelElementsList(props: TopLevelElementsListProps) {
                   const func = linkFunctionality.linkFunctionality();
                   const context = element.element;
                   const target = context.id;
-                  const href = func.fromReflection(context, target);
+                  const info = func.fromReflection(context, target);
                   return (
                     <ListItem disablePadding>
                       <ListItemButton
@@ -31,16 +31,16 @@ export default function TopLevelElementsList(props: TopLevelElementsListProps) {
                           index() === 0 && props.lastSelectedGroup === groupName
                         }
                         component="a"
-                        href={href}
+                        href={info?.href}
                         onClick={(evt) => {
                           evt.preventDefault();
-                          if (href) {
-                            func.onClick({ context, href, target });
+                          if (info) {
+                            func.onClick({ context, href: info.href, target });
                           }
                         }}
                       >
                         <ListItemText
-                          primary={element.text}
+                          primary={info?.text ?? element.text}
                           secondary={
                             element.showKind
                               ? element.globalContext.docKind

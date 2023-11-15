@@ -11,7 +11,6 @@ export default function SingleElementView(
   props: SingleElementViewProps,
 ): JSX.Element {
   // Functions, Constructors, and Accessors never have comments directly on them.
-  console.log("FAK", props.currentElement, props.docKinds);
   return (
     <>
       <section>

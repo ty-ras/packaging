@@ -13,7 +13,7 @@ export default function Link(props: LinkProps) {
       <Match
         when={tryGetInternalLinkInfo(
           props.linkContext,
-          props.target.target,
+          props.target,
           context.linkFunctionality(),
         )}
       >
@@ -22,7 +22,8 @@ export default function Link(props: LinkProps) {
             context={props.linkContext}
             href={internalLinkInfo().href}
             navigation={internalLinkInfo().navigation}
-            text={props.target.text}
+            // Don't use props.target.text, as it might be something like "<import name>.<type name>"
+            text={internalLinkInfo().text}
             onClick={context.linkFunctionality().onClick}
           />
         )}
@@ -62,22 +63,23 @@ export type InlineLinkTarget = Exclude<
 
 const tryGetInternalLinkInfo = (
   context: navigation.LinkContext,
-  target: InlineLinkTarget,
-  href: navigation.LinkHrefFunctionality,
+  { target, text }: InlineLink,
+  href: navigation.LinkFunctionality,
 ):
-  | { href: string; navigation: InternalLinkProps["navigation"] }
+  | (navigation.InternalLinkInfo & {
+      navigation: InternalLinkProps["navigation"];
+    })
   | undefined => {
   switch (typeof target) {
     case "number": {
-      const hrefText = href.fromReflection(context, target);
-      return hrefText === undefined
-        ? undefined
-        : { href: hrefText, navigation: target };
+      const info = href.fromReflection(context, target);
+      return info === undefined ? undefined : { ...info, navigation: target };
     }
     case "string": {
       const { origin, targetURL } = getTargetURL(target);
       return targetURL.origin === origin
         ? {
+            text,
             href: targetURL.href,
             navigation: true,
           }
@@ -88,8 +90,8 @@ const tryGetInternalLinkInfo = (
 
 const tryGetExternalLinkInfo = (
   target: InlineLinkTarget,
-  href: navigation.LinkHrefFunctionality,
-): { href: string } | undefined => {
+  href: navigation.LinkFunctionality,
+): navigation.ExternalLinkInfo | undefined => {
   switch (typeof target) {
     case "string": {
       const { origin, targetURL } = getTargetURL(target);
@@ -99,10 +101,8 @@ const tryGetExternalLinkInfo = (
             href: targetURL.href,
           };
     }
-    case "object": {
-      const hrefText = href.fromExternalSymbol(target);
-      return hrefText === undefined ? undefined : { href: hrefText };
-    }
+    case "object":
+      return href.fromExternalSymbol(target);
   }
 };
 

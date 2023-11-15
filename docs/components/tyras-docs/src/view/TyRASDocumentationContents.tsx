@@ -284,38 +284,40 @@ const createLinkHrefFunctionality = (
   setContentNavigationParams: types.SimpleSetter<types.ContentNavigationParams>,
   setFullNavigationParams: types.SimpleSetter<types.FullNavigationParams>,
   docs: Record<string, structure.Documentation>,
-  // index: documentation.ModelIndex,
-  // docKind: structure.VersionKind | undefined,
-): documentation.LinkHrefFunctionality => {
+): documentation.LinkFunctionality => {
   const docEntries = Object.entries(docs);
-  const findDocKindAndDoc = (
-    linkContext: documentation.LinkContext,
-    id: number,
-  ) => docEntries.find(([, { modelIndex }]) => modelIndex[id] === linkContext);
+  const findDocKindAndDoc = (linkContext: documentation.LinkContext) =>
+    docEntries.find(
+      ([, { modelIndex }]) => modelIndex[linkContext.id] === linkContext,
+    );
   return {
     fromReflection: (linkContext, id) => {
-      const docKindAndDoc = findDocKindAndDoc(linkContext, id);
-      return docKindAndDoc === undefined
+      const docKindAndDoc = findDocKindAndDoc(linkContext);
+      const targetModel = docKindAndDoc?.[1].modelIndex[id];
+      return docKindAndDoc === undefined || targetModel === undefined
         ? undefined
-        : routing.logicalURL2ActualURL(
-            structure.buildNavigationURL(
-              toolbarNavigationParams.kind ===
-                structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
-                ? {
-                    ...toolbarNavigationParams,
-                    selectedReflection: {
-                      name: docKindAndDoc[1].modelIndex[id].name,
-                      docKind: ensureDocKind(docKindAndDoc[0]),
+        : {
+            text: targetModel.name,
+            href: routing.logicalURL2ActualURL(
+              structure.buildNavigationURL(
+                toolbarNavigationParams.kind ===
+                  structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
+                  ? {
+                      ...toolbarNavigationParams,
+                      selectedReflection: {
+                        name: targetModel.name,
+                        docKind: ensureDocKind(docKindAndDoc[0]),
+                      },
+                    }
+                  : {
+                      ...toolbarNavigationParams,
+                      selectedReflection: targetModel.name,
                     },
-                  }
-                : {
-                    ...toolbarNavigationParams,
-                    selectedReflection: docKindAndDoc[1].modelIndex[id].name,
-                  },
+              ),
             ),
-          );
+          };
     },
-    fromExternalSymbol: () => `/external-todo`,
+    fromExternalSymbol: () => ({ href: `/external-todo` }),
     onClick: ({ context: linkContext, target, href }) => {
       href = routing.actualURL2LogicalURL(href);
       let navigate = true;
@@ -330,7 +332,7 @@ const createLinkHrefFunctionality = (
         }
       } else {
         // Link to reflection
-        const docKindAndDoc = findDocKindAndDoc(linkContext, target);
+        const docKindAndDoc = findDocKindAndDoc(linkContext);
 
         if (docKindAndDoc) {
           setContentNavigationParams(

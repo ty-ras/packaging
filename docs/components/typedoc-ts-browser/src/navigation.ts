@@ -1,13 +1,25 @@
 import type * as typedoc from "typedoc";
 import type * as types from "./types";
 
-export interface LinkHrefFunctionality {
-  fromReflection: (context: LinkContext, id: number) => string | undefined;
+export interface LinkFunctionality {
+  fromReflection: (
+    context: LinkContext,
+    id: number,
+  ) => InternalLinkInfo | undefined;
   fromExternalSymbol: (
     symbol: typedoc.JSONOutput.ReflectionSymbolId,
-  ) => string | undefined;
+  ) => ExternalLinkInfo | undefined;
   // Only called if fromReflection ort fromExternalSymbol returns non-undefined
   onClick: HandleNavigation;
+}
+
+export interface InternalLinkInfo {
+  href: string;
+  text: string;
+}
+
+export interface ExternalLinkInfo {
+  href: string;
 }
 
 export type LinkContext = types.IndexableModel;

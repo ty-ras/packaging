@@ -3,7 +3,7 @@ import type * as navigation from "@typedoc-2-ts/browser";
 import * as ctx from "./common";
 
 export interface LinkFunctionalityContext {
-  linkFunctionality: () => navigation.LinkHrefFunctionality;
+  linkFunctionality: () => navigation.LinkFunctionality;
 }
 
 const requiresContext = ctx.requiresContext("LinkFunctionality");
