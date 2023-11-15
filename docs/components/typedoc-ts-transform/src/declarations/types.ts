@@ -13,7 +13,12 @@ export type ReflectionKindFunctionalityToText =
     }
   | ((args: GetBodyTextArgs) => text.IntermediateCode);
 
-export type GetChildren = (args: GetChildrenArgs) => Array<number>;
+export type GetChildren = (args: GetChildrenArgs) => Array<GroupChildren>;
+
+export interface GroupChildren {
+  groupName: string;
+  sortedChildren: Array<number>;
+}
 
 export interface GetSomeTextArgs {
   codeGenerationContext: text.CodeGenerationContext;

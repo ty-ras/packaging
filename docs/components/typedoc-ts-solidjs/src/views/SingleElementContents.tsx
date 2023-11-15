@@ -1,6 +1,7 @@
 import { For, Match, Show, Switch, type JSX } from "solid-js";
 import { Chip, Stack } from "@suid/material";
 import * as functionality from "@typedoc-2-ts/browser";
+import * as transform from "@typedoc-2-ts/transform";
 import Title from "../components/Title";
 import Comment from "../components/Comment";
 import FormattedCode from "../components/FormattedCode";
@@ -67,9 +68,30 @@ export default function SingleElementView(
           </Match>
         </Switch>
       </section>
-      {
-        // Traverse children and invoke itself recursively?
-      }
+      <For
+        each={transform.getDeclarationChildren({
+          declaration: props.currentElement,
+          index: (id) => props.index[id],
+        })}
+      >
+        {(groupInfo) => (
+          <section>
+            <SmallHeader headerLevel={props.headerLevel}>
+              {groupInfo.groupName}
+            </SmallHeader>
+            <For each={groupInfo.sortedChildren}>
+              {(childId) => (
+                <SingleElementView
+                  currentElement={props.index[childId]}
+                  headerLevel={props.headerLevel + 1}
+                  index={props.index}
+                  docKinds={undefined}
+                />
+              )}
+            </For>
+          </section>
+        )}
+      </For>
     </>
   );
 }
@@ -77,6 +99,7 @@ export default function SingleElementView(
 export interface SingleElementViewProps {
   currentElement: functionality.IndexableModel;
   headerLevel: number;
+  index: functionality.ModelIndex;
   docKinds: ReadonlyArray<string> | undefined;
 }
 

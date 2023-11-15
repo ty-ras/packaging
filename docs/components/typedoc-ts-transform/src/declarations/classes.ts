@@ -11,11 +11,12 @@ const getChildren: types.GetChildren = ({ declaration, index }) =>
         get.getGroupOrderNumber(titleX, CLASS_CHILDREN_ORDER) -
         get.getGroupOrderNumber(titleY, CLASS_CHILDREN_ORDER),
     )
-    .flatMap(({ children }) =>
-      [...(children ?? [])].sort((childIdX, childIdY) =>
+    .map(({ title, children }) => ({
+      groupName: title,
+      sortedChildren: [...(children ?? [])].sort((childIdX, childIdY) =>
         index(childIdX).name.localeCompare(index(childIdY).name),
       ),
-    );
+    }));
 
 export default {
   text: {
@@ -39,8 +40,8 @@ export default {
         code` implements ${text.join(implementedTypes.map(getTypeText), ", ")}`,
     )} {
 ${text.join(
-  getChildren({ declaration, index }).map((childId) =>
-    getDeclarationText(index(childId)),
+  getChildren({ declaration, index }).flatMap(({ sortedChildren }) =>
+    sortedChildren.map((childId) => getDeclarationText(index(childId))),
   ),
   "\n",
 )}

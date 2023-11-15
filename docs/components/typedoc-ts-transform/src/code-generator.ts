@@ -38,9 +38,7 @@ export const createCodeGenerator = (index: types.ModelIndex): CodeGenerator => {
           textGenerator,
           importContext,
           // We must prefix with `type ___X___ = <actual type> in order to make it valid TypeScript program
-          textGenerator.code`${text.text(TYPE)} ${text.text(
-            TYPE_NAME,
-          )} ${text.text(EQUALS)} ${typeToText(type)}`,
+          textGenerator.code`${text.text(FULL_PREFIX)}${typeToText(type)}`,
         ),
         processTokenInfos: processTokenInfosForType,
       };
@@ -173,6 +171,7 @@ ${intermediate}`;
 const TYPE = "type";
 const TYPE_NAME = "___X___";
 const EQUALS = "=";
+const FULL_PREFIX = `${TYPE} ${TYPE_NAME} ${EQUALS} `;
 
 const processTokenInfosForType: TokenInfoProcessor = (
   tokenInfos,

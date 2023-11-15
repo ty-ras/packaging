@@ -176,6 +176,7 @@ export default function TyRASDocumentationContents(
                           currentElement={elem().element}
                           docKinds={getAllDocKinds(props.docs, elem())}
                           headerLevel={3}
+                          index={elem().index}
                         />
                       </LinkContextContextProvider>
                     </CodeFunctionalityContextProvider>
