@@ -10,6 +10,7 @@ import {
 } from "@suid/material";
 import type * as typedoc from "typedoc";
 import type * as format from "@typedoc-2-ts/format";
+import * as transform from "@typedoc-2-ts/transform";
 import { Throw } from "throw-expression";
 import Comment from "../components/Comment";
 import SingleLineCode from "../components/SingleLineCode";
@@ -59,30 +60,37 @@ export default function SingleSignatureView(props: SingleSignatureViewProps) {
                 </TableRow>
               )}
             </For>
-            <TableRow>
-              <TableCell component="th" scope="row">
-                Return value
-              </TableCell>
-              <TableCell>
-                <FormattedCode
-                  reflection={
-                    props.signature.type ??
-                    Throw("Signature without return type")
-                  }
-                  kind="getTypeText"
-                  tokenInfoProcessor={typeTokensProcessor}
-                />
-              </TableCell>
-              <TableCell>
-                <Comment
-                  comment={
-                    props.signature.comment?.blockTags?.find(
-                      (cTag) => cTag.tag === "@returns",
-                    )?.content ?? NOT_DOCUMENTED
-                  }
-                />
-              </TableCell>
-            </TableRow>
+            <Show
+              when={
+                props.signature.kind !==
+                transform.ReflectionKind.ConstructorSignature
+              }
+            >
+              <TableRow>
+                <TableCell component="th" scope="row">
+                  Return value
+                </TableCell>
+                <TableCell>
+                  <FormattedCode
+                    reflection={
+                      props.signature.type ??
+                      Throw("Signature without return type")
+                    }
+                    kind="getTypeText"
+                    tokenInfoProcessor={typeTokensProcessor}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Comment
+                    comment={
+                      props.signature.comment?.blockTags?.find(
+                        (cTag) => cTag.tag === "@returns",
+                      )?.content ?? NOT_DOCUMENTED
+                    }
+                  />
+                </TableCell>
+              </TableRow>
+            </Show>
           </TableBody>
         </Table>
       </TableContainer>

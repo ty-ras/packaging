@@ -7,6 +7,8 @@ export const VERSION_KIND_SERVER = NAVIGATION_PARAM_KIND_SERVER;
 export const VERSION_KIND_CLIENT = NAVIGATION_PARAM_KIND_CLIENT;
 
 export const SELECTED_REFLECTION_SEPARATOR = "-";
+export const SELECTED_REFLECTION_PATH_ITEM_SEPARATOR = ":";
+export const SELECTED_REFLECTION_GROUP_CHILD_SEPARATOR = "-";
 
 /**
  * Only applicable for server or client, not data validation

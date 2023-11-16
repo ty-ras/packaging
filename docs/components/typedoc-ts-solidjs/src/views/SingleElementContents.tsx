@@ -6,6 +6,7 @@ import {
   type JSX,
   createResource,
   useContext,
+  onMount,
 } from "solid-js";
 import { Chip, Stack } from "@suid/material";
 import * as functionality from "@typedoc-2-ts/browser";
@@ -24,7 +25,7 @@ export default function SingleElementView(
 ): JSX.Element {
   const codeContext = useContext(codeContextDef);
   const [formattedCode] = createResource(
-    () => props.currentElement,
+    () => props.topLevelElement,
     async (reflection) =>
       await formatting.formatCodeAsync(
         codeContext,
@@ -36,12 +37,13 @@ export default function SingleElementView(
   return (
     <SingleElementViewForTokens
       headerLevel={props.headerLevel}
+      topLevelElement={props.topLevelElement}
+      docKinds={props.docKinds}
+      focusToChild={props.focusToChild}
       titlePrefix={`${getReflectionKindTypeScriptName(
-        props.currentElement.kind,
+        props.topLevelElement.kind,
       )} `}
       index={props.index}
-      currentElement={props.currentElement}
-      docKinds={props.docKinds}
       formattedCode={formattedCode()}
     />
   );
@@ -51,7 +53,8 @@ export interface SingleElementViewProps {
   headerLevel: number;
   index: functionality.ModelIndex;
   docKinds: ReadonlyArray<string> | undefined;
-  currentElement: functionality.IndexableModel;
+  topLevelElement: functionality.IndexableModel;
+  focusToChild: number | undefined;
 }
 
 const tryGetSingleSignature = (element: functionality.IndexableModel) =>
@@ -63,12 +66,21 @@ const tryGetManySignatures = (element: functionality.IndexableModel) =>
 function SingleElementViewForTokens(
   props: SingleElementViewForTokensProps,
 ): JSX.Element {
+  let refElement: HTMLHeadingElement | undefined;
+  onMount(() => {
+    if (
+      props.focusToChild !== undefined &&
+      props.focusToChild === props.topLevelElement.id
+    ) {
+      refElement?.scrollIntoView();
+    }
+  });
   return (
     <>
       <section>
-        <SmallHeader headerLevel={props.headerLevel}>
+        <SmallHeader ref={refElement} headerLevel={props.headerLevel}>
           {props.titlePrefix}
-          <code>{props.currentElement.name}</code>
+          <code>{props.topLevelElement.name}</code>
         </SmallHeader>
         <Show when={props.docKinds}>
           {(docKinds) => (
@@ -86,7 +98,7 @@ function SingleElementViewForTokens(
           {(theCode) => <TokenizedCode tokens={theCode().tokens} />}
         </Show>
         <Switch>
-          <Match when={props.currentElement.comment}>
+          <Match when={props.topLevelElement.comment}>
             {(summary) => (
               <>
                 <SmallHeader headerLevel={props.headerLevel}>
@@ -96,7 +108,7 @@ function SingleElementViewForTokens(
               </>
             )}
           </Match>
-          <Match when={tryGetSingleSignature(props.currentElement)}>
+          <Match when={tryGetSingleSignature(props.topLevelElement)}>
             {(signature) => (
               <SingleSignatureView
                 signature={signature()}
@@ -104,7 +116,7 @@ function SingleElementViewForTokens(
               />
             )}
           </Match>
-          <Match when={tryGetManySignatures(props.currentElement)}>
+          <Match when={tryGetManySignatures(props.topLevelElement)}>
             {(signatures) => (
               <For each={signatures()}>
                 {(signature, index) => (
@@ -121,42 +133,43 @@ function SingleElementViewForTokens(
           </Match>
         </Switch>
       </section>
-      <Show when={props.formattedCode}>
-        {(theCode) => (
-          <For
-            each={transform.getDeclarationChildren({
-              declaration: props.currentElement,
-              index: (id) => props.index[id],
-            })}
-          >
-            {(groupInfo) => (
-              <section>
-                <SmallHeader headerLevel={props.headerLevel}>
-                  {groupInfo.groupName}
-                </SmallHeader>
-                <For each={groupInfo.sortedChildren}>
-                  {(childId) => (
-                    <SingleElementViewForTokens
-                      currentElement={props.index[childId]}
-                      titlePrefix=""
-                      headerLevel={props.headerLevel + 1}
-                      index={props.index}
-                      docKinds={undefined}
-                      formattedCode={{
-                        declarationRanges: theCode().declarationRanges,
-                        tokens: getTokensForDeclaration(
-                          theCode().tokens,
-                          theCode().declarationRanges[childId],
-                        ),
-                      }}
-                    />
-                  )}
-                </For>
-              </section>
-            )}
-          </For>
+
+      <For
+        each={transform.getDeclarationChildren({
+          declaration: props.topLevelElement,
+          index: (id) => props.index[id],
+        })}
+      >
+        {(groupInfo) => (
+          <section>
+            <SmallHeader headerLevel={props.headerLevel}>
+              {groupInfo.groupName}
+            </SmallHeader>
+            <For each={groupInfo.sortedChildren}>
+              {(childId) => (
+                <SingleElementViewForTokens
+                  index={props.index}
+                  focusToChild={props.focusToChild}
+                  headerLevel={props.headerLevel + 1}
+                  topLevelElement={props.index[childId]}
+                  titlePrefix=""
+                  docKinds={undefined}
+                  formattedCode={{
+                    declarationRanges:
+                      props.formattedCode?.declarationRanges ?? {},
+                    tokens: props.formattedCode
+                      ? getTokensForDeclaration(
+                          props.formattedCode.tokens,
+                          props.formattedCode.declarationRanges[childId],
+                        )
+                      : [],
+                  }}
+                />
+              )}
+            </For>
+          </section>
         )}
-      </Show>
+      </For>
     </>
   );
 }

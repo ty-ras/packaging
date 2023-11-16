@@ -5,6 +5,7 @@ import * as functionality from "@typedoc-2-ts/browser";
 export default function SmallHeader(props: SmallHeaderProps) {
   return (
     <Typography
+      ref={props.ref}
       component={`h${functionality.ensureHeaderLevel(props.headerLevel)}`}
       variant={`h${functionality.ensureHeaderLevel(props.headerLevel + 1)}`}
     >
@@ -16,4 +17,5 @@ export default function SmallHeader(props: SmallHeaderProps) {
 export interface SmallHeaderProps {
   headerLevel: number;
   children?: JSX.Element;
+  ref?: HTMLHeadingElement;
 }

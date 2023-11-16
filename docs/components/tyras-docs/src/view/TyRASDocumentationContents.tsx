@@ -13,7 +13,9 @@ import equals from "fast-deep-equal";
 import * as documentation from "@typedoc-2-ts/browser";
 import type * as codeGen from "@typedoc-2-ts/transform";
 import TopLevelElementsList from "@typedoc-2-ts/solidjs/views/TopLevelElementsList";
-import SingleElementContents from "@typedoc-2-ts/solidjs/views/SingleElementContents";
+import SingleElementContents, {
+  type SingleElementViewProps,
+} from "@typedoc-2-ts/solidjs/views/SingleElementContents";
 // This context does not need lazy as it doesn't really require any extra big libs
 import LinkFunctionalityContextProvider from "@typedoc-2-ts/solidjs/context/LinkFunctionalityContextProvider";
 import LinkContextContextProvider from "@typedoc-2-ts/solidjs/context/LinkContextContextProvider";
@@ -171,10 +173,13 @@ export default function TyRASDocumentationContents(
                       index={elem().index}
                       prettierOptions={prettierOptions()}
                     >
-                      <LinkContextContextProvider linkContext={elem().element}>
+                      <LinkContextContextProvider
+                        linkContext={elem().topLevelElement}
+                      >
                         <SingleElementContents
-                          currentElement={elem().element}
+                          topLevelElement={elem().topLevelElement}
                           docKinds={getAllDocKinds(props.docs, elem())}
+                          focusToChild={elem().focusToChild}
                           headerLevel={3}
                           index={elem().index}
                         />
@@ -251,34 +256,55 @@ const useResize = (minWidth: number, initialWidth?: number) => {
 const getCurrentElementFromNavigationParams = (
   selectedReflection: structure.SelectedReflection,
   docs: Record<string, structure.Documentation>,
-): types.SelectedElement | undefined => {
+): SelectedElement | undefined => {
   if (selectedReflection) {
-    const name =
-      typeof selectedReflection === "string"
-        ? selectedReflection
-        : selectedReflection.name;
+    const path =
+      "docKind" in selectedReflection
+        ? selectedReflection.path
+        : selectedReflection;
     const docKind =
-      typeof selectedReflection === "string"
-        ? undefined
-        : selectedReflection.docKind;
+      "docKind" in selectedReflection ? selectedReflection.docKind : undefined;
     const topLevel = documentation
       .getTopLevelElements(docs)
       .find(
         ({ allDocKinds, element: { name: topLevelName } }) =>
-          topLevelName === name &&
+          path.topLevelName === topLevelName &&
           (docKind === undefined || allDocKinds.indexOf(docKind) >= 0),
       );
-    return topLevel ? topLevelElementToSelectedElement(topLevel) : undefined;
+
+    return topLevel
+      ? topLevelElementToSelectedElement(topLevel, path.pathToElement)
+      : undefined;
   }
 };
 
 const topLevelElementToSelectedElement = (
   topLevel: documentation.TopLevelElement,
-): types.SelectedElement => ({
-  element: topLevel.element,
-  index: topLevel.globalContext.index,
-  allDocKinds: topLevel.allDocKinds,
-});
+  pathArray: structure.SelectedReflectionPathArray,
+): SelectedElement => {
+  const index = topLevel.globalContext.index;
+  const topLevelElement = topLevel.element;
+  return {
+    topLevelElement,
+    index,
+    docKinds: topLevel.allDocKinds,
+    focusToChild:
+      pathArray.length > 0
+        ? pathArray.reduce<number | undefined>(
+            (prevModelId, { groupName, elementName }) => {
+              return prevModelId === undefined
+                ? undefined
+                : index[prevModelId]?.groups
+                    ?.find(({ title }) => title === groupName)
+                    ?.children?.find(
+                      (childId) => index[childId]?.name === elementName,
+                    );
+            },
+            topLevelElement.id,
+          )
+        : undefined,
+  };
+};
 
 const createLinkHrefFunctionality = (
   toolbarNavigationParams: types.ToolbarNavigationParams,
@@ -294,8 +320,11 @@ const createLinkHrefFunctionality = (
   return {
     fromReflection: (linkContext, id) => {
       const docKindAndDoc = findDocKindAndDoc(linkContext);
-      const targetModel = docKindAndDoc?.[1].modelIndex[id];
-      return docKindAndDoc === undefined || targetModel === undefined
+      const modelIndex = docKindAndDoc?.[1].modelIndex;
+      const targetModel = modelIndex?.[id];
+      return docKindAndDoc === undefined ||
+        targetModel === undefined ||
+        modelIndex === undefined
         ? undefined
         : {
             text: targetModel.name,
@@ -306,13 +335,19 @@ const createLinkHrefFunctionality = (
                   ? {
                       ...toolbarNavigationParams,
                       selectedReflection: {
-                        name: targetModel.name,
                         docKind: ensureDocKind(docKindAndDoc[0]),
+                        path: createSelectedReflectionPath(
+                          targetModel,
+                          modelIndex,
+                        ),
                       },
                     }
                   : {
                       ...toolbarNavigationParams,
-                      selectedReflection: targetModel.name,
+                      selectedReflection: createSelectedReflectionPath(
+                        targetModel,
+                        modelIndex,
+                      ),
                     },
               ),
             ),
@@ -336,17 +371,22 @@ const createLinkHrefFunctionality = (
         const docKindAndDoc = findDocKindAndDoc(linkContext);
 
         if (docKindAndDoc) {
+          const modelIndex = docKindAndDoc?.[1].modelIndex;
+          const targetModel = modelIndex?.[target];
           setContentNavigationParams(
             toolbarNavigationParams.kind ===
               structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT
               ? {
                   selectedReflection: {
                     docKind: ensureDocKind(docKindAndDoc[0]),
-                    name: docKindAndDoc[1].modelIndex[target].name,
+                    path: createSelectedReflectionPath(targetModel, modelIndex),
                   },
                 }
               : {
-                  selectedReflection: docKindAndDoc[1].modelIndex[target].name,
+                  selectedReflection: createSelectedReflectionPath(
+                    targetModel,
+                    modelIndex,
+                  ),
                 },
           );
         } else {
@@ -366,11 +406,38 @@ const createLinkHrefFunctionality = (
 
 const getAllDocKinds = (
   docs: Record<string, structure.Documentation>,
-  selectedElement: types.SelectedElement,
-) => (Object.keys(docs).length > 1 ? selectedElement.allDocKinds : undefined);
+  selectedElement: SelectedElement,
+) => (Object.keys(docs).length > 1 ? selectedElement.docKinds : undefined);
 
 const ensureDocKind = (docKind: string | undefined) =>
   (docKind as structure.VersionKind) ??
   Throw(
     `Doc kind must be defined when toolbar navigation kind is "${structure.NAVIGATION_PARAM_KIND_SERVER_AND_CLIENT}".`,
   );
+
+const createSelectedReflectionPath = (
+  model: documentation.IndexableModel,
+  index: documentation.ModelIndex,
+): structure.SelectedReflectionPath => {
+  let topLevelName = model.name;
+  const pathToElement: structure.SelectedReflectionPathArray = [];
+  while (model.parentId !== undefined) {
+    const parent = index[model.parentId];
+    pathToElement.unshift({
+      elementName: topLevelName,
+      groupName:
+        parent.groups?.find(
+          ({ children }) => (children?.indexOf(model.id) ?? -1) >= 0,
+        )?.title ??
+        Throw(
+          `Failed to find group for element ${model.id} having parent ${parent.id}`,
+        ),
+    });
+    topLevelName = parent.name;
+    model = parent;
+  }
+
+  return { topLevelName, pathToElement };
+};
+
+type SelectedElement = Omit<SingleElementViewProps, "headerLevel">;

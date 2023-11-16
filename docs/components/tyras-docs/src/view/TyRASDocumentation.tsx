@@ -149,7 +149,7 @@ export default function TyRASDocumentation() {
             setToolbarParams(params);
             setContentParams(
               // eslint-disable-next-line sonarjs/no-all-duplicated-branches
-              typeof selectedReflection === "string"
+              !!selectedReflection && "docKind" in selectedReflection
                 ? { selectedReflection }
                 : { selectedReflection },
             );

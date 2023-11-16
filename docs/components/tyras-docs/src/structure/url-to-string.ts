@@ -76,15 +76,9 @@ export const buildNavigationURL = ({
       throw new Error("New params kind not supported");
   }
 
-  return `/${params.dataValidation}/${urlSuffix}${
-    selectedReflection
-      ? `/${
-          typeof selectedReflection === "string"
-            ? selectedReflection
-            : `${selectedReflection.docKind}-${selectedReflection.name}`
-        }`
-      : ""
-  }`;
+  return `/${params.dataValidation}/${urlSuffix}${getReflectionURLSuffix(
+    selectedReflection,
+  )}`;
 };
 
 const getURLSuffix = ({ name, version }: types.ComponentAndVersion) =>
@@ -97,3 +91,49 @@ const getServerDataURLSuffix = ({
 const getClientDataURLSuffix = ({
   client: { name, version },
 }: types.DocumentationParamsClientBase) => `client-${name}/${version}`;
+
+const getReflectionURLSuffix = (
+  selectedReflection: types.SelectedReflection,
+) => {
+  return selectedReflection
+    ? "docKind" in selectedReflection
+      ? `/${ensureNoSeparator(
+          selectedReflection.docKind,
+          consts.SELECTED_REFLECTION_SEPARATOR,
+        )}${consts.SELECTED_REFLECTION_SEPARATOR}${getReflectionPathURLSuffix(
+          selectedReflection.path,
+        )}`
+      : getReflectionPathURLSuffix(selectedReflection)
+    : "";
+};
+
+const getReflectionPathURLSuffix = (path: types.SelectedReflectionPath) => {
+  return `${ensureNoSeparator(
+    path.topLevelName,
+    consts.SELECTED_REFLECTION_PATH_ITEM_SEPARATOR,
+  )}${
+    path.pathToElement.length > 0
+      ? `${consts.SELECTED_REFLECTION_PATH_ITEM_SEPARATOR}${path.pathToElement
+          .map(
+            ({ groupName, elementName }) =>
+              `${ensureNoSeparator(
+                groupName,
+                consts.SELECTED_REFLECTION_GROUP_CHILD_SEPARATOR,
+              )}${
+                consts.SELECTED_REFLECTION_GROUP_CHILD_SEPARATOR
+              }${ensureNoSeparator(
+                elementName,
+                consts.SELECTED_REFLECTION_PATH_ITEM_SEPARATOR,
+              )}`,
+          )
+          .join(consts.SELECTED_REFLECTION_PATH_ITEM_SEPARATOR)}`
+      : ""
+  }`;
+};
+
+const ensureNoSeparator = (str: string, separator: string) => {
+  if (str.indexOf(separator) >= 0) {
+    throw new Error(`String "${str}" contained separator "${separator}".`);
+  }
+  return str;
+};
