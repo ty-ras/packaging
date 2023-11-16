@@ -10,13 +10,29 @@ export interface CodeFormattingArgs {
 
 export type PrettierOptions = Omit<prettier.Options, "parser" | "plugins">;
 
+export interface CodeFormattingResult {
+  tokens: TokenInfos;
+  declarationRanges: common.DeclarationRangesInCode;
+}
+
 export type TokenInfos = Array<TokenInfo>;
-export type TokenInfo =
-  | TSESTree.Token
-  | string
-  | { token: TSESTree.IdentifierToken; typeRef: common.CodeGenerationTypeRef };
+export type TokenInfo = TokenInfoToken | TokenInfoText | TokenInfoTypeRef;
+
+export interface TokenInfoToken {
+  token: TSESTree.Token;
+}
+
+export interface TokenInfoText {
+  text: string;
+}
+
+export interface TokenInfoTypeRef {
+  token: TSESTree.IdentifierToken;
+  typeRef: common.CodeGenerationTypeRef;
+}
 
 export type OnTokenInconsistency = (args: OnTokenInconsistencyArgs) => void;
+
 export interface OnTokenInconsistencyArgs {
   typeReference: common.TokenRange;
   token: common.TokenRange;

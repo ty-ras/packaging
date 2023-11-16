@@ -5,12 +5,13 @@ import typescript from "prettier/plugins/typescript";
 import { Throw } from "throw-expression";
 import type * as common from "@typedoc-2-ts/types";
 import type * as types from "./formatting.types";
+import { diffArrays, type ArrayChange } from "diff";
 
 export const formatCode = async ({
   code,
   prettierOptions,
   onTokenInconsistency,
-}: types.CodeFormattingArgs): Promise<types.TokenInfos> => {
+}: types.CodeFormattingArgs): Promise<types.CodeFormattingResult> => {
   const formattedCode = await prettier.format(code.code, {
     ...prettierOptions,
     parser: "typescript",
@@ -20,10 +21,11 @@ export const formatCode = async ({
 };
 
 const fixTypeReferences = (
-  { code: originalCode, typeReferences }: common.Code,
+  { code: originalCode, typeReferences, declarationRanges }: common.Code,
   formattedCode: string,
   onTokenInconsistency: types.OnTokenInconsistency | undefined,
-): types.TokenInfos => {
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+): types.CodeFormattingResult => {
   // Find out which tokens are the ones which are type refs
   const originalTokens = getTSTokens(originalCode);
   const typeRefTokenInfos: Array<TokenIndexAndTypeRef> = [];
@@ -48,14 +50,53 @@ const fixTypeReferences = (
     }
   }
 
-  return Array.from(
-    constructTokenInfoArray(
-      originalTokens,
-      typeRefTokenInfos,
-      formattedCode,
-      getTSTokens(formattedCode),
+  const codeDiff = diffArrays(originalCode.split(""), formattedCode.split(""));
+  declarationRanges = Object.entries(declarationRanges).reduce<
+    typeof declarationRanges
+  >((newDeclarationRanges, [id, ranges]) => {
+    // Using parseInt is a bit silly but using `as` is maybe more dangerous
+    newDeclarationRanges[parseInt(id)] = ranges.reduce<typeof ranges>(
+      (newRanges, { start, length }) => {
+        const diffIndices: DiffIndices = {
+          diffIdx: 0,
+          originalIdx: 0,
+          formattedIdx: 0,
+        };
+        const subtractFromStringIndices = advanceDiffIndices(
+          codeDiff,
+          start,
+          diffIndices,
+        );
+        const newStart = diffIndices.formattedIdx;
+        advanceDiffIndices(
+          codeDiff,
+          start + length,
+          diffIndices,
+          subtractFromStringIndices,
+        );
+        newRanges.push({
+          start: newStart,
+          length: diffIndices.formattedIdx - newStart,
+        });
+
+        return newRanges;
+      },
+      [],
+    );
+    return newDeclarationRanges;
+  }, {});
+
+  return {
+    declarationRanges,
+    tokens: Array.from(
+      constructTokenInfoArray(
+        originalTokens,
+        typeRefTokenInfos,
+        formattedCode,
+        getTSTokens(formattedCode),
+      ),
     ),
-  );
+  };
 };
 
 const getTSTokens = (code: string) =>
@@ -85,10 +126,10 @@ const ensureIdentifierToken = (
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function* constructTokenInfoArray(
-  originalCodeTokens: ReadonlyArray<TSESTree.Token>,
+  originalCodeTokens: TSESTokens,
   typeRefTokenInfos: ReadonlyArray<TokenIndexAndTypeRef>,
   formattedCode: string,
-  formattedCodeTokens: ReadonlyArray<TSESTree.Token>,
+  formattedCodeTokens: TSESTokens,
 ): Generator<types.TokenInfo, void, unknown> {
   let prevIndex = 0;
   let originalCodeTokenIndex = 0; // Index to originalCodeTokens
@@ -98,7 +139,9 @@ function* constructTokenInfoArray(
       range: [start, end],
     } = token;
     if (start > prevIndex) {
-      yield formattedCode.substring(prevIndex, start);
+      yield {
+        text: formattedCode.substring(prevIndex, start),
+      };
     }
 
     // We exploit the two facts:
@@ -127,11 +170,70 @@ function* constructTokenInfoArray(
     }
 
     if (startingTypeRefTokenInfoIndex === typeRefTokenInfoIndex) {
-      yield token;
+      yield {
+        token,
+      };
     }
     prevIndex = end; // The end of the token range is exclusive
   }
   if (prevIndex < formattedCode.length) {
-    yield formattedCode.substring(prevIndex);
+    yield {
+      text: formattedCode.substring(prevIndex),
+    };
   }
 }
+
+type TSESTokens = ReadonlyArray<TSESTree.Token>;
+
+interface DiffIndices {
+  diffIdx: number;
+  originalIdx: number;
+  formattedIdx: number;
+}
+const advanceDiffIndices = (
+  codeDiff: ReadonlyArray<ArrayChange<string>>,
+  originalEnd: number,
+  indices: DiffIndices,
+  subtractFromStringIndices = 0,
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+) => {
+  if (subtractFromStringIndices > 0) {
+    indices.formattedIdx -= subtractFromStringIndices;
+    indices.originalIdx -= subtractFromStringIndices;
+  }
+  do {
+    const curDiff = codeDiff[indices.diffIdx];
+    if (curDiff) {
+      const startOriginal = indices.originalIdx;
+      const { count, added, removed } = curDiff;
+      if (added && removed) {
+        throw new Error("Diff which is both added and removed?");
+      } else if (count === undefined) {
+        throw new Error("Diff item with undefined count?");
+      }
+      if (added) {
+        indices.formattedIdx += count;
+      } else if (removed) {
+        indices.originalIdx += count;
+      } else {
+        indices.formattedIdx += count;
+        indices.originalIdx += count;
+      }
+
+      if (indices.originalIdx > originalEnd) {
+        indices.formattedIdx -= indices.originalIdx - originalEnd;
+        indices.originalIdx = originalEnd;
+        subtractFromStringIndices = originalEnd - startOriginal;
+      } else {
+        ++indices.diffIdx;
+      }
+    } else {
+      // No more diff information
+      subtractFromStringIndices = 0;
+      indices.formattedIdx += originalEnd - indices.originalIdx;
+      indices.originalIdx = originalEnd;
+    }
+  } while (indices.originalIdx !== originalEnd);
+
+  return subtractFromStringIndices;
+};

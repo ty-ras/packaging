@@ -6,7 +6,9 @@ import * as ctx from "./common";
 
 export interface CodeFunctionalityContext {
   codeGenerator: () => codeGen.CodeGenerator;
-  codeFormatter: () => (code: common.Code) => Promise<formatting.TokenInfos>;
+  codeFormatter: () => (
+    code: common.Code,
+  ) => Promise<formatting.CodeFormattingResult>;
 }
 
 const requiresContext = ctx.requiresContext("CodeFunctionality");

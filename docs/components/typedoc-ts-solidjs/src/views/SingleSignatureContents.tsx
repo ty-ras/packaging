@@ -111,7 +111,7 @@ const typeTokensProcessor = (
 };
 
 const shouldBeDroppedFromEndOfTypeTokens = (tokenInfo: format.TokenInfo) =>
-  typeof tokenInfo === "string" ||
-  (!("token" in tokenInfo) &&
-    tokenInfo.type === "Punctuator" &&
-    tokenInfo.value === ";");
+  "text" in tokenInfo ||
+  (!("typeRef" in tokenInfo) &&
+    tokenInfo.token.type === "Punctuator" &&
+    tokenInfo.token.value === ";");

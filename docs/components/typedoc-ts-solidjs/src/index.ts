@@ -4,7 +4,7 @@ export { default as Link } from "./components/Link";
 export { default as MultiLineCode } from "./components/MultiLineCode";
 export { default as SingleLineCode } from "./components/SingleLineCode";
 export { default as SmallHeader } from "./components/SmallHeader";
-export { default as Title } from "./components/Title";
+export { default as TokenizedCode } from "./components/TokenizedCode";
 
 export { default as SingleElementContents } from "./views/SingleElementContents";
 export { default as SingleSignatureContents } from "./views/SingleSignatureContents";

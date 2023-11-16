@@ -1,5 +1,6 @@
 import type * as typedoc from "typedoc";
 import { type TSESTree } from "@typescript-eslint/types";
+import type * as common from "@typedoc-2-ts/types";
 
 import type * as types from "./types";
 import * as declaration from "./declaration";
@@ -11,7 +12,7 @@ import * as text from "./text";
 export const createCodeGenerator = (index: types.ModelIndex): CodeGenerator => {
   const getDeclarationTextImpl = (
     reflection: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
-  ): types.Code => {
+  ): common.Code => {
     const { textGenerator, importContext, declarationToText } =
       createCallbacks(index);
     return textWithImports(
@@ -67,9 +68,9 @@ export type CodeGenerator = {
 };
 
 export type CodeGenerationResult =
-  | types.Code
+  | common.Code
   | {
-      code: types.Code;
+      code: common.Code;
       processTokenInfos: TokenInfoProcessor;
     };
 
@@ -90,7 +91,7 @@ const isReference = (
   reflection.variant === "reference";
 
 const createCallbacks = (index: types.ModelIndex) => {
-  const textGenerator = createCodeGenerationContext();
+  const textGenerator = text.createCodeGenerationContext();
   const importContext: imports.ImportContext = {
     imports: {},
     globals: new Set(["typescript"]),
@@ -126,7 +127,7 @@ const createCallbacks = (index: types.ModelIndex) => {
     typeToText(type),
   );
   const declarationToText = declaration.createGetDeclarationText(
-    textGenerator,
+    text.createCodeGenerationContext,
     index,
     typeToText,
     sigToText,
@@ -144,7 +145,7 @@ const textWithImports = (
   { code }: text.CodeGenerationContext,
   importContext: imports.ImportContext,
   intermediate: text.IntermediateCode,
-): types.Code => {
+): common.Code => {
   const fullCode = code`${text.join(
     Object.entries(importContext.imports).map(
       ([, importInfo]) =>
@@ -165,7 +166,7 @@ const textWithImports = (
 
 ${intermediate}`;
 
-  return intermediateToComplete(fullCode);
+  return text.intermediateToComplete(fullCode);
 };
 
 const TYPE = "type";
@@ -221,77 +222,5 @@ const TYPE_STRING_TOKEN_PROCESSOR_MATCHERS: TokenProcessorMatchers = [
   (token2) => token2.type === "Identifier" && token2.value === TYPE_NAME,
   (token3) => token3.type === "Punctuator" && token3.value === EQUALS,
 ];
-
-const createCodeGenerationContext = (): text.CodeGenerationContext => ({
-  code: (fragments, ...args) =>
-    Array.from(saveCodeTemplateArgs(fragments, args)),
-});
-
-// eslint-disable-next-line sonarjs/cognitive-complexity
-function* saveCodeTemplateArgs(
-  fragments: ReadonlyArray<string>,
-  args: Readonly<text.TemplateStringArgs>,
-): Generator<text.CodeGenerationFragment, void, unknown> {
-  for (const [idx, fragment] of fragments.entries()) {
-    if (fragment.length > 0) {
-      yield fragment;
-    }
-    if (idx < args.length) {
-      const arg = args[idx];
-      if (Array.isArray(arg)) {
-        for (const frag of arg) {
-          if (typeof frag !== "string" || frag.length > 0) {
-            yield frag;
-          }
-        }
-      } else if (typeof arg === "object") {
-        if (arg === null) {
-          // Literal 'null'
-          yield "null";
-        } else {
-          if ("text" in arg) {
-            // Plain text
-            if (arg.text.length > 0) {
-              yield arg.text;
-            }
-          } else if ("value" in arg && "negative" in arg) {
-            // Big int literal
-            yield `${arg.negative ? "-" : ""}${arg.value}n`;
-          } else {
-            // Type reference
-            yield arg;
-          }
-        }
-      } else {
-        // Number or boolean literal
-        yield `${arg}`;
-      }
-    }
-  }
-}
-
-const intermediateToComplete = (
-  intermediate: text.IntermediateCode,
-): types.Code => {
-  let code = "";
-  const typeReferences: types.TypeReferencesInCode = [];
-  for (const fragment of intermediate) {
-    if (typeof fragment === "string") {
-      code += fragment;
-    } else {
-      const textual = fragment.name;
-      typeReferences.push({
-        range: { start: code.length, length: textual.length },
-        ref: fragment.ref,
-      });
-      code += textual;
-    }
-  }
-
-  return {
-    code,
-    typeReferences,
-  };
-};
 
 const TYPES_PACKAGE_PREFIX = "@types/";

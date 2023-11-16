@@ -3,15 +3,16 @@ import * as text from "./text";
 import * as declarations from "./declarations";
 
 export const createGetDeclarationText = (
-  codeGenerationContext: text.CodeGenerationContext,
+  getCodeGenerationContext: (id: number) => text.CodeGenerationContext,
   index: types.ModelIndex,
   getTypeText: types.GetSomeTypeText,
   getSignatureText: types.GetSignatureText,
 ): types.GetDeclarationText => {
-  const { code } = codeGenerationContext;
   function getDeclarationText(
     declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
   ): text.IntermediateCode {
+    const codeGenerationContext = getCodeGenerationContext(declaration.id);
+    const { code } = codeGenerationContext;
     const textFunctionality = declarations.useFunctionality(
       declaration,
       "text",

@@ -11,9 +11,12 @@
   "module": "./src/index.ts",
   "dependencies": {},
   "peerDependencies": {
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "diff": "^5.1.0"
   },
   "devDependencies": {
-    "@typedoc-2-ts/types": "1.0.0"
+    "@typedoc-2-ts/types": "1.0.0",
+    "diff": "5.1.0",
+    "@types/diff": "5.0.8"
   }
 }
