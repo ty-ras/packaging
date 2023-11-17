@@ -1,18 +1,9 @@
 import Typography, { type TypographyProps } from "@suid/material/Typography";
-
+import type { SxProps } from "@suid/system";
 export default function SingleLineCode(
   props: Omit<TypographyProps<"code">, "component" | "sx">,
 ) {
-  return (
-    <Typography
-      component="code"
-      sx={{
-        fontFamily: "monospace",
-        backgroundColor: "grey.200",
-      }}
-      {...props}
-    />
-  );
+  return <Typography component="code" sx={CODE_SX_PROPS} {...props} />;
 }
 
 // // This would be better solution but theme.palette.grey didn't work
@@ -23,3 +14,8 @@ export default function SingleLineCode(
 //   fontFamily: "monospace",
 //   backgroundColor: theme.palette.grey[200],
 // }));
+
+export const CODE_SX_PROPS = {
+  fontFamily: "monospace",
+  backgroundColor: "grey.200",
+} as const satisfies SxProps;

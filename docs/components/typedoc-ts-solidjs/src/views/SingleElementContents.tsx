@@ -8,7 +8,7 @@ import {
   useContext,
   onMount,
 } from "solid-js";
-import { Chip, Stack } from "@suid/material";
+import { Box, Chip, Stack } from "@suid/material";
 import * as functionality from "@typedoc-2-ts/browser";
 import * as transform from "@typedoc-2-ts/transform";
 import type * as formatter from "@typedoc-2-ts/format";
@@ -16,9 +16,10 @@ import type * as common from "@typedoc-2-ts/types";
 import codeContextDef from "../context-def/code-functionality";
 import Comment from "../components/Comment";
 import SmallHeader from "../components/SmallHeader";
-import SingleSignatureView from "./SingleSignatureContents";
+import SingleSignatureView, { NOT_DOCUMENTED } from "./SingleSignatureContents";
 import * as formatting from "../formatting";
 import TokenizedCode from "../components/TokenizedCode";
+import { CODE_SX_PROPS } from "../components/SingleLineCode";
 
 export default function SingleElementView(
   props: SingleElementViewProps,
@@ -80,7 +81,14 @@ function SingleElementViewForTokens(
       <section>
         <SmallHeader ref={refElement} headerLevel={props.headerLevel}>
           {props.titlePrefix}
-          <code>{props.topLevelElement.name}</code>
+          <Box
+            component="code"
+            sx={CODE_SX_PROPS}
+            // variant={`h${functionality.ensureHeaderLevel(props.headerLevel)}`}
+            // fontSize="1rem"
+          >
+            {props.topLevelElement.name}
+          </Box>
         </SmallHeader>
         <Show when={props.docKinds}>
           {(docKinds) => (
@@ -97,17 +105,16 @@ function SingleElementViewForTokens(
         <Show when={props.formattedCode}>
           {(theCode) => <TokenizedCode tokens={theCode().tokens} />}
         </Show>
-        <Switch>
-          <Match when={props.topLevelElement.comment}>
-            {(summary) => (
-              <>
-                <SmallHeader headerLevel={props.headerLevel}>
-                  Summary
-                </SmallHeader>
-                <Comment comment={summary()} />
-              </>
-            )}
-          </Match>
+        <Switch
+          fallback={
+            <>
+              <SmallHeader headerLevel={props.headerLevel}>Summary</SmallHeader>
+              <Comment
+                comment={props.topLevelElement.comment ?? NOT_DOCUMENTED}
+              />
+            </>
+          }
+        >
           <Match when={tryGetSingleSignature(props.topLevelElement)}>
             {(signature) => (
               <SingleSignatureView
@@ -183,25 +190,9 @@ const getTokensForDeclaration = (
   tokens: formatter.TokenInfos,
   ranges: common.DeclarationRangeInCode | undefined,
 ) => {
-  if (ranges) {
-    let rangeIdx = 0;
-    let isInsideRange = false;
-    tokens = tokens.filter((token) => {
-      if (rangeIdx < ranges.length && "token" in token) {
-        const range = ranges[rangeIdx];
-        const [start, end] = token.token.range;
-        isInsideRange =
-          start >= range.start && end <= range.start + range.length;
-        if (!isInsideRange && start > range.start + range.length) {
-          ++rangeIdx;
-        }
-      }
-      return isInsideRange;
-    });
-  } else {
-    tokens = [];
-  }
-  return tokens;
+  return ranges && ranges.length > 0
+    ? buildTokensForRanges(tokens, ranges)
+    : [];
 };
 
 const getReflectionKindTypeScriptName = (
@@ -227,4 +218,58 @@ const getReflectionKindTypeScriptName = (
     default:
       throw new Error(`Implement TS name for ${reflectionKind}.`);
   }
+};
+
+const buildTokensForRanges = (
+  tokens: formatter.TokenInfos,
+  ranges: common.DeclarationRangeInCode,
+) => {
+  let stringIdx = 0;
+  let rangeIdx = 0;
+  let prevIsInsideRange = false;
+  const tokensForRanges = new Array<formatter.TokenInfos>(ranges.length).fill(
+    [],
+  );
+  tokens.forEach((token) => {
+    if (rangeIdx < ranges.length) {
+      const range = ranges[rangeIdx];
+      const [start, end] =
+        "token" in token
+          ? token.token.range
+          : [stringIdx, stringIdx + token.text.length];
+      const isInsideRange =
+        start >= range.start && end <= range.start + range.length;
+
+      if (isInsideRange) {
+        tokensForRanges[rangeIdx].push(token);
+      } else if (prevIsInsideRange) {
+        ++rangeIdx;
+      }
+      prevIsInsideRange = isInsideRange;
+      stringIdx = end;
+    }
+  });
+
+  // Remove all leading and trailing pure-string tokens for each range
+  return tokensForRanges.flatMap(trimLeadingAndTrailingTextTokens);
+};
+
+const trimLeadingAndTrailingTextTokens = (
+  tokensForOneRange: formatter.TokenInfos,
+): formatter.TokenInfos => {
+  let idx = 0;
+  while (idx < tokensForOneRange.length && "text" in tokensForOneRange[idx]) {
+    ++idx;
+  }
+  if (idx > 0) {
+    tokensForOneRange.splice(0, idx);
+  }
+  if (tokensForOneRange.length > 0) {
+    idx = tokensForOneRange.length - 1;
+    while (idx >= 0 && "text" in tokensForOneRange[idx]) {
+      --idx;
+    }
+    tokensForOneRange.splice(idx + 1);
+  }
+  return tokensForOneRange;
 };

@@ -104,7 +104,7 @@ export interface SingleSignatureViewProps {
   overloadOrder?: number;
 }
 
-const NOT_DOCUMENTED: Array<typedoc.JSONOutput.CommentDisplayPart> = [
+export const NOT_DOCUMENTED: Array<typedoc.JSONOutput.CommentDisplayPart> = [
   { kind: "text", text: "<Not documented>" },
 ];
 
