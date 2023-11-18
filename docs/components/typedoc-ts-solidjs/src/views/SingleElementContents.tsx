@@ -5,11 +5,14 @@ import {
   Switch,
   type JSX,
   createResource,
+  createSignal,
   useContext,
   onMount,
   ErrorBoundary,
+  createEffect,
+  batch,
 } from "solid-js";
-import { Box, Button, Chip, Stack, Typography } from "@suid/material";
+import { Box, Chip, Stack, Typography } from "@suid/material";
 import * as functionality from "@typedoc-2-ts/browser";
 import * as transform from "@typedoc-2-ts/transform";
 import type * as formatter from "@typedoc-2-ts/format";
@@ -38,21 +41,16 @@ export default function SingleElementView(
   );
   return (
     <ErrorBoundary
-      fallback={(err, reset) =>
-        (
-          // eslint-disable-next-line no-console
-          console.error("SingleElementView", err),
-          (
-            <Box>
-              <Typography>
-                Failed to generate type for {props.topLevelElement?.name} (ID{" "}
-                {props.topLevelElement?.id}).
-              </Typography>
-              <Button onClick={reset}>Reload</Button>
-            </Box>
-          )
-        )
-      }
+      fallback={(err, reset) => {
+        return (
+          <ErrorFallback
+            element={props.topLevelElement}
+            reset={reset}
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            error={err}
+          />
+        );
+      }}
     >
       <SingleElementViewForTokens
         headerLevel={props.headerLevel}
@@ -292,3 +290,37 @@ const trimLeadingAndTrailingTextTokens = (
   }
   return tokensForOneRange;
 };
+
+function ErrorFallback(props: ErrorFallbackProps) {
+  const [lastErroredElement, setLastErroredElement] =
+    createSignal<functionality.IndexableModel>();
+  // eslint-disable-next-line no-console
+  console.error("SingleElementView", props.error);
+
+  createEffect(() => {
+    const lastSeen = lastErroredElement();
+    if (lastSeen === undefined) {
+      setLastErroredElement(props.element);
+    } else if (lastSeen !== props.element) {
+      batch(() => {
+        setLastErroredElement(undefined);
+        props.reset();
+      });
+    }
+  });
+
+  return (
+    <Box>
+      <Typography>
+        Failed to generate type for {props.element?.name} (ID{" "}
+        {props.element?.id}).
+      </Typography>
+    </Box>
+  );
+}
+
+interface ErrorFallbackProps {
+  element: SingleElementViewProps["topLevelElement"];
+  error: unknown;
+  reset: () => void;
+}
