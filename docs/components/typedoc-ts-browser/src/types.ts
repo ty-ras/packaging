@@ -21,4 +21,7 @@ export type MakeChildrenIntegers<
   T extends {
     children?: Array<typedoc.JSONOutput.DeclarationReflection> | undefined;
   },
-> = Omit<T, "children"> & { children?: Array<number> | undefined };
+> = Omit<T, "children"> & {
+  // Notice that we must use different name for children - otherwise code in @td2ts/transform (src/declarations/get.ts) will get broken!
+  childIDs?: Array<number> | undefined;
+};

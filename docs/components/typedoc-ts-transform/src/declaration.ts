@@ -1,17 +1,25 @@
+import type * as typedoc from "typedoc";
 import type * as types from "./types";
 import * as text from "./text";
 import * as declarations from "./declarations";
 
 export const createGetDeclarationText = (
-  getCodeGenerationContext: (id: number) => text.CodeGenerationContext,
+  getCodeGenerationContext: (
+    id: number | undefined,
+  ) => text.CodeGenerationContext,
   index: types.ModelIndex,
   getTypeText: types.GetSomeTypeText,
   getSignatureText: types.GetSignatureText,
-): types.GetDeclarationText => {
+): GetDeclarationTextSpecific => {
   function getDeclarationText(
-    declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
+    declaration:
+      | types.CodeGeneratorGenerationFunctionMap["getDeclarationText"]
+      | typedoc.JSONOutput.DeclarationReflection,
+    skipDedicatedCodeGenerationContext: boolean = false,
   ): text.IntermediateCode {
-    const codeGenerationContext = getCodeGenerationContext(declaration.id);
+    const codeGenerationContext = getCodeGenerationContext(
+      skipDedicatedCodeGenerationContext ? undefined : declaration.id,
+    );
     const { code } = codeGenerationContext;
     const textFunctionality = declarations.useFunctionality(
       declaration,
@@ -60,3 +68,10 @@ export const createGetDeclarationText = (
 
   return getDeclarationText;
 };
+
+export type GetDeclarationTextSpecific = (
+  declaration:
+    | types.CodeGeneratorGenerationFunctionMap["getDeclarationText"]
+    | typedoc.JSONOutput.DeclarationReflection,
+  skipDedicatedCodeGenerationContext: boolean,
+) => text.IntermediateCode;

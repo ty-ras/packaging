@@ -19,7 +19,7 @@ export const indexProject = ({
       ...rest,
       ...((children?.length ?? 0) > 0
         ? {
-            children: children?.map((child) =>
+            childIDs: children?.map((child) =>
               indexReflection(child, reflection.id),
             ),
           }
@@ -33,7 +33,7 @@ export const indexProject = ({
     modelIndex,
     project: {
       ...project,
-      children: children?.map((child) => indexReflection(child, undefined)),
+      childIDs: children?.map((child) => indexReflection(child, undefined)),
     },
   };
 };

@@ -10,8 +10,10 @@ export interface CodeGeneratorGenerationFunctionMap {
 
 export type PrettierOptions = Omit<prettier.Options, "parser" | "plugins">;
 
-export type GetDeclarationText = (
-  declaration: CodeGeneratorGenerationFunctionMap["getDeclarationText"],
+export type GetDeclarationText<TAdditionalType = never> = (
+  declaration:
+    | CodeGeneratorGenerationFunctionMap["getDeclarationText"]
+    | TAdditionalType,
 ) => text.IntermediateCode;
 
 export type GetSomeTypeText = (

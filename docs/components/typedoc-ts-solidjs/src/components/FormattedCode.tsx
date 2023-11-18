@@ -13,7 +13,7 @@ export default function FormattedCode<
   const [formattedCode] = createResource(
     () => props.reflection,
     async (reflection) =>
-      await formatting.formatCodeAsync(
+      await formatting.formatCode(
         codeContext,
         props.kind,
         reflection,
@@ -23,7 +23,7 @@ export default function FormattedCode<
   return (
     <Box>
       <Show when={formattedCode()}>
-        {(tokens) => <TokenizedCode tokens={tokens().tokens} />}
+        {(tokens) => <TokenizedCode tokens={tokens()} />}
       </Show>
     </Box>
   );

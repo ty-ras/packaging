@@ -1,3 +1,4 @@
+import type * as typedoc from "typedoc";
 import type * as types from "../types";
 import type * as text from "../text";
 
@@ -20,12 +21,16 @@ export interface GroupChildren {
   sortedChildren: Array<number>;
 }
 
+export type MaybeDeclarationReflection =
+  | types.IndexableModel
+  | typedoc.JSONOutput.DeclarationReflection;
+
 export interface GetSomeTextArgs {
   codeGenerationContext: text.CodeGenerationContext;
 }
 
 export interface GetPrefixTextArgs extends GetSomeTextArgs {
-  declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"];
+  declaration: MaybeDeclarationReflection;
 }
 
 export interface GetBodyTextArgs extends GetSomeTextArgs {
@@ -33,7 +38,7 @@ export interface GetBodyTextArgs extends GetSomeTextArgs {
   getTypeText: types.GetSomeTypeText;
   getDeclarationText: types.GetDeclarationText;
   getSignatureText: types.GetSignatureText;
-  declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"];
+  declaration: MaybeDeclarationReflection;
 }
 
 export interface GetChildrenArgs {

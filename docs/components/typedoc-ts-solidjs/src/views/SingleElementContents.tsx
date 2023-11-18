@@ -32,11 +32,10 @@ export default function SingleElementView(
   const [formattedCode] = createResource(
     () => props.topLevelElement,
     async (reflection) =>
-      await formatting.formatCodeAsync(
+      await formatting.formatCodeWithRanges(
         codeContext,
         "getDeclarationText",
         reflection,
-        undefined,
       ),
   );
   return (

@@ -2,10 +2,12 @@ import { Throw } from "throw-expression";
 import type * as types from "../types";
 import * as kind from "../reflection-kind";
 import classes from "./classes";
+import interfaces from "./interfaces";
 import constructors from "./constructors";
 import properties from "./properties";
 import methods from "./methods";
 import functions from "./functions";
+import typeLiterals from "./type-literals";
 import type * as toTextTypes from "./types";
 
 export type * from "./types";
@@ -23,8 +25,10 @@ const functionalities: Partial<
   Record<kind.ReflectionKind, toTextTypes.ReflectionKindFunctionality>
 > = {
   [kind.ReflectionKind.Class]: classes,
+  [kind.ReflectionKind.Interface]: interfaces,
   [kind.ReflectionKind.Constructor]: constructors,
   [kind.ReflectionKind.Property]: properties,
   [kind.ReflectionKind.Method]: methods,
   [kind.ReflectionKind.Function]: functions,
+  [kind.ReflectionKind.TypeLiteral]: typeLiterals,
 };

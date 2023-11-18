@@ -18,7 +18,7 @@ export const createCodeGenerator = (index: types.ModelIndex): CodeGenerator => {
     return textWithImports(
       textGenerator,
       importContext,
-      declarationToText(reflection),
+      declarationToText(reflection, false),
     );
   };
 
@@ -122,7 +122,7 @@ const createCallbacks = (index: types.ModelIndex) => {
     textGenerator,
     registerImport,
     (sig) => sigToText(sig, "=>"),
-    (dec) => declarationToText(dec),
+    (dec) => declarationToText(dec, true),
   );
   const sigToText = sig.createGetSignatureText(textGenerator, (type) =>
     typeToText(type),
@@ -209,7 +209,7 @@ const remainingTokensAfter = <TItem>(
   }
   while (
     tokenIndex < tokenInfos.length &&
-    typeof tokenInfos[tokenIndex] === "string"
+    tryGetToken(tokenInfos[tokenIndex]) === undefined
   ) {
     ++tokenIndex;
   }
