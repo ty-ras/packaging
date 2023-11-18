@@ -56,10 +56,8 @@ export interface InlineLink {
   target: InlineLinkTarget;
 }
 
-export type InlineLinkTarget = Exclude<
-  typedoc.JSONOutput.InlineTagDisplayPart["target"],
-  undefined
->;
+export type InlineLinkTarget =
+  typedoc.JSONOutput.InlineTagDisplayPart["target"];
 
 const tryGetInternalLinkInfo = (
   context: navigation.LinkContext,
@@ -163,7 +161,7 @@ interface BrokenLinkProps extends BaseLinkProps {
   // No custom properties so far
 }
 function BrokenLink(props: BrokenLinkProps) {
-  return <SingleLineCode>{props.text}</SingleLineCode>;
+  return <SingleLineCode color="red">{props.text}</SingleLineCode>;
 }
 
 const getTargetURL = (href: string) => {

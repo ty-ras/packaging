@@ -74,7 +74,7 @@ const tryGetLink = ({
   text,
   ...summary
 }: typedoc.JSONOutput.CommentDisplayPart): InlineLink | undefined =>
-  summary.kind === "inline-tag" && !!summary.target
+  summary.kind === "inline-tag"
     ? {
         text:
           (typeof summary.target === "object"
