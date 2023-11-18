@@ -116,6 +116,7 @@ const createCallbacks = (index: types.ModelIndex) => {
   const registerImport = imports.createRegisterImport(
     textGenerator,
     importContext,
+    true,
   );
   const typeToText = someType.createGetSomeTypeText(
     textGenerator,

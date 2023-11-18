@@ -1,5 +1,5 @@
-import { Box, Typography } from "@suid/material";
-import { ErrorBoundary, Show, createResource, useContext } from "solid-js";
+import { Box } from "@suid/material";
+import { Show, createResource, useContext } from "solid-js";
 import codeContextDef from "../context-def/code-functionality";
 import type * as codeGen from "@typedoc-2-ts/transform";
 import type * as formatter from "@typedoc-2-ts/format";
@@ -21,15 +21,11 @@ export default function FormattedCode<
       ),
   );
   return (
-    <ErrorBoundary
-      fallback={<Typography>Error while rendering TS code.</Typography>}
-    >
-      <Box>
-        <Show when={formattedCode()}>
-          {(tokens) => <TokenizedCode tokens={tokens().tokens} />}
-        </Show>
-      </Box>
-    </ErrorBoundary>
+    <Box>
+      <Show when={formattedCode()}>
+        {(tokens) => <TokenizedCode tokens={tokens().tokens} />}
+      </Show>
+    </Box>
   );
 }
 

@@ -6,6 +6,7 @@ import type * as types from "./types";
 export const createRegisterImport = (
   { code }: text.CodeGenerationContext,
   importContext: ImportContext,
+  forceToIndividual: boolean,
 ): types.RegisterImport => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   function registerImport(
@@ -24,7 +25,12 @@ export const createRegisterImport = (
     if (isGlobal) {
       retVal = code`${text.text(name)}`;
     } else {
-      const kind = target.qualifiedName === name ? "individual" : "named";
+      let qName = target.qualifiedName;
+      let kind: ImportInfo["import"] = qName === name ? "individual" : "named";
+      if (kind === "named" && forceToIndividual) {
+        kind = "individual";
+        qName = name;
+      }
       let currentImport = importContext.imports[packageName];
       if (currentImport) {
         if (currentImport.import !== kind) {
@@ -35,7 +41,7 @@ export const createRegisterImport = (
         switch (currentImport.import) {
           case "individual":
             currentImport.importedElements.push({
-              name: target.qualifiedName,
+              name: qName,
               ref: target,
             });
             break;
@@ -51,6 +57,7 @@ export const createRegisterImport = (
           packageName,
           name,
           target,
+          qName,
         );
       }
       retVal =
@@ -112,24 +119,28 @@ const createImportInfo = (
   packageName: string,
   name: string,
   target: typedoc.JSONOutput.ReflectionSymbolId,
+  qName: string,
 ): ImportInfo =>
   kind === "individual"
     ? {
         import: kind,
         packageName,
-        importedElements: [{ name: target.qualifiedName, ref: target }],
+        importedElements: [{ name: qName, ref: target }],
       }
     : {
-        import: "named",
+        import: kind,
         packageName,
-        alias: getImportAlias(name, target.qualifiedName),
+        alias: getImportAlias(name, qName),
       };
 
 const getTypeName = (name: string, importAlias: string) => {
-  if (!name.startsWith(`${importAlias}.`)) {
+  let substringStart: number | undefined;
+  if (name.startsWith(`${importAlias}.`)) {
+    substringStart = importAlias.length + 1;
+  } else if (name.indexOf(".") >= 0) {
     throw new Error(
       `Name "${name}" did not start with import alias "${importAlias}".`,
     );
   }
-  return name.substring(importAlias.length + 1);
+  return substringStart === undefined ? name : name.substring(substringStart);
 };

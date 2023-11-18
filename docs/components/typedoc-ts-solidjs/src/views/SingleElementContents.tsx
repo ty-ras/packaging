@@ -7,8 +7,9 @@ import {
   createResource,
   useContext,
   onMount,
+  ErrorBoundary,
 } from "solid-js";
-import { Box, Chip, Stack } from "@suid/material";
+import { Box, Button, Chip, Stack, Typography } from "@suid/material";
 import * as functionality from "@typedoc-2-ts/browser";
 import * as transform from "@typedoc-2-ts/transform";
 import type * as formatter from "@typedoc-2-ts/format";
@@ -36,17 +37,35 @@ export default function SingleElementView(
       ),
   );
   return (
-    <SingleElementViewForTokens
-      headerLevel={props.headerLevel}
-      topLevelElement={props.topLevelElement}
-      docKinds={props.docKinds}
-      focusToChild={props.focusToChild}
-      titlePrefix={`${getReflectionKindTypeScriptName(
-        props.topLevelElement.kind,
-      )} `}
-      index={props.index}
-      formattedCode={formattedCode()}
-    />
+    <ErrorBoundary
+      fallback={(err, reset) =>
+        (
+          // eslint-disable-next-line no-console
+          console.error("SingleElementView", err),
+          (
+            <Box>
+              <Typography>
+                Failed to generate type for {props.topLevelElement?.name} (ID{" "}
+                {props.topLevelElement?.id}).
+              </Typography>
+              <Button onClick={reset}>Reload</Button>
+            </Box>
+          )
+        )
+      }
+    >
+      <SingleElementViewForTokens
+        headerLevel={props.headerLevel}
+        topLevelElement={props.topLevelElement}
+        docKinds={props.docKinds}
+        focusToChild={props.focusToChild}
+        titlePrefix={`${getReflectionKindTypeScriptName(
+          props.topLevelElement.kind,
+        )} `}
+        index={props.index}
+        formattedCode={formattedCode()}
+      />
+    </ErrorBoundary>
   );
 }
 
