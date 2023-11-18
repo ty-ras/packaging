@@ -41,7 +41,8 @@ const formatCodeImpl = async <
     | undefined,
   throwIfNeedsPostProcessing: boolean,
 ): Promise<formatter.CodeFormattingResult> => {
-  const rawCode = codeContext.codeGenerator()[kind](reflection);
+  const { generator, typeRefShouldBeIncluded } = codeContext.codeGenerator();
+  const rawCode = generator[kind](reflection);
   const needPostProcessing = "processTokenInfos" in rawCode;
   if (
     throwIfNeedsPostProcessing &&
@@ -51,10 +52,12 @@ const formatCodeImpl = async <
       `The functionality "${kind}" needs postprocessing, and that will mess up with ranges. Please use "formatCode" function instead.`,
     );
   }
-
-  const formatterResult = await codeContext.codeFormatter()(
-    needPostProcessing ? rawCode.code : rawCode,
+  const actualCode = needPostProcessing ? rawCode.code : rawCode;
+  actualCode.typeReferences = actualCode.typeReferences.filter(
+    typeRefShouldBeIncluded,
   );
+
+  const formatterResult = await codeContext.codeFormatter()(actualCode);
   let tokenInfos = formatterResult.tokens;
   if (needPostProcessing) {
     tokenInfos = rawCode.processTokenInfos(tokenInfos, (info) =>

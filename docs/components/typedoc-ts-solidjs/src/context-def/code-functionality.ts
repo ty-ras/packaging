@@ -5,7 +5,12 @@ import type * as common from "@typedoc-2-ts/types";
 import * as ctx from "./common";
 
 export interface CodeFunctionalityContext {
-  codeGenerator: () => codeGen.CodeGenerator;
+  codeGenerator: () => {
+    generator: codeGen.CodeGenerator;
+    typeRefShouldBeIncluded: (
+      typeRef: common.TypeReferencesInCode[number],
+    ) => boolean;
+  };
   codeFormatter: () => (
     code: common.Code,
   ) => Promise<formatting.CodeFormattingResult>;

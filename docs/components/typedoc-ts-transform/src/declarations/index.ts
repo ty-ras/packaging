@@ -7,6 +7,7 @@ import constructors from "./constructors";
 import properties from "./properties";
 import methods from "./methods";
 import functions from "./functions";
+import typeAliases from "./type-aliases";
 import typeLiterals from "./type-literals";
 import type * as toTextTypes from "./types";
 
@@ -24,11 +25,12 @@ export const useFunctionality = <
 const functionalities: Partial<
   Record<kind.ReflectionKind, toTextTypes.ReflectionKindFunctionality>
 > = {
+  [kind.ReflectionKind.Function]: functions,
   [kind.ReflectionKind.Class]: classes,
   [kind.ReflectionKind.Interface]: interfaces,
   [kind.ReflectionKind.Constructor]: constructors,
   [kind.ReflectionKind.Property]: properties,
   [kind.ReflectionKind.Method]: methods,
-  [kind.ReflectionKind.Function]: functions,
   [kind.ReflectionKind.TypeLiteral]: typeLiterals,
+  [kind.ReflectionKind.TypeAlias]: typeAliases,
 };

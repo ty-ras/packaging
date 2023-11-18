@@ -231,6 +231,8 @@ const getReflectionKindTypeScriptName = (
       return "property";
     case transform.ReflectionKind.Method:
       return "method";
+    case transform.ReflectionKind.TypeAlias:
+      return "type";
     default:
       throw new Error(`Implement TS name for ${reflectionKind}.`);
   }

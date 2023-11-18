@@ -9,11 +9,14 @@ export default function CodeFunctionalityContextProvider(
   props: CodeFunctionalityContextProviderProps,
 ) {
   const context = createMemo<contextDef.CodeFunctionalityContext>(() => ({
-    codeGenerator: () =>
-      codeGen.createCodeGenerator(
+    codeGenerator: () => ({
+      generator: codeGen.createCodeGenerator(
         (id) =>
           props.index[id] ?? Throw(`Failed to find model with index ${id}`),
       ),
+      typeRefShouldBeIncluded: ({ ref }) =>
+        !(typeof ref === "number") || ref in props.index,
+    }),
     codeFormatter: () => (code) =>
       formatter.formatCode({
         code,
