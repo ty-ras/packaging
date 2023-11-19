@@ -5,6 +5,7 @@
   "engines": {
     "node": ">= 18"
   },
+  "type": "module",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -29,7 +30,6 @@
       }
     }
   },
-  "module": "./src/index.ts",
   "dependencies": {
     "@suid/material": "0.15.1",
     "@suid/icons-material": "0.6.11",

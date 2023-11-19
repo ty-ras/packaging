@@ -1,5 +1,5 @@
 import { Throw } from "throw-expression";
-import type * as types from "../types";
+import type * as codeGenTypes from "../types";
 import * as kind from "../reflection-kind";
 import classes from "./classes";
 import interfaces from "./interfaces";
@@ -9,22 +9,24 @@ import methods from "./methods";
 import functions from "./functions";
 import typeAliases from "./type-aliases";
 import typeLiterals from "./type-literals";
-import type * as toTextTypes from "./types";
+import variables from "./variables";
+import type * as types from "./functionality.types";
 
-export type * from "./types";
+export type * from "./functionality.types";
 
 export const useFunctionality = <
-  TKey extends keyof toTextTypes.ReflectionKindFunctionality,
+  TKey extends keyof types.ReflectionKindFunctionality,
 >(
-  declaration: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
+  declaration: codeGenTypes.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
   name: TKey,
-): toTextTypes.ReflectionKindFunctionality[TKey] =>
+): types.ReflectionKindFunctionality[TKey] =>
   (functionalities[declaration.kind] ??
     Throw(`Implement to-text functionality for ${declaration.kind}`))[name];
 
 const functionalities: Partial<
-  Record<kind.ReflectionKind, toTextTypes.ReflectionKindFunctionality>
+  Record<kind.ReflectionKind, types.ReflectionKindFunctionality>
 > = {
+  [kind.ReflectionKind.Variable]: variables,
   [kind.ReflectionKind.Function]: functions,
   [kind.ReflectionKind.Class]: classes,
   [kind.ReflectionKind.Interface]: interfaces,

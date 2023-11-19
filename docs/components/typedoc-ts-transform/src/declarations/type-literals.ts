@@ -1,5 +1,5 @@
 import * as text from "../text";
-import * as types from "./types";
+import type * as types from "./functionality.types";
 import * as get from "./get";
 
 const getChildren = get.createGetChildren({

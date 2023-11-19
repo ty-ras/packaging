@@ -11,8 +11,9 @@ export { default as SingleSignatureContents } from "./views/SingleSignatureConte
 export { default as TopLevelElementsList } from "./views/TopLevelElementsList";
 export { default as TopLevelElementsToolbar } from "./views/TopLevelElementsToolbar";
 
-export { default as CodeFunctionalityContext } from "./context/CodeFunctionalityContextProvider";
-export { default as LinkFunctionalityContext } from "./context/LinkFunctionalityContextProvider";
+export { default as CodeFunctionalityContextProvider } from "./context/CodeFunctionalityContextProvider";
+export { default as LinkContextContextProvider } from "./context/LinkContextContextProvider";
+export { default as LinkFunctionalityContextProvider } from "./context/LinkFunctionalityContextProvider";
 
 export * as codeFunctionalityContext from "./context-def/code-functionality";
 export * as linkFunctionalityContext from "./context-def/link-functionality";

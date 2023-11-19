@@ -1,11 +1,11 @@
 import * as get from "./get";
-import type * as types from "./types";
+import type * as types from "./functionality.types";
 import * as text from "../text";
 
 const getChildren = get.createGetChildren({
   Properties: 0,
-  Accessors: 2,
-  Methods: 3,
+  Accessors: 1,
+  Methods: 2,
 });
 
 export default {

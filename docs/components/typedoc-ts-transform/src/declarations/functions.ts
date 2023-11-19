@@ -1,8 +1,7 @@
-import * as types from "./types";
-import * as text from "../text";
 import { Throw } from "throw-expression";
+import type * as types from "./functionality.types";
+import * as text from "../text";
 
-// TODO are there parameters as children of function?
 const getChildren: types.GetChildren = () => [];
 
 export default {

@@ -1,5 +1,5 @@
 import * as get from "./get";
-import type * as types from "./types";
+import type * as types from "./functionality.types";
 import * as flags from "../flags";
 import * as text from "../text";
 

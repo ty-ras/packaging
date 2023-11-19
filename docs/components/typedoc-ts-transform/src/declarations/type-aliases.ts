@@ -1,5 +1,5 @@
 import { Throw } from "throw-expression";
-import type * as types from "./types";
+import type * as types from "./functionality.types";
 
 export default {
   text: {
