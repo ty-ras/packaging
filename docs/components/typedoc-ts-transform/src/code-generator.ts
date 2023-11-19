@@ -9,15 +9,20 @@ import * as sig from "./signature";
 import * as imports from "./imports";
 import * as text from "./text";
 
-export const createCodeGenerator = (index: types.ModelIndex): CodeGenerator => {
+export const createCodeGenerator = (
+  index: types.ModelIndex,
+  importContext: imports.ImportContext = imports.createDefaultImportContext(),
+): CodeGenerator => {
   const getDeclarationTextImpl = (
     reflection: types.CodeGeneratorGenerationFunctionMap["getDeclarationText"],
   ): common.Code => {
-    const { textGenerator, importContext, declarationToText } =
-      createCallbacks(index);
+    const { textGenerator, importState, declarationToText } = createCallbacks(
+      index,
+      importContext,
+    );
     return textWithImports(
       textGenerator,
-      importContext,
+      importState,
       declarationToText(reflection, false),
     );
   };
@@ -32,12 +37,14 @@ export const createCodeGenerator = (index: types.ModelIndex): CodeGenerator => {
 
   return {
     getTypeText: (type) => {
-      const { textGenerator, importContext, typeToText } =
-        createCallbacks(index);
+      const { textGenerator, importState, typeToText } = createCallbacks(
+        index,
+        importContext,
+      );
       return {
         code: textWithImports(
           textGenerator,
-          importContext,
+          importState,
           // We must prefix with `type ___X___ = <actual type> in order to make it valid TypeScript program
           textGenerator.code`${text.text(FULL_PREFIX)}${typeToText(type)}`,
         ),
@@ -45,12 +52,14 @@ export const createCodeGenerator = (index: types.ModelIndex): CodeGenerator => {
       };
     },
     getSignatureText: (sig) => {
-      const { textGenerator, importContext, sigToText } =
-        createCallbacks(index);
+      const { textGenerator, importState, sigToText } = createCallbacks(
+        index,
+        importContext,
+      );
       const sigText = sigToText(sig, ":");
       return textWithImports(
         textGenerator,
-        importContext,
+        importState,
         textGenerator.code`export declare function ${text.text(
           sig.name,
         )}${sigText}`,
@@ -90,32 +99,18 @@ const isReference = (
 ): reflection is types.WithoutChildren<typedoc.JSONOutput.ReferenceReflection> =>
   reflection.variant === "reference";
 
-const createCallbacks = (index: types.ModelIndex) => {
+const createCallbacks = (
+  index: types.ModelIndex,
+  importContextArg: imports.ImportContext,
+) => {
   const textGenerator = text.createCodeGenerationContext();
-  const importContext: imports.ImportContext = {
-    imports: {},
-    globals: new Set(["typescript"]),
-    // TODO make this callback customizable
-    getVisiblePackageName: (packageName, { qualifiedName }) => {
-      let visiblePackageName = packageName.startsWith(TYPES_PACKAGE_PREFIX)
-        ? packageName.substring(TYPES_PACKAGE_PREFIX.length)
-        : packageName;
-      if (visiblePackageName === "node") {
-        // Node is special
-        const secondIdx = qualifiedName.indexOf('".', 1);
-        if (secondIdx < 0 || !qualifiedName.startsWith('"')) {
-          throw new Error(
-            `Named Node module import "${qualifiedName}" did not have quotes`,
-          );
-        }
-        visiblePackageName = `node:${qualifiedName.substring(1, secondIdx)}`;
-      }
-      return visiblePackageName;
-    },
-  };
+  const importState: imports.ImportState = {};
+  const importContext =
+    importContextArg ?? imports.createDefaultImportContext();
   const registerImport = imports.createRegisterImport(
     textGenerator,
     importContext,
+    importState,
     true,
   );
   const typeToText = someType.createGetSomeTypeText(
@@ -135,7 +130,7 @@ const createCallbacks = (index: types.ModelIndex) => {
   );
   return {
     textGenerator,
-    importContext,
+    importState,
     typeToText,
     sigToText,
     declarationToText,
@@ -144,11 +139,11 @@ const createCallbacks = (index: types.ModelIndex) => {
 
 const textWithImports = (
   { code }: text.CodeGenerationContext,
-  importContext: imports.ImportContext,
+  importState: imports.ImportState,
   intermediate: text.IntermediateCode,
 ): common.Code => {
   const fullCode = code`${text.join(
-    Object.entries(importContext.imports).map(
+    Object.entries(importState).map(
       ([, importInfo]) =>
         code`import type ${
           importInfo.import === "named"
@@ -223,5 +218,3 @@ const TYPE_STRING_TOKEN_PROCESSOR_MATCHERS: TokenProcessorMatchers = [
   (token2) => token2.type === "Identifier" && token2.value === TYPE_NAME,
   (token3) => token3.type === "Punctuator" && token3.value === EQUALS,
 ];
-
-const TYPES_PACKAGE_PREFIX = "@types/";

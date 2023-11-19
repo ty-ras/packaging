@@ -3,9 +3,30 @@ import type * as typedoc from "typedoc";
 import * as text from "./text";
 import type * as types from "./types";
 
+export const createDefaultImportContext = (): ImportContext => ({
+  globals: new Set(["typescript"]),
+  getVisiblePackageName: (packageName, { qualifiedName }) => {
+    let visiblePackageName = packageName.startsWith(TYPES_PACKAGE_PREFIX)
+      ? packageName.substring(TYPES_PACKAGE_PREFIX.length)
+      : packageName;
+    if (visiblePackageName === "node") {
+      // Node is special
+      const secondIdx = qualifiedName.indexOf('".', 1);
+      if (secondIdx < 0 || !qualifiedName.startsWith('"')) {
+        throw new Error(
+          `Named Node module import "${qualifiedName}" did not have quotes`,
+        );
+      }
+      visiblePackageName = `node:${qualifiedName.substring(1, secondIdx)}`;
+    }
+    return visiblePackageName;
+  },
+});
+
 export const createRegisterImport = (
   { code }: text.CodeGenerationContext,
   importContext: ImportContext,
+  imports: ImportState,
   forceToIndividual: boolean,
 ): types.RegisterImport => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -31,7 +52,7 @@ export const createRegisterImport = (
         kind = "individual";
         qName = name;
       }
-      let currentImport = importContext.imports[packageName];
+      let currentImport = imports[packageName];
       if (currentImport) {
         if (currentImport.import !== kind) {
           throw new Error(
@@ -52,7 +73,7 @@ export const createRegisterImport = (
             throw new Error("Implement functionality for new import kind");
         }
       } else {
-        importContext.imports[packageName] = currentImport = createImportInfo(
+        imports[packageName] = currentImport = createImportInfo(
           kind,
           packageName,
           name,
@@ -74,13 +95,14 @@ export const createRegisterImport = (
 };
 
 export interface ImportContext {
-  imports: Record<string, ImportInfo>;
-  globals: Set<string>;
+  globals: ReadonlySet<string>;
   getVisiblePackageName: (
     packageName: string,
     target: typedoc.JSONOutput.ReflectionSymbolId,
   ) => string;
 }
+
+export type ImportState = Record<string, ImportInfo>;
 
 export type ImportInfo = ImportInfoNamed | ImportInfoIndividual;
 
@@ -144,3 +166,5 @@ const getTypeName = (name: string, importAlias: string) => {
   }
   return substringStart === undefined ? name : name.substring(substringStart);
 };
+
+const TYPES_PACKAGE_PREFIX = "@types/";
