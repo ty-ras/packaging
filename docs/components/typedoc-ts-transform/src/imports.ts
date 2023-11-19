@@ -51,6 +51,10 @@ export const createRegisterImport = (
       if (kind === "named" && forceToIndividual) {
         kind = "individual";
         qName = name;
+        const dotIdx = qName.indexOf(".");
+        if (dotIdx > 0 && dotIdx < qName.length - 1) {
+          qName = qName.substring(dotIdx + 1);
+        }
       }
       let currentImport = imports[packageName];
       if (currentImport) {
@@ -83,7 +87,7 @@ export const createRegisterImport = (
       }
       retVal =
         currentImport.import === "individual"
-          ? code`${text.ref(name, target)}`
+          ? code`${text.ref(qName, target)}`
           : code`${text.text(`${currentImport.alias}.`)}${text.ref(
               getTypeName(name, currentImport.alias),
               target,
