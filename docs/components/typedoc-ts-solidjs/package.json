@@ -18,15 +18,48 @@
         "default": "./src/index.ts"
       }
     },
-    "./*": {
-      "types": "./src/*.tsx",
+    "./components/*": {
+      "types": "./src/components/*.tsx",
       "import": {
-        "types": "./src/*.tsx",
-        "default": "./src/*.tsx"
+        "types": "./src/components/*.tsx",
+        "default": "./src/components/*.tsx"
       },
       "require": {
-        "types": "./src/*.tsx",
-        "default": "./src/*.tsx"
+        "types": "./src/components/*.tsx",
+        "default": "./src/components/*.tsx"
+      }
+    },
+    "./context/*": {
+      "types": "./src/context/*.tsx",
+      "import": {
+        "types": "./src/context/*.tsx",
+        "default": "./src/context/*.tsx"
+      },
+      "require": {
+        "types": "./src/context/*.tsx",
+        "default": "./src/context/*.tsx"
+      }
+    },
+    "./views/*": {
+      "types": "./src/views/*.tsx",
+      "import": {
+        "types": "./src/views/*.tsx",
+        "default": "./src/views/*.tsx"
+      },
+      "require": {
+        "types": "./src/views/*.tsx",
+        "default": "./src/views/*.tsx"
+      }
+    },
+    "./*": {
+      "types": "./src/*.ts",
+      "import": {
+        "types": "./src/*.ts",
+        "default": "./src/*.ts"
+      },
+      "require": {
+        "types": "./src/*.ts",
+        "default": "./src/*.ts"
       }
     }
   },

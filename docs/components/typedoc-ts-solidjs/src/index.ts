@@ -16,4 +16,7 @@ export { default as LinkContextContextProvider } from "./context/LinkContextCont
 export { default as LinkFunctionalityContextProvider } from "./context/LinkFunctionalityContextProvider";
 
 export * as codeFunctionalityContext from "./context-def/code-functionality";
+export * as linkContext from "./context-def/link-context";
 export * as linkFunctionalityContext from "./context-def/link-functionality";
+
+export * as formatting from "./formatting";
