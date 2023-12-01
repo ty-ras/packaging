@@ -33,9 +33,11 @@ export const getChildrenInstances = (
     index = (id) =>
       childrenById[id] ?? Throw(`Children array did not have child ${id}.`);
   }
-  return groupedChildren.flatMap(({ sortedChildren }) =>
-    sortedChildren.map((childId) => index(childId)),
-  );
+  return groupedChildren
+    .flatMap(({ sortedChildren }) =>
+      sortedChildren.map((childId) => index(childId)),
+    )
+    .filter((child) => child.inheritedFrom === undefined);
 };
 
 const getGroupOrderNumber = (title: string, orders: OrderSpecifier) =>
