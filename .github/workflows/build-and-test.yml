@@ -45,7 +45,7 @@ jobs:
 
       - name: Get all global and project-specific changes
         id: changed-files-yaml
-        uses: tj-actions/changed-files@v38
+        uses: tj-actions/changed-files@v41
         with:
           dir_names: true
           dir_names_max_depth: 2
