@@ -528,10 +528,10 @@
   dependencies:
     "@ty-ras/protocol" "^2.0.0"
 
-"@ty-ras/endpoint-spec@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@ty-ras/endpoint-spec/-/endpoint-spec-2.0.1.tgz#7bdeb33d125bad3c42a959fbcd178b805a602ca9"
-  integrity sha512-mLeqUGx8t6d7jIp2aedQT0kZwh63DIjhLWdV+nCHm6KWEnaRZuTw9Q5Sv3VIW1dalTyX1mSW7T+2GWKVMN1ipA==
+"@ty-ras/endpoint-spec@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@ty-ras/endpoint-spec/-/endpoint-spec-2.1.1.tgz#bef7c85a39c0777c9bdce8eea46e9f9ecb881d12"
+  integrity sha512-M3pXOyJA8FWVSBvSPCkDXZS0O8bUlt8k9YOm7vsK2VNA00a5pmRuKU17atxT1FiS6TbhRtch704m2MgNMNr9kA==
   dependencies:
     "@ty-ras/endpoint" "^2.0.0"
     "@ty-ras/metadata" "^2.0.0"
