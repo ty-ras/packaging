@@ -4,5 +4,5 @@
  * - using `runtypes` as data validation framework
  */
 
-export * as configuration from "@ty-ras-extras/config-runtypes/string";
+export * as configuration from "@ty-ras-extras/config-runtypes/string"; // Don't export maybe-file, as that uses Node-specific file operations.
 export * as cache from "@ty-ras-extras/cache";

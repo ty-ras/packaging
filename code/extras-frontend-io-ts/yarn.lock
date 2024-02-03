@@ -396,15 +396,15 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@ty-ras-extras/cache@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras-extras/cache/-/cache-1.0.0.tgz#d1224b11a7ffc627f0f78a7b456e651aa4b68c73"
-  integrity sha512-csw/9Q7ySyRzRALsSN2xz3JGg7qBgaV0Bm031Uv5bivPK1iCLWGJfZ+st2Wf+zMLwjECsQRglB8TqCiK/Ahtqw==
+"@ty-ras-extras/cache@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras-extras/cache/-/cache-2.0.0.tgz#cabe7b8d20eddcae91f40e675cdf82cf1da9e7aa"
+  integrity sha512-yFj/g0AYruty44W6L4NFDrfy07TB94noR7FZBVU/LJHmYjBe3GiRYzkcklNlXv9md+BIEROubLumKd0u+lg7cA==
 
-"@ty-ras-extras/config-io-ts@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@ty-ras-extras/config-io-ts/-/config-io-ts-1.0.2.tgz#135103225eb31ad70c570b4a927a534679acbbc5"
-  integrity sha512-hDr+IVGC7HBC0cT094zEyfN3sWkgjto2IXe8aw1zwV77pqqijFI6HikGl+xF09pjm86R3Z89Y6eST/EH8Vfq2A==
+"@ty-ras-extras/config-io-ts@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras-extras/config-io-ts/-/config-io-ts-2.0.0.tgz#74e5447394295712cea4c6d231343ea86c8aa973"
+  integrity sha512-Pr1ctC8gqFYy+y47ZZFy/UvZmG45BTHNaaaWlxdR9hbpeXKB+rmVONhV57D4D24RTnwP37jv45M45v6q1O6YUQ==
 
 "@types/json-schema@^7.0.9":
   version "7.0.12"
