@@ -24,11 +24,7 @@ import * as epSpec from "./endpoint-spec";
  */
 export function endpointsWithOpenAPI(
   builder: epSpec.ApplicationBuilderAny,
-  creationResult: epSpecBase.EndpointsCreationResult<
-    epSpec.MetadataProviders,
-    server.ServerContext,
-    epSpec.DefaultStateInfo
-  >,
+  creationResult: EndpointsCreationResultForOpenAPI,
   openAPIPath?: string,
 ): MutableServerEndpoints;
 
@@ -67,10 +63,9 @@ export function endpointsWithOpenAPI<
     TDefaultResponseBodyContentType,
     TAdditionalDataSpecHKT
   >,
-  creationResult: epSpecBase.EndpointsCreationResult<
-    epSpec.MetadataProviders,
-    server.ServerContext,
-    epSpec.DefaultStateInfo<TAuthenticatedState, TOtherState>
+  creationResult: EndpointsCreationResultForOpenAPI<
+    TAuthenticatedState,
+    TOtherState
   >,
   responseContentType: TAllResponseBodyContentTypes,
   authState: TAuthenticatedState,
@@ -123,11 +118,7 @@ export function endpointsWithOpenAPI<
   {
     metadata,
     endpoints,
-  }: epSpecBase.EndpointsCreationResult<
-    epSpec.MetadataProviders,
-    server.ServerContext,
-    epSpec.DefaultStateInfo<TAuthenticatedState, TOtherState>
-  >,
+  }: EndpointsCreationResultForOpenAPI<TAuthenticatedState, TOtherState>,
   responseContentTypeOrOpenAPIPath?: TAllResponseBodyContentTypes | string,
   authState?: TAuthenticatedState,
   stateKeys?: TStateKeys,
@@ -228,6 +219,24 @@ export type MutableServerEndpoints<
     epSpec.DefaultStateInfo<TAuthenticatedState, TOtherState>
   >[number]
 >;
+
+/**
+ * Helper type to specify endpoint creation result of {@link endpointsWithOpenAPI}.
+ */
+export type EndpointsCreationResultForOpenAPI<
+  TAuthenticatedState extends epSpec.TStateSpecBase = epSpec.TStateSpecBase,
+  TOtherState extends epSpec.TStateSpecBase = epSpec.TStateSpecBase,
+> =
+  | epSpecBase.EndpointsCreationResult<
+      epSpec.MetadataProviders,
+      server.ServerContext,
+      epSpec.DefaultStateInfo<TAuthenticatedState, TOtherState>
+    >
+  | epSpecBase.EndpointsCreationResult<
+      epSpec.MetadataProviders,
+      never,
+      epSpec.DefaultStateInfo<TAuthenticatedState, TOtherState>
+    >;
 
 /**
  * This is the protocol interface for OpenAPI endpoint.
