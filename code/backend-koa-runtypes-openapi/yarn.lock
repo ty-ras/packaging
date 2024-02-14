@@ -502,10 +502,10 @@
   dependencies:
     "@ty-ras/protocol" "^2.0.0"
 
-"@ty-ras/endpoint-spec@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@ty-ras/endpoint-spec/-/endpoint-spec-2.1.1.tgz#bef7c85a39c0777c9bdce8eea46e9f9ecb881d12"
-  integrity sha512-M3pXOyJA8FWVSBvSPCkDXZS0O8bUlt8k9YOm7vsK2VNA00a5pmRuKU17atxT1FiS6TbhRtch704m2MgNMNr9kA==
+"@ty-ras/endpoint-spec@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras/endpoint-spec/-/endpoint-spec-2.2.0.tgz#be4975fe00dec66c10ba86486aba639b5a7c4f88"
+  integrity sha512-T1LnSduUR/+c7XsQ1YSrxOtjU5mTvCtVyRwgcRFuR+crHz7Y7c6a13ie1MZ/khUnRhPvSsjOda8NRdZKk2KR8A==
   dependencies:
     "@ty-ras/endpoint" "^2.0.0"
     "@ty-ras/metadata" "^2.0.0"
@@ -551,17 +551,17 @@
   resolved "https://registry.yarnpkg.com/@ty-ras/protocol/-/protocol-2.0.0.tgz#2cba0ceb6f891228bed881eadb3e17812152c632"
   integrity sha512-4ZGXghpSu8pdNz8oG8t36QAcYOugZ7FcfzsnGUIdK4VXIAwm5dW8d3y2JNv8w4hpa/QT6/oFUngK1H+ARrBc/Q==
 
-"@ty-ras/server-koa@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/server-koa/-/server-koa-2.2.0.tgz#adf091d12f3f07820a8be8f6bb21268d95018fc7"
-  integrity sha512-931ejD4ix10iUWrgbfK540GbqA960h4J4QuGD6S5QE8YRAKML/HRkI3CX0NTb/cC/8EWPqxf8h5eLASawMYnpg==
+"@ty-ras/server-koa@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras/server-koa/-/server-koa-2.3.0.tgz#bf5bb885340b572f26f3debf0cbdfbd8ee04da94"
+  integrity sha512-6pxxJ413+89i9h1n8Sr+Wov3neYlgqlGxAmq2AkIcBvlEL73gwK0wsfYMF1aSVwgHjx6GBWoZQK8N9YR66fE1g==
   dependencies:
-    "@ty-ras/server" "^2.2.0"
+    "@ty-ras/server" "^2.3.0"
 
-"@ty-ras/server@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/server/-/server-2.2.0.tgz#6a1dc54767241355be5202006127afea3a2ff602"
-  integrity sha512-rJwZj20uiO2tcS9Ln+5TfapdILDPcWxYbeyIDUjmbOmkv+FvMma+pVgKhozNP3iQj1mnKN2CmqgIhaxKw+bRBg==
+"@ty-ras/server@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras/server/-/server-2.3.0.tgz#f168669b29f777130823bf583341f83f0ade8ec0"
+  integrity sha512-0DhQqHHwyfDP2YJQhbxl+TAs4yDXKaBAVgs53+nCS0lr0M7Surc1MZ9AUeDQtcZJKc8FkWhUhUpt9aOQjZ89EA==
   dependencies:
     "@ty-ras/endpoint" "^2.0.0"
 

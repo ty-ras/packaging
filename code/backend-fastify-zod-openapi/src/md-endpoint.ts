@@ -5,8 +5,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type * as protocol from "@ty-ras/protocol"; // Imported only for JSDoc
 import * as dataIO from "@ty-ras/data-backend-zod";
-import type * as ep from "@ty-ras/endpoint";
 import type * as server from "@ty-ras/server-fastify";
+import type * as serverGeneric from "@ty-ras/server";
 import type * as epSpecBase from "@ty-ras/endpoint-spec";
 import * as md from "@ty-ras/metadata-openapi";
 import * as t from "zod";
@@ -23,14 +23,14 @@ import * as epSpec from "./endpoint-spec";
  * @returns All of the endpoints of `creationResult` along with endpoints to serve the OpenAPI document.
  */
 export function endpointsWithOpenAPI(
-  builder: epSpec.ApplicationBuilder,
+  builder: epSpec.ApplicationBuilderAny,
   creationResult: epSpecBase.EndpointsCreationResult<
     epSpec.MetadataProviders,
     server.ServerContext,
     epSpec.DefaultStateInfo
   >,
   openAPIPath?: string,
-): Array<ep.AppEndpoint<server.ServerContext, epSpec.DefaultStateInfo>>;
+): MutableServerEndpoints;
 
 /**
  * Given the builder and the {@link epSpecBase.EndpointsCreationResult} from the builder, returns the endpoints of given {@link epSpecBase.EndpointsCreationResult}, along with endpoint(s) to serve OpenAPI document built from the endpoints.
@@ -58,7 +58,7 @@ export function endpointsWithOpenAPI<
     ...Array<keyof TAuthenticatedState>,
   ],
 >(
-  builder: epSpec.ApplicationBuilder<
+  builder: epSpec.ApplicationBuilderAny<
     TAuthenticatedState,
     TOtherState,
     TAllRequestBodyContentTypes,
@@ -81,12 +81,7 @@ export function endpointsWithOpenAPI<
     { [P in TStateKeys[number]]: false }
   >,
   openAPIPath?: string,
-): Array<
-  ep.AppEndpoint<
-    server.ServerContext,
-    epSpec.DefaultStateInfo<TAuthenticatedState, TOtherState>
-  >
->;
+): MutableServerEndpoints<TAuthenticatedState, TOtherState>;
 
 /**
  * Given the builder and the {@link epSpecBase.EndpointsCreationResult} from the builder, returns the endpoints of given {@link epSpecBase.EndpointsCreationResult}, along with endpoint(s) to serve OpenAPI document built from the endpoints.
@@ -116,7 +111,7 @@ export function endpointsWithOpenAPI<
     ...Array<keyof TAuthenticatedState>,
   ],
 >(
-  builder: epSpec.ApplicationBuilder<
+  builder: epSpec.ApplicationBuilderAny<
     TAuthenticatedState,
     TOtherState,
     TAllRequestBodyContentTypes,
@@ -142,13 +137,8 @@ export function endpointsWithOpenAPI<
     { [P in TStateKeys[number]]: false }
   >,
   openAPIPath?: string,
-): Array<
-  ep.AppEndpoint<
-    server.ServerContext,
-    epSpec.DefaultStateInfo<TAuthenticatedState, TOtherState>
-  >
-> {
-  const noMD = builder.resetMetadataProviders();
+): MutableServerEndpoints<TAuthenticatedState, TOtherState> {
+  const noMD = builder.showContextToEndpoints().resetMetadataProviders();
   const noURLParameters = noMD.url``({});
   const params: ParametersValidation<
     TAuthenticatedState,
@@ -231,6 +221,19 @@ export function endpointsWithOpenAPI<
       .endpoints,
   ];
 }
+
+/**
+ * Helper type to specify return type of {@link endpointsWithOpenAPI}.
+ */
+export type MutableServerEndpoints<
+  TAuthenticatedState extends epSpec.TStateSpecBase = epSpec.TStateSpecBase,
+  TOtherState extends epSpec.TStateSpecBase = epSpec.TStateSpecBase,
+> = Array<
+  serverGeneric.ServerEndpoints<
+    server.ServerContext,
+    epSpec.DefaultStateInfo<TAuthenticatedState, TOtherState>
+  >[number]
+>;
 
 /**
  * This is the protocol interface for OpenAPI endpoint.

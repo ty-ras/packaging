@@ -48,6 +48,7 @@ export function newBuilder<
     TDefaultResponseBodyContentType
   >,
 ): ApplicationBuilder<
+  never,
   TAuthenticatedState,
   TOtherState,
   TAllRequestBodyContentTypes,
@@ -80,6 +81,7 @@ export function newBuilder<
     TDefaultResponseBodyContentType
   >,
 ): ApplicationBuilder<
+  never,
   TAuthenticatedState,
   TOtherState,
   TAllRequestBodyContentTypes,
@@ -133,9 +135,10 @@ export function newBuilder<
 }
 
 /**
- * This type specializes generic {@link epSpec.ApplicationBuilder} type to use `io-ts` and OpenAPI -specific type parameters where possible.
+ * This type specializes generic {@link epSpec.ApplicationBuilderGeneric} type to use `io-ts` and OpenAPI -specific type parameters where possible.
  */
 export type ApplicationBuilder<
+  TServerContext = never,
   TAuthenticatedState extends TStateSpecBase = typeof DEFAULT_AUTHENTICATED_STATE,
   TOtherState extends TStateSpecBase = typeof DEFAULT_NOT_AUTHENTICATED_STATE,
   TAllRequestBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
@@ -150,12 +153,47 @@ export type ApplicationBuilder<
   DefaultStateHKT<TAuthenticatedState, TOtherState>,
   MetadataProviders,
   server.ServerContext,
+  TServerContext,
   TAllRequestBodyContentTypes,
   TAllResponseBodyContentTypes,
   TDefaultRequestBodyContentType,
   TDefaultResponseBodyContentType,
   TAdditionalDataSpecHKT
 >;
+
+/**
+ * This is helper type to have both {@link server.ServerContext} and `never` as context types of {@link ApplicationBuilder}.
+ */
+export type ApplicationBuilderAny<
+  TAuthenticatedState extends TStateSpecBase = typeof DEFAULT_AUTHENTICATED_STATE,
+  TOtherState extends TStateSpecBase = typeof DEFAULT_NOT_AUTHENTICATED_STATE,
+  TAllRequestBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
+  TAllResponseBodyContentTypes extends string = typeof dataIO.CONTENT_TYPE,
+  TDefaultRequestBodyContentType extends TAllRequestBodyContentTypes = TAllRequestBodyContentTypes,
+  TDefaultResponseBodyContentType extends TAllResponseBodyContentTypes = TAllResponseBodyContentTypes,
+  // TMetadataProviders extends epSpec.TMetadataProvidersBase = MetadataProviders,
+  TAdditionalDataSpecHKT extends epSpec.EndpointSpecAdditionalDataHKTBase = epSpec.NoAdditionalSpecDataHKT,
+> =
+  | ApplicationBuilder<
+      server.ServerContext,
+      TAuthenticatedState,
+      TOtherState,
+      TAllRequestBodyContentTypes,
+      TAllResponseBodyContentTypes,
+      TDefaultRequestBodyContentType,
+      TDefaultResponseBodyContentType,
+      TAdditionalDataSpecHKT
+    >
+  | ApplicationBuilder<
+      never,
+      TAuthenticatedState,
+      TOtherState,
+      TAllRequestBodyContentTypes,
+      TAllResponseBodyContentTypes,
+      TDefaultRequestBodyContentType,
+      TDefaultResponseBodyContentType,
+      TAdditionalDataSpecHKT
+    >;
 
 /**
  * This is the {@link dataBE.MaterializeStateInfo} type for {@link DefaultStateHKT}.

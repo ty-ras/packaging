@@ -516,10 +516,10 @@
   dependencies:
     "@ty-ras/protocol" "^2.0.0"
 
-"@ty-ras/endpoint-spec@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@ty-ras/endpoint-spec/-/endpoint-spec-2.1.1.tgz#bef7c85a39c0777c9bdce8eea46e9f9ecb881d12"
-  integrity sha512-M3pXOyJA8FWVSBvSPCkDXZS0O8bUlt8k9YOm7vsK2VNA00a5pmRuKU17atxT1FiS6TbhRtch704m2MgNMNr9kA==
+"@ty-ras/endpoint-spec@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras/endpoint-spec/-/endpoint-spec-2.2.0.tgz#be4975fe00dec66c10ba86486aba639b5a7c4f88"
+  integrity sha512-T1LnSduUR/+c7XsQ1YSrxOtjU5mTvCtVyRwgcRFuR+crHz7Y7c6a13ie1MZ/khUnRhPvSsjOda8NRdZKk2KR8A==
   dependencies:
     "@ty-ras/endpoint" "^2.0.0"
     "@ty-ras/metadata" "^2.0.0"
@@ -565,17 +565,17 @@
   resolved "https://registry.yarnpkg.com/@ty-ras/protocol/-/protocol-2.0.0.tgz#2cba0ceb6f891228bed881eadb3e17812152c632"
   integrity sha512-4ZGXghpSu8pdNz8oG8t36QAcYOugZ7FcfzsnGUIdK4VXIAwm5dW8d3y2JNv8w4hpa/QT6/oFUngK1H+ARrBc/Q==
 
-"@ty-ras/server-fastify@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/server-fastify/-/server-fastify-2.0.0.tgz#3f130f2d0fb6e70c5854dd9f0c95421fa4419538"
-  integrity sha512-RI0SsJs9SHfK5/1A5w/9ytQntrJ2q8c9F8OTbmIUvKsRHpIIeUEiptfy/NNgsXdR8PW/vlFDK6NMTJs549b2ng==
+"@ty-ras/server-fastify@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras/server-fastify/-/server-fastify-2.1.0.tgz#ced52bfc47a318e4738b2862c7b02838ef3a9562"
+  integrity sha512-mvD5L+3LYPRH1smbltFgCn0ofgNjDUuys3ygEudSYpyvfkTDO1yqZm/ns9SfaWHAUxw0LHQH6L+h5XxwbuZKHA==
   dependencies:
-    "@ty-ras/server" "^2.2.0"
+    "@ty-ras/server" "^2.3.0"
 
-"@ty-ras/server@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@ty-ras/server/-/server-2.2.0.tgz#6a1dc54767241355be5202006127afea3a2ff602"
-  integrity sha512-rJwZj20uiO2tcS9Ln+5TfapdILDPcWxYbeyIDUjmbOmkv+FvMma+pVgKhozNP3iQj1mnKN2CmqgIhaxKw+bRBg==
+"@ty-ras/server@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@ty-ras/server/-/server-2.3.0.tgz#f168669b29f777130823bf583341f83f0ade8ec0"
+  integrity sha512-0DhQqHHwyfDP2YJQhbxl+TAs4yDXKaBAVgs53+nCS0lr0M7Surc1MZ9AUeDQtcZJKc8FkWhUhUpt9aOQjZ89EA==
   dependencies:
     "@ty-ras/endpoint" "^2.0.0"
 

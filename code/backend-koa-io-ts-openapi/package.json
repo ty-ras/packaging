@@ -1,6 +1,6 @@
 {
   "name": "@ty-ras/backend-koa-io-ts-openapi",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "author": {
     "name": "Stanislav Muhametsin",
     "email": "346799+stazz@users.noreply.github.com",
@@ -45,9 +45,9 @@
     }
   },
   "dependencies": {
-    "@ty-ras/server-koa": "^2.2.0",
+    "@ty-ras/server-koa": "^2.3.0",
     "@ty-ras/data-backend-io-ts": "^2.0.2",
-    "@ty-ras/endpoint-spec": "^2.1.1",
+    "@ty-ras/endpoint-spec": "^2.2.0",
     "@ty-ras/metadata-jsonschema-io-ts": "^2.0.1",
     "@ty-ras/metadata-openapi": "^2.0.2",
     "@ty-ras/state-io-ts": "^2.0.1",
